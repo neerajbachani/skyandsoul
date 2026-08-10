@@ -1,0 +1,39 @@
+import Image from "next/image";
+import { Button } from "@/components/ui/Button";
+
+export function EditorialBanner() {
+  return (
+    <section className="bg-sky">
+      <div className="mx-auto grid max-w-7xl lg:grid-cols-2">
+        <div className="relative min-h-[320px] lg:min-h-[480px]">
+          <Image
+            src="https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=1200&q=80"
+            alt="Soft nursery keepsakes arranged with greenery"
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="object-cover"
+          />
+        </div>
+        <div className="flex items-center px-5 py-16 sm:px-12 lg:px-16 lg:py-20">
+          <div className="max-w-md">
+            <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-earth">
+              Gifting
+            </p>
+            <h2 className="mt-4 font-serif text-3xl font-medium leading-snug text-chocolate sm:text-4xl">
+              The Perfect Gift for New Beginnings
+            </h2>
+            <p className="mt-5 font-serif text-lg leading-relaxed text-chocolate/80">
+              Curated gift boxes filled with heirloom blankets, crochet companions,
+              and memory keepsakes — ready to welcome the ones we love.
+            </p>
+            <div className="mt-8">
+              <Button href="#gift-boxes" showArrow>
+                Shop Gift Collection
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

@@ -7,16 +7,13 @@ import { ProductGrid } from "@/components/catalog/ProductGrid";
 import { FrameItLanding } from "@/components/catalog/FrameItLanding";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { Button } from "@/components/ui/Button";
-import { getCategoryBySlug, listCategories } from "@/lib/catalog";
+import { getCategoryBySlug } from "@/lib/catalog";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export async function generateStaticParams() {
-  const categories = await listCategories();
-  return categories.map((category) => ({ slug: category.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,

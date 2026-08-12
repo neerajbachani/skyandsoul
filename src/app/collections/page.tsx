@@ -11,6 +11,8 @@ export const metadata: Metadata = {
     "Explore handmade blankets, crochet toys, frames, and little extras from Sky n Soul.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function CollectionsPage() {
   const [categories, featured] = await Promise.all([
     listCategories(),

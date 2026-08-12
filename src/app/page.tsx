@@ -11,6 +11,8 @@ import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { listCategories, listProducts } from "@/lib/catalog";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [categories, featured] = await Promise.all([
     listCategories(),

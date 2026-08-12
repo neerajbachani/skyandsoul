@@ -9,7 +9,6 @@ import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { SiteShell } from "@/components/layout/SiteShell";
 import {
   getProductBySlug,
-  listProducts,
 } from "@/lib/catalog";
 import { formatInr } from "@/lib/money";
 
@@ -17,10 +16,7 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export async function generateStaticParams() {
-  const { products } = await listProducts({ limit: 100 });
-  return products.map((product) => ({ slug: product.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,

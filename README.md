@@ -74,3 +74,34 @@ Open [http://localhost:3000](http://localhost:3000).
 
 - Collections, product pages, search, and content pages
 - Frame It Your Way marketing preview (interactive configurator still later)
+
+## Deploy on Vercel
+
+**Build command:** `npm run build` (default — runs `prisma generate && next build`)  
+**Install command:** `npm install` (default — `postinstall` also runs `prisma generate`)  
+**Output directory:** leave default (Next.js)
+
+Catalog pages are rendered dynamically at request time, so the build does **not** need a live database. You still need Postgres and env vars for the deployed app to work.
+
+1. Create a Postgres database ([Neon](https://neon.tech), [Supabase](https://supabase.com), or Vercel Postgres).
+2. In Vercel → Project → **Environment Variables**, add:
+
+| Variable | Required | Notes |
+|----------|----------|-------|
+| `DATABASE_URL` | Yes | Postgres connection string |
+| `JWT_SECRET` | Yes | Long random string for auth cookies |
+| `NEXT_PUBLIC_APP_URL` | Yes | Production URL, e.g. `https://skyandsoul.vercel.app` |
+| `RAZORPAY_KEY_ID` | For checkout | Server key |
+| `RAZORPAY_KEY_SECRET` | For checkout | Server secret |
+| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | For checkout | Client Checkout.js key |
+| `SMTP_*` / `SMTP_FROM` | Optional | Order emails skipped if unset |
+| `ADMIN_CONTACT_EMAIL` | Optional | Admin order notifications |
+
+3. After first deploy, run migrations and seed against production (from your machine or CI):
+
+```bash
+DATABASE_URL="your-production-url" npm run db:push
+DATABASE_URL="your-production-url" npm run db:seed
+```
+
+4. Redeploy or visit the site — homepage and collections load from the database at runtime.

@@ -45,7 +45,7 @@ export function Newsletter() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="Your email address"
-              className="min-h-12 flex-1 border border-chocolate/20 bg-canvas px-4 font-sans text-sm text-chocolate placeholder:text-chocolate/40 focus:border-earth focus:outline-none"
+              className="min-h-12 flex-1 border border-chocolate/20 bg-white px-4 font-sans text-sm text-chocolate placeholder:text-chocolate/40 focus:border-earth focus:outline-none"
             />
             <Button type="submit" variant="filled" className="min-h-12">
               Subscribe

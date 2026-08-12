@@ -2,13 +2,20 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { CartIcon } from "@/components/cart/CartIcon";
 import { MobileNav } from "@/components/layout/MobileNav";
+import { useAuthStatus, useLogout } from "@/hooks/useAuth";
 import { NAV_LINKS, SITE } from "@/lib/constants";
 
 export function Header() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const { isAuthenticated, user, isLoading } = useAuthStatus();
+  const logout = useLogout();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -31,63 +38,124 @@ export function Header() {
           scrolled ? "shadow-[0_1px_0_rgba(75,50,34,0.08)]" : ""
         }`}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 lg:px-8">
-          <Link href="/" className="flex shrink-0 items-center gap-3">
+        <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-4 px-5 py-4 lg:grid-cols-[auto_1fr_auto] lg:px-8">
+          <Link href="/" className="flex shrink-0 items-center justify-self-start">
             <Image
-              src="/logo.png"
-              alt={`${SITE.name} logo`}
-              width={52}
-              height={52}
-              className="h-12 w-12 rounded-full object-cover sm:h-[52px] sm:w-[52px]"
+              src="/logo-horizontal.png"
+              alt={`${SITE.name} — ${SITE.tagline}`}
+              width={450}
+              height={106}
+              className="h-12 w-auto object-contain sm:h-14"
+              style={{ width: "auto", height: "auto", maxHeight: "3.5rem" }}
               priority
             />
-            <div className="hidden min-[400px]:block">
-              <p className="font-serif text-xl leading-none text-earth sm:text-2xl">
-                {SITE.name.toLowerCase()}
-              </p>
-              <p className="mt-1 font-sans text-[9px] uppercase tracking-[0.18em] text-chocolate/70">
-                {SITE.tagline}
-              </p>
-            </div>
           </Link>
 
           <nav
-            className="hidden items-center lg:flex"
+            className="hidden items-center justify-center lg:flex"
             aria-label="Primary"
           >
-            {NAV_LINKS.map((link, index) => (
-              <span key={link.label} className="flex items-center">
-                {index > 0 ? (
-                  <span
-                    className="mx-3 h-3 w-px bg-chocolate/25"
-                    aria-hidden="true"
-                  />
-                ) : null}
-                <Link
-                  href={link.href}
-                  className="font-sans text-[11px] font-medium uppercase tracking-[0.16em] text-chocolate transition-colors hover:text-earth"
-                >
-                  {link.label}
-                </Link>
-              </span>
-            ))}
+            {NAV_LINKS.map((link, index) => {
+              const isActive =
+                pathname === link.href ||
+                (link.href !== "/collections" &&
+                  pathname.startsWith(link.href));
+
+              return (
+                <span key={link.label} className="flex items-center">
+                  {index > 0 ? (
+                    <span
+                      className="mx-2 select-none font-sans text-[10px] text-chocolate/30 xl:mx-3"
+                      aria-hidden="true"
+                    >
+                      |
+                    </span>
+                  ) : null}
+                  <Link
+                    href={link.href}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`whitespace-nowrap font-sans text-[10px] font-medium uppercase tracking-[0.14em] transition-colors hover:text-earth xl:text-[11px] xl:tracking-[0.16em] ${
+                      isActive ? "text-earth" : "text-chocolate"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </span>
+              );
+            })}
           </nav>
 
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
+          <div className="relative flex items-center justify-self-end gap-1">
+            <Link
+              href="/search"
               className="flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth"
               aria-label="Search"
             >
               <SearchIcon />
-            </button>
+            </Link>
+
+            {isLoading ? (
+              <span className="flex h-11 w-11 items-center justify-center text-chocolate/30">
+                <AccountIcon />
+              </span>
+            ) : isAuthenticated ? (
+              <div className="relative">
+                <button
+                  type="button"
+                  className="flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth"
+                  aria-label="Account menu"
+                  aria-expanded={accountOpen}
+                  onClick={() => setAccountOpen((open) => !open)}
+                >
+                  <AccountIcon />
+                </button>
+                {accountOpen ? (
+                  <div className="absolute right-0 top-full z-40 mt-2 w-48 border border-chocolate/10 bg-white py-2 shadow-md">
+                    <p className="truncate px-4 py-2 font-sans text-xs text-chocolate/60">
+                      {user?.email}
+                    </p>
+                    <Link
+                      href="/account/orders"
+                      className="block px-4 py-2 font-sans text-xs uppercase tracking-[0.12em] text-chocolate hover:bg-canvas"
+                      onClick={() => setAccountOpen(false)}
+                    >
+                      Orders
+                    </Link>
+                    <button
+                      type="button"
+                      className="block w-full px-4 py-2 text-left font-sans text-xs uppercase tracking-[0.12em] text-chocolate hover:bg-canvas"
+                      onClick={async () => {
+                        await logout.mutateAsync();
+                        setAccountOpen(false);
+                      }}
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth"
+                aria-label="Sign in"
+              >
+                <AccountIcon />
+              </Link>
+            )}
+
             <button
               type="button"
-              className="flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth"
-              aria-label="Cart"
+              className="flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-chocolate"
+              aria-label="Wishlist (coming soon)"
+              title="Wishlist coming soon"
+              disabled
             >
-              <BagIcon />
+              <HeartIcon />
             </button>
+
+            <CartIcon />
+
             <button
               type="button"
               className="flex h-11 w-11 items-center justify-center text-chocolate lg:hidden"
@@ -122,7 +190,7 @@ function SearchIcon() {
   );
 }
 
-function BagIcon() {
+function AccountIcon() {
   return (
     <svg
       width="20"
@@ -133,8 +201,24 @@ function BagIcon() {
       strokeWidth="1.5"
       aria-hidden="true"
     >
-      <path d="M6 8h12l-1 12H7L6 8z" />
-      <path d="M9 8V7a3 3 0 016 0v1" />
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M5 19c1.8-3.2 4.2-4.5 7-4.5s5.2 1.3 7 4.5" />
+    </svg>
+  );
+}
+
+function HeartIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden="true"
+    >
+      <path d="M12 20s-7-4.5-7-10a4 4 0 017-2.5A4 4 0 0119 10c0 5.5-7 10-7 10z" />
     </svg>
   );
 }

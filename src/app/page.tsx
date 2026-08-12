@@ -9,18 +9,24 @@ import { Testimonials } from "@/components/home/Testimonials";
 import { ValueProps } from "@/components/home/ValueProps";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { listCategories, listProducts } from "@/lib/catalog";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [categories, featured] = await Promise.all([
+    listCategories(),
+    listProducts({ featured: true, limit: 4 }),
+  ]);
+
   return (
     <>
       <AnnouncementBar />
       <Header />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <Hero />
         <BrandStory />
-        <CategoryGrid />
+        <CategoryGrid categories={categories} />
         <ValueProps />
-        <FeaturedProducts />
+        <FeaturedProducts products={featured.products} />
         <EditorialBanner />
         <Testimonials />
         <Newsletter />

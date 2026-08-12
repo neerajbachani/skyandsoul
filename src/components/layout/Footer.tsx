@@ -2,31 +2,26 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   FOOTER_CARE_LINKS,
+  FOOTER_LEGAL_LINKS,
   FOOTER_SHOP_LINKS,
   SITE,
+  SOCIAL_LINKS,
 } from "@/lib/constants";
+import type { SocialLink as SocialLinkType } from "@/lib/types";
 
 export function Footer() {
   return (
     <footer className="bg-chocolate text-white">
       <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 lg:grid-cols-12 lg:gap-8 lg:py-20">
         <div className="lg:col-span-4">
-          <Link href="/" className="inline-flex items-center gap-3">
+          <Link href="/" className="inline-flex items-center">
             <Image
               src="/logo.png"
-              alt={SITE.name}
-              width={56}
-              height={56}
-              className="h-14 w-14 rounded-full object-cover"
+              alt={`${SITE.name} — ${SITE.tagline}`}
+              width={72}
+              height={72}
+              className="h-16 w-16 rounded-full object-cover ring-1 ring-white/15"
             />
-            <div>
-              <p className="font-serif text-2xl text-white/95">
-                {SITE.name.toLowerCase()}
-              </p>
-              <p className="mt-1 font-sans text-[10px] uppercase tracking-[0.18em] text-white/60">
-                {SITE.tagline}
-              </p>
-            </div>
           </Link>
           <p className="mt-6 max-w-sm font-serif text-lg leading-relaxed text-white/75">
             Handmade keepsakes for the little moments that become forever.
@@ -77,15 +72,9 @@ export function Footer() {
             Stories, new arrivals, and quiet moments from the nest.
           </p>
           <div className="mt-5 flex gap-4">
-            <SocialLink href="#" label="Instagram">
-              IG
-            </SocialLink>
-            <SocialLink href="#" label="Pinterest">
-              PI
-            </SocialLink>
-            <SocialLink href="#" label="Email">
-              EM
-            </SocialLink>
+            {SOCIAL_LINKS.map((link) => (
+              <SocialLink key={link.network} link={link} />
+            ))}
           </div>
         </div>
       </div>
@@ -95,31 +84,77 @@ export function Footer() {
           <p className="font-sans text-xs text-white/50">
             © {new Date().getFullYear()} {SITE.name}. All rights reserved.
           </p>
-          <p className="font-sans text-xs text-white/50">
-            Crafted with love · Built to last
-          </p>
+          <nav
+            aria-label="Legal"
+            className="flex flex-wrap items-center gap-x-4 gap-y-2"
+          >
+            {FOOTER_LEGAL_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="font-sans text-xs text-white/50 transition-colors hover:text-white/80"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>
   );
 }
 
-function SocialLink({
-  href,
-  label,
-  children,
-}: {
-  href: string;
-  label: string;
-  children: React.ReactNode;
-}) {
+function SocialLink({ link }: { link: SocialLinkType }) {
+  const isExternal = link.href.startsWith("http");
+
   return (
     <Link
-      href={href}
-      aria-label={label}
-      className="flex h-10 w-10 items-center justify-center border border-white/25 font-sans text-[10px] tracking-[0.12em] text-white/80 transition-colors hover:border-sky hover:text-sky"
+      href={link.href}
+      aria-label={link.label}
+      {...(isExternal
+        ? { target: "_blank", rel: "noopener noreferrer" }
+        : {})}
+      className="flex h-10 w-10 items-center justify-center border border-white/25 text-white/80 transition-colors hover:border-sky hover:text-sky"
     >
-      {children}
+      <SocialIcon network={link.network} />
     </Link>
+  );
+}
+
+function SocialIcon({ network }: { network: SocialLinkType["network"] }) {
+  const common = {
+    width: 18,
+    height: 18,
+    viewBox: "0 0 24 24",
+    fill: "none" as const,
+    stroke: "currentColor",
+    strokeWidth: 1.5,
+    "aria-hidden": true as const,
+  };
+
+  if (network === "instagram") {
+    return (
+      <svg {...common}>
+        <rect x="3" y="3" width="18" height="18" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none" />
+      </svg>
+    );
+  }
+
+  if (network === "pinterest") {
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7.5c-2.2 0-3.8 1.4-3.8 3.4 0 1.3.5 2.1 1.6 2.4.1 0 .2 0 .2-.1l.4-1.5s0-.2-.1-.2c-.4-.4-.6-.9-.6-1.5 0-1.4 1.1-2.6 2.9-2.6 1.6 0 2.5 1 2.5 2.3 0 1.8-.8 3-2 3-.6 0-1.1-.5-1-.1l.4 1.6c.1.5.2 1 .3 1.5.6-.1 1.1-.4 1.6-.7C15.9 14.9 17 13 17 10.6 17 8.3 15 6.5 12 6.5" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg {...common}>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M4 7l8 6 8-6" />
+    </svg>
   );
 }

@@ -1,9 +1,17 @@
 import { CategoryCard } from "@/components/ui/CategoryCard";
-import { CATEGORIES } from "@/lib/constants";
+import type { CategorySummary } from "@/lib/types";
 
-export function CategoryGrid() {
+type CategoryGridProps = {
+  categories: CategorySummary[];
+};
+
+export function CategoryGrid({ categories }: CategoryGridProps) {
+  const visible = categories.filter(
+    (category) => category.slug !== "frame-it-your-way",
+  );
+
   return (
-    <section id="shop" className="bg-white px-5 py-6 sm:px-8 sm:py-10">
+    <section id="shop" className="bg-white px-5 py-20 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="mb-10 text-center sm:mb-14">
           <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage">
@@ -14,10 +22,8 @@ export function CategoryGrid() {
           </h2>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
-          {CATEGORIES.map((category) => (
-            <div key={category.id} id={category.id}>
-              <CategoryCard category={category} />
-            </div>
+          {visible.map((category) => (
+            <CategoryCard key={category.id} category={category} />
           ))}
         </div>
       </div>

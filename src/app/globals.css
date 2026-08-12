@@ -29,6 +29,10 @@ body {
   font-family: var(--font-serif), Georgia, serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 ::selection {
   background: var(--color-sky);
   color: var(--color-chocolate);

@@ -27,7 +27,7 @@ const base =
 const variants: Record<Variant, string> = {
   text: "bg-transparent text-chocolate underline underline-offset-[6px] decoration-chocolate/40 hover:text-earth hover:decoration-earth",
   filled:
-    "bg-chocolate px-7 py-3.5 text-white no-underline hover:bg-earth focus-visible:outline-chocolate",
+    "bg-chocolate px-7 py-3.5 text-white no-underline hover:bg-earth active:scale-[0.98] focus-visible:outline-chocolate",
   ghost:
     "bg-white px-5 py-3 text-chocolate no-underline shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300",
 };

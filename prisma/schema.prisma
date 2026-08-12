@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  slug        String    @unique
+  name        String
+  description String
+  image       String
+  imageAlt    String
+  sortOrder   Int       @default(0)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+}
+
+model Product {
+  id               String     @id @default(uuid())
+  slug             String     @unique
+  name             String
+  tagline          String?
+  description      String     @db.Text
+  material         String?
+  size             String?
+  ageRange         String?
+  features         String[]
+  careInstructions String[]
+  images           String[]
+  imageAlt         String
+  price            Int
+  categoryId       String
+  category         Category   @relation(fields: [categoryId], references: [id])
+  isFeatured       Boolean    @default(false)
+  sortOrder        Int        @default(0)
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@index([categoryId])
+  @@index([isFeatured])
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  password  String
+  name      String?
+  phone     String?
+  cartItems CartItem[]
+  orders    Order[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  quantity  Int      @default(1)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+model Order {
+  id                String        @id @default(uuid())
+  orderNumber       String        @unique
+  userId            String
+  user              User          @relation(fields: [userId], references: [id])
+  items             OrderItem[]
+  subtotal          Int
+  shippingFee       Int           @default(0)
+  discount          Int           @default(0)
+  total             Int
+  status            OrderStatus   @default(PENDING)
+  paymentStatus     PaymentStatus @default(PENDING)
+  paymentMethod     PaymentMethod @default(ONLINE)
+  razorpayOrderId   String?
+  razorpayPaymentId String?       @unique
+  razorpaySignature String?
+  shippingName      String
+  shippingPhone     String
+  shippingAddress   String
+  shippingCity      String
+  shippingState     String
+  shippingPincode   String
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([orderNumber])
+}
+
+model OrderItem {
+  id           String  @id @default(uuid())
+  orderId      String
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product @relation(fields: [productId], references: [id])
+  productName  String
+  productImage String
+  quantity     Int
+  price        Int
+  total        Int
+  createdAt    DateTime @default(now())
+
+  @@index([orderId])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  ONLINE
+}

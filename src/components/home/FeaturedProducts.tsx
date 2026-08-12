@@ -1,8 +1,12 @@
 import { Button } from "@/components/ui/Button";
 import { ProductCard } from "@/components/ui/ProductCard";
-import { PRODUCTS } from "@/lib/constants";
+import type { ProductWithCategory } from "@/lib/types";
 
-export function FeaturedProducts() {
+type FeaturedProductsProps = {
+  products: ProductWithCategory[];
+};
+
+export function FeaturedProducts({ products }: FeaturedProductsProps) {
   return (
     <section className="bg-white px-5 py-20 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-7xl">
@@ -15,12 +19,12 @@ export function FeaturedProducts() {
               Pieces from the Nest
             </h2>
           </div>
-          <Button href="#shop" showArrow>
+          <Button href="/collections" showArrow>
             View All
           </Button>
         </div>
         <div className="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4 lg:gap-x-6">
-          {PRODUCTS.map((product) => (
+          {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

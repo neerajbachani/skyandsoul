@@ -23,12 +23,12 @@ export function EditorialBanner() {
               The Perfect Gift for New Beginnings
             </h2>
             <p className="mt-5 font-serif text-lg leading-relaxed text-chocolate/80">
-              Curated gift boxes filled with heirloom blankets, crochet companions,
-              and memory keepsakes — ready to welcome the ones we love.
+              Heirloom blankets, crochet companions, and Frame It Your Way keepsakes —
+              ready to welcome the ones we love.
             </p>
             <div className="mt-8">
-              <Button href="#gift-boxes" showArrow>
-                Shop Gift Collection
+              <Button href="/collections/blankets" showArrow>
+                Shop Blankets
               </Button>
             </div>
           </div>

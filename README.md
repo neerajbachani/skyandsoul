@@ -56,7 +56,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | Script | Purpose |
 |--------|---------|
 | `npm run dev` | Next.js dev server |
-| `npm run build` | Prisma generate + production build |
+| `npm run build` | Prisma generate + production build (webpack) |
 | `npm run db:push` | Sync Prisma schema to DB |
 | `npm run db:seed` | Seed categories + Google Doc blanket copy |
 | `npm run db:studio` | Prisma Studio |

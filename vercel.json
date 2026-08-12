@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "build": {
+    "env": {
+      "DATABASE_URL": "postgresql://build:build@localhost:5432/build?schema=public"
+    }
+  }
+}

@@ -78,13 +78,13 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Deploy on Vercel
 
 **Build command:** `npm run build` (default — runs `prisma generate && next build`)  
-**Install command:** `npm install` (default — `postinstall` also runs `prisma generate`)  
+**Install command:** `npm install` (default)  
 **Output directory:** leave default (Next.js)
 
 Catalog pages are rendered dynamically at request time, so the build does **not** need a live database. You still need Postgres and env vars for the deployed app to work.
 
 1. Create a Postgres database ([Neon](https://neon.tech), [Supabase](https://supabase.com), or Vercel Postgres).
-2. In Vercel → Project → **Environment Variables**, add:
+2. In Vercel → Project → **Environment Variables**, add (required before deploy succeeds):
 
 | Variable | Required | Notes |
 |----------|----------|-------|

@@ -88,7 +88,8 @@ Catalog pages are rendered dynamically at request time, so the build does **not*
 
 | Variable | Required | Notes |
 |----------|----------|-------|
-| `DATABASE_URL` | Yes | Postgres connection string |
+| `DATABASE_URL` | Yes | Neon **pooler** URL with `?sslmode=require&pgbouncer=true&connect_timeout=15` |
+| `DIRECT_URL` | Yes (Neon) | Neon **direct** URL (hostname without `-pooler`) with `?sslmode=require` |
 | `JWT_SECRET` | Yes | Long random string for auth cookies |
 | `NEXT_PUBLIC_APP_URL` | Yes | Production URL, e.g. `https://skyandsoul.vercel.app` |
 | `RAZORPAY_KEY_ID` | For checkout | Server key |
@@ -105,3 +106,12 @@ DATABASE_URL="your-production-url" npm run db:seed
 ```
 
 4. Redeploy or visit the site — homepage and collections load from the database at runtime.
+
+**Neon on Vercel checklist**
+
+- Do **not** wrap values in quotes in the Vercel dashboard.
+- Remove `channel_binding=require` from connection strings.
+- Use the pooler host for `DATABASE_URL` and the direct host for `DIRECT_URL` (see `.env.example`).
+- Enable variables for **Production** (and Preview).
+- After changing env vars, click **Redeploy** — old deployments keep old values.
+- Verify runtime DB access at `/api/health` (should return `{ ok: true, categories: 5 }`).

@@ -16,16 +16,35 @@ export default function ContactPage() {
       title="Contact Us"
       intro="Tell us what you are looking for — a blanket, a toy, a Frame It Your Way idea, or a gift note."
     >
-      <p>
-        Prefer email? Write to{" "}
-        <a
-          href={`mailto:${SITE.email}`}
-          className="text-earth underline underline-offset-4"
-        >
-          {SITE.email}
-        </a>
-        .
-      </p>
+      <div className="space-y-4">
+        <p>
+          Prefer email? Write to{" "}
+          <a
+            href={`mailto:${SITE.email}`}
+            className="text-earth underline underline-offset-4"
+          >
+            {SITE.email}
+          </a>
+          .
+        </p>
+        <div>
+          <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-earth">
+            Contact details
+          </p>
+          <ul className="mt-3 space-y-2">
+            {SITE.phones.map((phone) => (
+              <li key={phone}>
+                <a
+                  href={`tel:${phone}`}
+                  className="font-serif text-lg text-chocolate/80 underline-offset-4 hover:text-earth hover:underline"
+                >
+                  {phone}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
       <ContactForm />
     </ContentPageLayout>
   );

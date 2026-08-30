@@ -11,25 +11,26 @@ import type { SocialLink as SocialLinkType } from "@/lib/types";
 
 export function Footer() {
   return (
-    <footer className="bg-chocolate text-white">
+    <footer className="bg-sky text-chocolate">
       <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 lg:grid-cols-12 lg:gap-8 lg:py-20">
         <div className="lg:col-span-4">
           <Link href="/" className="inline-flex items-center">
             <Image
-              src="/logo.png"
+              src="/logo-horizontal.png"
               alt={`${SITE.name} — ${SITE.tagline}`}
-              width={72}
-              height={72}
-              className="h-16 w-16 rounded-full object-cover ring-1 ring-white/15"
+              width={450}
+              height={106}
+              className="h-20 w-auto object-contain sm:h-24"
+              style={{ width: "auto", height: "auto", maxHeight: "6rem" }}
             />
           </Link>
-          <p className="mt-6 max-w-sm font-serif text-lg leading-relaxed text-white/75">
+          <p className="mt-6 max-w-sm font-serif text-lg leading-relaxed text-chocolate/75">
             Handmade keepsakes for the little moments that become forever.
           </p>
         </div>
 
         <div className="lg:col-span-2">
-          <h2 className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sky">
+          <h2 className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-earth">
             Shop
           </h2>
           <ul className="mt-5 space-y-3">
@@ -37,7 +38,7 @@ export function Footer() {
               <li key={link.label}>
                 <Link
                   href={link.href}
-                  className="font-sans text-sm text-white/75 transition-colors hover:text-white"
+                  className="font-sans text-sm text-chocolate/75 transition-colors hover:text-chocolate"
                 >
                   {link.label}
                 </Link>
@@ -47,7 +48,7 @@ export function Footer() {
         </div>
 
         <div className="lg:col-span-3">
-          <h2 className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sky">
+          <h2 className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-earth">
             Customer Care
           </h2>
           <ul className="mt-5 space-y-3">
@@ -55,7 +56,7 @@ export function Footer() {
               <li key={link.label}>
                 <Link
                   href={link.href}
-                  className="font-sans text-sm text-white/75 transition-colors hover:text-white"
+                  className="font-sans text-sm text-chocolate/75 transition-colors hover:text-chocolate"
                 >
                   {link.label}
                 </Link>
@@ -65,10 +66,10 @@ export function Footer() {
         </div>
 
         <div className="lg:col-span-3">
-          <h2 className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sky">
+          <h2 className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-earth">
             Follow Along
           </h2>
-          <p className="mt-5 font-serif text-base text-white/75">
+          <p className="mt-5 font-serif text-base text-chocolate/75">
             Stories, new arrivals, and quiet moments from the nest.
           </p>
           <div className="mt-5 flex gap-4">
@@ -79,9 +80,9 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-white/10">
+      <div className="border-t border-chocolate/10">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-3 px-5 py-6 sm:flex-row sm:items-center sm:px-8">
-          <p className="font-sans text-xs text-white/50">
+          <p className="font-sans text-xs text-chocolate/50">
             © {new Date().getFullYear()} {SITE.name}. All rights reserved.
           </p>
           <nav
@@ -92,7 +93,7 @@ export function Footer() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="font-sans text-xs text-white/50 transition-colors hover:text-white/80"
+                className="font-sans text-xs text-chocolate/50 transition-colors hover:text-chocolate/80"
               >
                 {link.label}
               </Link>
@@ -114,7 +115,7 @@ function SocialLink({ link }: { link: SocialLinkType }) {
       {...(isExternal
         ? { target: "_blank", rel: "noopener noreferrer" }
         : {})}
-      className="flex h-10 w-10 items-center justify-center border border-white/25 text-white/80 transition-colors hover:border-sky hover:text-sky"
+      className="flex h-10 w-10 items-center justify-center border border-chocolate/25 text-chocolate/80 transition-colors hover:border-earth hover:text-earth"
     >
       <SocialIcon network={link.network} />
     </Link>

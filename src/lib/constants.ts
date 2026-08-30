@@ -5,7 +5,8 @@ export const SITE = {
   tagline: "Where Little Memories Begin",
   announcement: "Free shipping above ₹999 · Flat 10% off on your first order",
   url: "https://skynsoul.com",
-  email: "hello@skynsoul.com",
+  email: "infoskynsoul@gmail.com",
+  phones: ["+918602423131", "+918560048348"],
 } as const;
 
 export const NAV_LINKS: NavLink[] = [
@@ -42,7 +43,7 @@ export const FOOTER_LEGAL_LINKS: NavLink[] = [
 export const SOCIAL_LINKS: SocialLink[] = [
   {
     label: "Instagram",
-    href: "https://www.instagram.com/",
+    href: "https://www.instagram.com/skynsoul.co?utm_source=qr",
     network: "instagram",
   },
   {
@@ -110,8 +111,9 @@ export const HERO = {
   cta: "Discover the Collection",
   ctaHref: "/collections",
   image:
-    "https://images.unsplash.com/photo-1586105251261-72a756497a11?w=1600&q=80",
-  imageAlt: "Close-up of a cream chunky knit heirloom blanket",
+    "https://images.pexels.com/photos/30631384/pexels-photo-30631384.jpeg?auto=compress&cs=tinysrgb&w=2400",
+  imageAlt:
+    "Sleeping newborn wrapped in a soft cream cable-knit blanket",
 } as const;
 
 export const BRAND_STORY = {

@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 import { formatInr } from "@/lib/money";
 
 function getFromAddress() {
-  const fromEmail = process.env.SMTP_FROM || "hello@skynsoul.com";
+  const fromEmail = process.env.SMTP_FROM || "infoskynsoul@gmail.com";
   return `Sky n Soul <${fromEmail}>`;
 }
 

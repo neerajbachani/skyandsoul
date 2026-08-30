@@ -27,8 +27,9 @@ async function main() {
       description:
         "Handcrafted crochet baby blankets woven with premium cotton yarn — soft, breathable, and made for every nap and bedtime cuddle.",
       image:
-        "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80",
-      imageAlt: "Knit blanket draped over a wooden crib",
+        "https://res.cloudinary.com/dix9x012c/image/upload/v1788113430/IMG_20260825_165049_b5lmu6.jpg",
+      imageAlt:
+        "Rainbow Nest striped crochet baby blanket with cloud appliqués in a kraft gift box",
       sortOrder: 1,
     },
   });
@@ -40,8 +41,9 @@ async function main() {
       description:
         "Soft crochet companions made by hand for play, comfort, and keepsake moments.",
       image:
-        "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200&q=80",
-      imageAlt: "Handmade crochet toy beside soft yarn",
+        "https://res.cloudinary.com/dix9x012c/image/upload/v1788113442/IMG_20260830_225100_qth2a7.jpg",
+      imageAlt:
+        "Handmade crochet safari animals and personalized nursery keepsake",
       sortOrder: 2,
     },
   });
@@ -53,8 +55,9 @@ async function main() {
       description:
         "Thoughtful frames designed to hold first smiles, tiny footprints, and forever memories.",
       image:
-        "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=1200&q=80",
-      imageAlt: "Wooden picture frame on a soft surface",
+        "https://res.cloudinary.com/dix9x012c/image/upload/v1788113429/IMG-20260623-WA0057_rkkce3.jpg",
+      imageAlt:
+        "Rattan heart wall frame with crochet ballerina, flowers, and fairy lights",
       sortOrder: 3,
     },
   });
@@ -66,8 +69,9 @@ async function main() {
       description:
         "Personalize a keepsake in five gentle steps — choose a frame, pick a toy, add a name, preview, and order when checkout opens.",
       image:
-        "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=1200&q=80",
-      imageAlt: "Creative craft materials for personalizing a keepsake",
+        "https://res.cloudinary.com/dix9x012c/image/upload/v1788113426/IMG_20260830_225354_dmtjrm.jpg",
+      imageAlt:
+        "Personalized cloud nursery frame with crochet animals and a name plaque",
       sortOrder: 4,
     },
   });
@@ -79,8 +83,8 @@ async function main() {
       description:
         "Small thoughtful pieces that complete the nursery nest — rattles, wraps, and everyday comforts.",
       image:
-        "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=1200&q=80",
-      imageAlt: "Baby keepsakes with wooden rattle and greenery",
+        "https://res.cloudinary.com/dix9x012c/image/upload/v1788113427/IMG_20260830_230055_txwtvr.jpg",
+      imageAlt: "Handmade nursery keepsake from the Little Extras collection",
       sortOrder: 5,
     },
   });
@@ -101,9 +105,10 @@ async function main() {
         "Ideal for babies aged 0–3 years",
       ],
       images: [
-        "https://images.unsplash.com/photo-1586105251261-72a756497a11?w=1200&q=80",
+        "https://res.cloudinary.com/dix9x012c/image/upload/v1788113433/IMG_20260828_205957_kzj0ky.jpg",
       ],
-      imageAlt: "Soft cream knit blanket folded neatly",
+      imageAlt:
+        "Bedtime Buddies granny-square crochet blanket with colorful animal faces and a cream scalloped border",
       price: 2999,
       isFeatured: true,
       sortOrder: 1,
@@ -124,9 +129,10 @@ async function main() {
         "Suitable for babies aged 0–3 years",
       ],
       images: [
-        "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200&q=80",
+        "https://res.cloudinary.com/dix9x012c/image/upload/v1788113434/IMG_20260828_205339_l9lu2d.jpg",
       ],
-      imageAlt: "Cozy nursery blanket on soft bedding",
+      imageAlt:
+        "Cozy Cub light blue crochet blanket with bear appliqués covering a baby in a nest",
       price: 2999,
       isFeatured: true,
       sortOrder: 2,
@@ -147,9 +153,10 @@ async function main() {
         "Designed for babies aged 0–3 years",
       ],
       images: [
-        "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=1200&q=80",
+        "https://res.cloudinary.com/dix9x012c/image/upload/v1788113430/IMG_20260825_165049_b5lmu6.jpg",
       ],
-      imageAlt: "Soft baby blanket in a nursery setting",
+      imageAlt:
+        "Rainbow Nest striped crochet baby blanket with cloud appliqués in a kraft gift box",
       price: 3199,
       isFeatured: true,
       sortOrder: 3,
@@ -169,9 +176,10 @@ async function main() {
         "Crafted for babies aged 0–3 years",
       ],
       images: [
-        "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=1200&q=80",
+        "https://res.cloudinary.com/dix9x012c/image/upload/v1788113424/IMG_20260828_205140_xypyrn.jpg",
       ],
-      imageAlt: "Dreamy nursery keepsake arrangement",
+      imageAlt:
+        "Dream Keeper striped crochet blanket with owl faces and tassels draped over a white chair",
       price: 3199,
       isFeatured: false,
       sortOrder: 4,
@@ -191,9 +199,10 @@ async function main() {
         "Designed for babies aged 0–3 years",
       ],
       images: [
-        "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=1200&q=80",
+        "https://res.cloudinary.com/dix9x012c/image/upload/v1788113428/IMG-20260812-WA0019_nhmex2.jpg",
       ],
-      imageAlt: "Soft baby textiles in warm natural light",
+      imageAlt:
+        "Butter Cup Bliss lime green crochet blanket with white flower appliqués on a black background",
       price: 3299,
       isFeatured: true,
       sortOrder: 5,
@@ -213,9 +222,10 @@ async function main() {
         "Designed for babies aged 0–3 years",
       ],
       images: [
-        "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80",
+        "https://res.cloudinary.com/dix9x012c/image/upload/v1788113425/IMG_20260828_205551_wo1qbs.jpg",
       ],
-      imageAlt: "Baby blanket in a wooden crib",
+      imageAlt:
+        "Tiny Paws personalized nursery shadow box with a crochet girl and fluffy dog on a swing",
       price: 2999,
       isFeatured: false,
       sortOrder: 6,
@@ -236,9 +246,10 @@ async function main() {
         "Thoughtfully designed for babies aged 0–3 years",
       ],
       images: [
-        "https://images.unsplash.com/photo-1471970471555-19d4b113e9ed?w=1200&q=80",
+        "https://res.cloudinary.com/dix9x012c/image/upload/v1788113433/WhatsApp_Image_2026-08-30_at_22.48.19_b6uxfq.jpg",
       ],
-      imageAlt: "Keepsake book and soft nursery textiles",
+      imageAlt:
+        "Dream Raider pale yellow crochet blanket with white daisy appliqués covering a baby",
       price: 3399,
       isFeatured: false,
       sortOrder: 7,

@@ -225,7 +225,7 @@ async function main() {
         "https://res.cloudinary.com/dix9x012c/image/upload/v1788113425/IMG_20260828_205551_wo1qbs.jpg",
       ],
       imageAlt:
-        "Tiny Paws personalized nursery shadow box with a crochet girl and fluffy dog on a swing",
+        "Baby wrapped in Tiny Paws light blue crochet blanket with beige bear appliqués",
       price: 2999,
       isFeatured: false,
       sortOrder: 6,

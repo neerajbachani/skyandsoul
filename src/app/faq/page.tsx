@@ -1,52 +1,70 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ContentPageLayout } from "@/components/layout/ContentPageLayout";
+import {
+  HELP_DESK_FAQS,
+  PRODUCT_CARE_FAQS,
+} from "@/lib/catalog-content";
 
 export const metadata: Metadata = {
-  title: "FAQ",
+  title: "Help Desk",
   description:
-    "Answers about materials, care, shipping, and Sky n Soul handmade products.",
+    "Order, shipping, delivery, and gifting questions for Sky n Soul handmade products.",
 };
-
-const FAQS = [
-  {
-    q: "What are the blankets made of?",
-    a: "Our crochet baby blankets are handcrafted with premium cotton yarn and include a soft backing lining for everyday comfort.",
-  },
-  {
-    q: "What age are the blankets for?",
-    a: "Blankets are designed for babies aged 0–3 years — soft enough for newborns and cozy through early childhood.",
-  },
-  {
-    q: "How do I wash a blanket?",
-    a: "Hand wash only with mild detergent, lay flat to air dry, and avoid hanging, bleaching, or tumble drying.",
-  },
-  {
-    q: "Do you offer free shipping?",
-    a: "Yes — free shipping on orders above ₹999. First orders also receive a flat 10% discount.",
-  },
-  {
-    q: "What is Frame It Your Way?",
-    a: "A five-step personalization experience: choose a frame design, select a toy, add a name, preview, and purchase. Interactive checkout opens in Phase B.",
-  },
-  {
-    q: "Can I order without online checkout?",
-    a: "Yes. Use Contact to Order on any product page and we will help you reserve a piece while cart and payments are being built.",
-  },
-];
 
 export default function FaqPage() {
   return (
     <ContentPageLayout
       eyebrow="Customer Care"
-      title="Frequently Asked Questions"
-      intro="A few quiet answers for the details that matter before you welcome a piece home."
+      title="Help Desk"
+      intro="Answers to the questions we hear most often about orders, delivery, and gifting."
     >
-      {FAQS.map((item) => (
-        <section key={item.q}>
-          <h2 className="font-serif text-2xl font-medium text-chocolate">{item.q}</h2>
-          <p className="mt-3">{item.a}</p>
-        </section>
-      ))}
+      <section>
+        <h2 className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage">
+          Orders & Delivery
+        </h2>
+        <div className="mt-6 space-y-8">
+          {HELP_DESK_FAQS.map((item) => (
+            <div key={item.q}>
+              <h3 className="font-serif text-2xl font-medium text-chocolate">
+                {item.q}
+              </h3>
+              <p className="mt-3">{item.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-t border-chocolate/10 pt-10">
+        <h2 className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage">
+          Products & Care
+        </h2>
+        <div className="mt-6 space-y-8">
+          {PRODUCT_CARE_FAQS.map((item) => (
+            <div key={item.q}>
+              <h3 className="font-serif text-2xl font-medium text-chocolate">
+                {item.q}
+              </h3>
+              <p className="mt-3">{item.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-t border-chocolate/10 pt-10">
+        <h2 className="font-serif text-2xl font-medium text-chocolate">
+          Still need help?
+        </h2>
+        <p className="mt-3">
+          <Link
+            href="/contact"
+            className="text-earth underline underline-offset-4"
+          >
+            Speak to us
+          </Link>{" "}
+          — we are here Monday to Saturday, 9am to 6pm.
+        </p>
+      </section>
     </ContentPageLayout>
   );
 }

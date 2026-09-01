@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
+import { CLOUDINARY } from "@/lib/catalog-images";
 
 export function EditorialBanner() {
   return (
@@ -7,8 +8,8 @@ export function EditorialBanner() {
       <div className="mx-auto grid max-w-7xl lg:grid-cols-2">
         <div className="relative min-h-[320px] lg:min-h-[480px]">
           <Image
-            src="https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=1200&q=80"
-            alt="Soft nursery keepsakes arranged with greenery"
+            src={CLOUDINARY.categoryFrameItYourWay}
+            alt="Personalized cloud nursery frame with crochet animals"
             fill
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover"

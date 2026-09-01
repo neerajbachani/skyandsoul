@@ -1,3 +1,4 @@
+import { FRAME_DESIGNS } from "@/lib/catalog-content";
 import type { NavLink, SocialLink, Testimonial, ValueProp } from "./types";
 
 export const SITE = {
@@ -7,6 +8,12 @@ export const SITE = {
   url: "https://skynsoul.com",
   email: "infoskynsoul@gmail.com",
   phones: ["+918602423131", "+918560048348"],
+  address: {
+    line1: "Plot no 86, Sector 5",
+    city: "Vidhyadhar Nagar, Jaipur",
+    pincode: "302039",
+  },
+  hours: "Monday to Saturday · 9am to 6pm",
 } as const;
 
 export const NAV_LINKS: NavLink[] = [
@@ -32,7 +39,7 @@ export const FOOTER_CARE_LINKS: NavLink[] = [
   { label: "Care Guide", href: "/care-guide" },
   { label: "Gift Wrapping", href: "/gift-wrapping" },
   { label: "Contact Us", href: "/contact" },
-  { label: "FAQ", href: "/faq" },
+  { label: "Help Desk", href: "/faq" },
 ];
 
 export const FOOTER_LEGAL_LINKS: NavLink[] = [
@@ -148,3 +155,5 @@ export const FRAME_IT_STEPS = [
     description: "Checkout opens in Phase B — for now, reach out and we will hold your design.",
   },
 ] as const;
+
+export { FRAME_DESIGNS };

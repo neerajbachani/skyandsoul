@@ -16,17 +16,23 @@ export function Footer() {
         <div className="lg:col-span-4">
           <Link href="/" className="inline-flex items-center">
             <Image
-              src="/logo-horizontal.png"
-              alt={`${SITE.name} — ${SITE.tagline}`}
-              width={450}
-              height={106}
-              className="h-20 w-auto object-contain sm:h-24"
-              style={{ width: "auto", height: "auto", maxHeight: "6rem" }}
+              src="/logo.png"
+              alt={SITE.name}
+              width={56}
+              height={56}
+              className="h-14 w-14 rounded-full object-cover ring-1 ring-chocolate/10"
             />
           </Link>
           <p className="mt-6 max-w-sm font-serif text-lg leading-relaxed text-chocolate/75">
             Handmade keepsakes for the little moments that become forever.
           </p>
+          <address className="mt-5 not-italic font-serif text-sm leading-relaxed text-chocolate/65">
+            {SITE.address.line1}
+            <br />
+            {SITE.address.city}, {SITE.address.pincode}
+            <br />
+            <span className="mt-2 block">{SITE.hours}</span>
+          </address>
         </div>
 
         <div className="lg:col-span-2">

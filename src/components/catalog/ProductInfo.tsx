@@ -1,3 +1,5 @@
+import { HANDMADE_NOTE } from "@/lib/catalog-content";
+
 type ProductInfoProps = {
   description: string;
   features: string[];
@@ -59,6 +61,12 @@ export function ProductInfo({
           </ul>
         </section>
       ) : null}
+
+      <section className="border-t border-chocolate/10 pt-8">
+        <p className="font-serif text-base italic leading-relaxed text-chocolate/70">
+          {HANDMADE_NOTE}
+        </p>
+      </section>
     </div>
   );
 }

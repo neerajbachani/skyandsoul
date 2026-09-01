@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { Button } from "@/components/ui/Button";
+import { FRAME_DESIGNS } from "@/lib/catalog-content";
 import { FRAME_IT_STEPS } from "@/lib/constants";
 
 type FrameItLandingProps = {
@@ -12,15 +13,6 @@ type FrameItLandingProps = {
     imageAlt: string;
   };
 };
-
-const FRAME_PREVIEWS = [
-  "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=600&q=80",
-  "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=600&q=80",
-  "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=600&q=80",
-  "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&q=80",
-  "https://images.unsplash.com/photo-1471970471555-19d4b113e9ed?w=600&q=80",
-  "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=600&q=80",
-];
 
 export function FrameItLanding({ category }: FrameItLandingProps) {
   return (
@@ -96,28 +88,37 @@ export function FrameItLanding({ category }: FrameItLandingProps) {
                 Preview
               </p>
               <h2 className="mt-3 font-serif text-3xl font-medium text-chocolate">
-                12 frame design directions
+                Frame design collection
               </h2>
             </div>
             <p className="max-w-md font-serif text-base text-chocolate/70">
-              A glimpse of the frame styles you will choose from. Full interactive
-              configurator opens with checkout in Phase B.
+              Choose from our signature frame styles — each one ready to pair with a
+              crochet companion and a name plaque.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-            {FRAME_PREVIEWS.map((image, index) => (
-              <div
-                key={image}
-                className="relative aspect-square overflow-hidden bg-sky/20"
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+            {FRAME_DESIGNS.map((frame) => (
+              <Link
+                key={frame.slug}
+                href={`/products/${frame.slug}`}
+                className="group block"
               >
-                <Image
-                  src={image}
-                  alt={`Frame design option ${index + 1}`}
-                  fill
-                  sizes="(max-width: 768px) 50vw, 16vw"
-                  className="object-cover"
-                />
-              </div>
+                <div className="relative aspect-square overflow-hidden bg-sky/20">
+                  <Image
+                    src={frame.image}
+                    alt={frame.imageAlt}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 16vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <p className="mt-3 font-serif text-base font-medium text-chocolate group-hover:text-earth">
+                  {frame.name}
+                </p>
+                <p className="font-sans text-[10px] uppercase tracking-[0.14em] text-chocolate/50">
+                  {frame.subtitle}
+                </p>
+              </Link>
             ))}
           </div>
         </div>
@@ -126,11 +127,11 @@ export function FrameItLanding({ category }: FrameItLandingProps) {
       <section className="bg-sky px-5 py-16 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="font-serif text-3xl font-medium text-chocolate">
-            Ready to design yours?
+            Speak to Us
           </h2>
           <p className="mt-4 font-serif text-lg leading-relaxed text-chocolate/80">
-            Purchase and live preview arrive in Phase B. For now, tell us what you
-            have in mind and we will hold your design notes.
+            Tell us your frame, toy, and name choices — we will hold your design notes
+            and guide you through the order.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button href="/contact" variant="filled">

@@ -667,8 +667,7 @@ export const categorySeedData = [
     description:
       "Thoughtful frames designed to hold first smiles, tiny footprints, and forever memories.",
     image: CLOUDINARY.categoryFrames,
-    imageAlt:
-      "Rattan heart wall frame with crochet ballerina, flowers, and fairy lights",
+    imageAlt: "Memory Nest keepsake frame with crochet details",
     sortOrder: 3,
   },
   {
@@ -687,7 +686,7 @@ export const categorySeedData = [
     description:
       "Tea coasters and crochet keychains — small thoughtful pieces that complete the nursery nest.",
     image: CLOUDINARY.categoryLittleExtras,
-    imageAlt: "Handmade tea coaster and crochet keychains",
+    imageAlt: "Bunny crochet keychain",
     sortOrder: 5,
   },
 ] as const;

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { Button } from "@/components/ui/Button";
 import { FRAME_DESIGNS } from "@/lib/catalog-content";
+import { CUSTOMIZE_FRAME_IMAGES } from "@/lib/catalog-images";
 import { FRAME_IT_STEPS } from "@/lib/constants";
 
 type FrameItLandingProps = {
@@ -96,7 +97,7 @@ export function FrameItLanding({ category }: FrameItLandingProps) {
               crochet companion and a name plaque.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {FRAME_DESIGNS.map((frame) => (
               <Link
                 key={frame.slug}
@@ -119,6 +120,39 @@ export function FrameItLanding({ category }: FrameItLandingProps) {
                   {frame.subtitle}
                 </p>
               </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white px-5 py-16 sm:px-8 sm:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-10 max-w-2xl">
+            <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage">
+              Inspiration
+            </p>
+            <h2 className="mt-3 font-serif text-3xl font-medium text-chocolate">
+              Customize Frames
+            </h2>
+            <p className="mt-4 font-serif text-base leading-relaxed text-chocolate/70">
+              See how personalized keepsakes come together — name plaques, crochet
+              companions, and birth details woven into every design.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3">
+            {CUSTOMIZE_FRAME_IMAGES.map((image, index) => (
+              <div
+                key={image}
+                className="relative aspect-square overflow-hidden bg-sky/20"
+              >
+                <Image
+                  src={image}
+                  alt={`Customized nursery frame example ${index + 1}`}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 33vw"
+                  className="object-cover"
+                />
+              </div>
             ))}
           </div>
         </div>

@@ -7,6 +7,15 @@ import {
   TOY_THREAD_CARE,
 } from "@/lib/catalog-content";
 
+export type SeedVariant = {
+  slug: string;
+  name: string;
+  price: number;
+  badge?: string | null;
+  sortOrder: number;
+  images?: string[];
+};
+
 export type SeedProduct = {
   slug: string;
   name: string;
@@ -21,7 +30,9 @@ export type SeedProduct = {
   imageAlt: string;
   price: number;
   isFeatured: boolean;
+  requiresPatternSelection?: boolean;
   sortOrder: number;
+  variants?: SeedVariant[];
 };
 
 export const BLANKET_META = {
@@ -497,11 +508,30 @@ export const extraProducts: SeedProduct[] = [
       "Perfect for coffee tables, bedside tables and workspaces",
     ],
     careInstructions: [...KEYCHAIN_CARE],
-    images: [CLOUDINARY.teaCoaster],
+    images: [...CLOUDINARY.teaCoasterGallery],
     imageAlt: "Photo frame inspired crochet tea coaster",
-    price: 399,
+    price: 1499,
     isFeatured: true,
+    requiresPatternSelection: true,
     sortOrder: 1,
+    variants: [
+      {
+        slug: "set-of-4",
+        name: "Set of 4",
+        price: 1499,
+        badge: "Most Popular",
+        sortOrder: 1,
+        images: [...CLOUDINARY.teaCoasterSet4Gallery],
+      },
+      {
+        slug: "set-of-6",
+        name: "Set of 6",
+        price: 1999,
+        badge: "Best Value",
+        sortOrder: 2,
+        images: [...CLOUDINARY.teaCoasterSet6Gallery],
+      },
+    ],
   },
   {
     slug: "giraffe-keychain",

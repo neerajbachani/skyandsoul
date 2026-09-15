@@ -11,6 +11,8 @@ import {
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.cartItem.deleteMany();
+  await prisma.productVariant.deleteMany();
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
 
@@ -22,32 +24,36 @@ async function main() {
 
   const bySlug = Object.fromEntries(categories.map((c) => [c.slug, c]));
 
-  for (const product of blanketProducts) {
+  async function createProduct(
+    product: (typeof blanketProducts)[number],
+    categoryId: string,
+    extra: Record<string, unknown> = {},
+  ) {
+    const { variants, ...productData } = product;
     await prisma.product.create({
       data: {
-        ...product,
-        ...BLANKET_META,
-        categoryId: bySlug.blankets.id,
+        ...productData,
+        ...extra,
+        categoryId,
+        variants: variants?.length ? { create: variants } : undefined,
       },
     });
   }
 
+  for (const product of blanketProducts) {
+    await createProduct(product, bySlug.blankets.id, BLANKET_META);
+  }
+
   for (const product of toyProducts) {
-    await prisma.product.create({
-      data: { ...product, categoryId: bySlug.toys.id },
-    });
+    await createProduct(product, bySlug.toys.id);
   }
 
   for (const product of frameProducts) {
-    await prisma.product.create({
-      data: { ...product, categoryId: bySlug.frames.id },
-    });
+    await createProduct(product, bySlug.frames.id);
   }
 
   for (const product of extraProducts) {
-    await prisma.product.create({
-      data: { ...product, categoryId: bySlug["little-extras"].id },
-    });
+    await createProduct(product, bySlug["little-extras"].id);
   }
 
   console.log(

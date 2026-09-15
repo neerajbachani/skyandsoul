@@ -18,9 +18,16 @@ export type CartProduct = {
 export type CartLineItem = {
   id: string;
   productId: string;
+  variantId: string | null;
+  variantName: string | null;
+  selectedPatternImage: string | null;
+  selectedPatternLabel: string | null;
+  displayName: string;
   quantity: number;
   product: CartProduct;
+  unitPrice: number;
   lineTotal: number;
+  lineImage: string;
 };
 
 export type CartTotals = {
@@ -39,6 +46,9 @@ export type CartResponse = {
 
 export type GuestCartPayloadItem = {
   productId: string;
+  variantId?: string | null;
+  selectedPatternImage?: string | null;
+  selectedPatternLabel?: string | null;
   quantity: number;
 };
 
@@ -55,6 +65,9 @@ export type ShippingDetails = {
 export type CreateOrderRequest = {
   items: Array<{
     productId: string;
+    variantId?: string | null;
+    selectedPatternImage?: string | null;
+    selectedPatternLabel?: string | null;
     quantity: number;
     price: number;
   }>;
@@ -85,7 +98,10 @@ export type OrderSummary = {
     id: string;
     productId: string;
     productName: string;
+    variantName: string | null;
     productImage: string;
+    selectedPatternImage: string | null;
+    selectedPatternLabel: string | null;
     quantity: number;
     price: number;
     total: number;

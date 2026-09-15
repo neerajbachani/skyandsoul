@@ -66,12 +66,21 @@ export function useAddToCart() {
     mutationFn: async ({
       productId,
       quantity,
+      variantId,
+      selectedPatternImage,
+      selectedPatternLabel,
     }: {
       productId: string;
       quantity: number;
+      variantId?: string | null;
+      selectedPatternImage?: string | null;
+      selectedPatternLabel?: string | null;
     }) => {
       if (!isAuthenticated) {
-        addToGuestCart(productId, quantity);
+        addToGuestCart(productId, quantity, variantId ?? null, {
+          selectedPatternImage: selectedPatternImage ?? null,
+          selectedPatternLabel: selectedPatternLabel ?? null,
+        });
         notifyGuestCart();
         return { guest: true };
       }
@@ -80,7 +89,13 @@ export function useAddToCart() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ productId, quantity }),
+        body: JSON.stringify({
+          productId,
+          quantity,
+          variantId: variantId ?? null,
+          selectedPatternImage: selectedPatternImage ?? null,
+          selectedPatternLabel: selectedPatternLabel ?? null,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to add to cart");
@@ -102,14 +117,23 @@ export function useUpdateCartItem() {
     mutationFn: async ({
       cartItemId,
       productId,
+      variantId,
+      selectedPatternImage,
       quantity,
     }: {
       cartItemId?: string;
       productId?: string;
+      variantId?: string | null;
+      selectedPatternImage?: string | null;
       quantity: number;
     }) => {
       if (!isAuthenticated && productId) {
-        updateGuestCartItem(productId, quantity);
+        updateGuestCartItem(
+          productId,
+          quantity,
+          variantId ?? null,
+          selectedPatternImage ?? null,
+        );
         notifyGuestCart();
         return { guest: true };
       }
@@ -140,12 +164,20 @@ export function useRemoveCartItem() {
     mutationFn: async ({
       cartItemId,
       productId,
+      variantId,
+      selectedPatternImage,
     }: {
       cartItemId?: string;
       productId?: string;
+      variantId?: string | null;
+      selectedPatternImage?: string | null;
     }) => {
       if (!isAuthenticated && productId) {
-        removeFromGuestCart(productId);
+        removeFromGuestCart(
+          productId,
+          variantId ?? null,
+          selectedPatternImage ?? null,
+        );
         notifyGuestCart();
         return { guest: true };
       }

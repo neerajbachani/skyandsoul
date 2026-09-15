@@ -13,7 +13,6 @@ type CartItemProps = {
 export function CartItemRow({ item }: CartItemProps) {
   const updateItem = useUpdateCartItem();
   const removeItem = useRemoveCartItem();
-  const image = item.product.images[0] ?? "/logo.png";
 
   return (
     <div className="grid grid-cols-[5rem_1fr] gap-4 border-b border-chocolate/10 py-6 sm:grid-cols-[7rem_1fr_auto]">
@@ -22,7 +21,7 @@ export function CartItemRow({ item }: CartItemProps) {
         className="relative aspect-square overflow-hidden bg-sky/20"
       >
         <Image
-          src={image}
+          src={item.lineImage}
           alt={item.product.imageAlt}
           fill
           sizes="112px"
@@ -38,10 +37,15 @@ export function CartItemRow({ item }: CartItemProps) {
           href={`/products/${item.product.slug}`}
           className="mt-1 block font-serif text-xl text-chocolate hover:text-earth"
         >
-          {item.product.name}
+          {item.displayName}
         </Link>
+        {item.selectedPatternLabel ? (
+          <p className="mt-1 font-sans text-sm text-chocolate/70">
+            Pattern: {item.selectedPatternLabel}
+          </p>
+        ) : null}
         <p className="mt-1 font-sans text-sm text-earth">
-          {formatInr(item.product.price)}
+          {formatInr(item.unitPrice)}
         </p>
 
         <div className="mt-4 flex items-center gap-3">

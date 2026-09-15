@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -65,16 +66,36 @@ export function OrderDetailClient() {
         </dl>
 
         <h2 className="mt-8 font-serif text-2xl text-chocolate">Items</h2>
-        <ul className="mt-4 space-y-3">
+        <ul className="mt-4 space-y-4">
           {order.items.map((item) => (
             <li
               key={item.id}
-              className="flex justify-between border-b border-chocolate/10 py-3 font-serif text-base"
+              className="flex items-start justify-between gap-4 border-b border-chocolate/10 pb-4"
             >
-              <span>
-                {item.productName} × {item.quantity}
+              <div className="flex items-start gap-3">
+                <div className="relative h-16 w-16 shrink-0 overflow-hidden bg-sky/20">
+                  <Image
+                    src={item.productImage}
+                    alt={item.productName}
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="font-serif text-base text-chocolate">
+                  <p>
+                    {item.productName} × {item.quantity}
+                  </p>
+                  {item.selectedPatternLabel ? (
+                    <p className="mt-1 font-sans text-sm text-chocolate/70">
+                      Pattern: {item.selectedPatternLabel}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+              <span className="font-serif text-base text-chocolate">
+                {formatInr(item.total)}
               </span>
-              <span>{formatInr(item.total)}</span>
             </li>
           ))}
         </ul>

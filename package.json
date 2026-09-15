@@ -11,7 +11,8 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
-    "upload:doc2": "tsx scripts/upload-doc2-to-cloudinary.ts"
+    "upload:doc2": "tsx scripts/upload-doc2-to-cloudinary.ts",
+    "upload:docs3": "tsx scripts/upload-docs3-to-cloudinary.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -11,6 +11,9 @@ const createOrderSchema = z.object({
     .array(
       z.object({
         productId: z.string().min(1),
+        variantId: z.string().min(1).nullable().optional(),
+        selectedPatternImage: z.string().min(1).nullable().optional(),
+        selectedPatternLabel: z.string().min(1).nullable().optional(),
         quantity: z.number().int().min(1),
         price: z.number().int().min(0),
       }),
@@ -96,11 +99,19 @@ export async function POST(request: NextRequest) {
     }
 
     for (const item of body.items) {
-      const cartItem = cart.items.find((c) => c.productId === item.productId);
+      const cartItem = cart.items.find(
+        (c) =>
+          c.productId === item.productId &&
+          (c.variantId ?? null) === (item.variantId ?? null) &&
+          (c.selectedPatternImage ?? null) ===
+            (item.selectedPatternImage ?? null),
+      );
       if (
         !cartItem ||
         cartItem.quantity !== item.quantity ||
-        cartItem.product.price !== item.price
+        cartItem.unitPrice !== item.price ||
+        (cartItem.selectedPatternLabel ?? null) !==
+          (item.selectedPatternLabel ?? null)
       ) {
         return NextResponse.json(
           { error: "Cart items changed. Please refresh and try again." },
@@ -135,10 +146,13 @@ export async function POST(request: NextRequest) {
           items: {
             create: cart.items.map((item) => ({
               productId: item.productId,
-              productName: item.product.name,
-              productImage: item.product.images[0] ?? "/logo.png",
+              productName: item.displayName,
+              variantName: item.variantName,
+              productImage: item.lineImage,
+              selectedPatternImage: item.selectedPatternImage,
+              selectedPatternLabel: item.selectedPatternLabel,
               quantity: item.quantity,
-              price: item.product.price,
+              price: item.unitPrice,
               total: item.lineTotal,
             })),
           },

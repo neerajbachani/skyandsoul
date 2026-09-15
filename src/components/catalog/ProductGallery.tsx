@@ -6,11 +6,23 @@ import { useState } from "react";
 type ProductGalleryProps = {
   images: string[];
   alt: string;
+  selectedImage?: string | null;
+  onImageSelect?: (image: string, index: number) => void;
 };
 
-export function ProductGallery({ images, alt }: ProductGalleryProps) {
+export function ProductGallery({
+  images,
+  alt,
+  selectedImage,
+  onImageSelect,
+}: ProductGalleryProps) {
   const gallery = images.length > 0 ? images : ["/logo.png"];
   const [active, setActive] = useState(0);
+
+  function handleThumbClick(index: number) {
+    setActive(index);
+    onImageSelect?.(gallery[index], index);
+  }
 
   return (
     <div>
@@ -30,9 +42,9 @@ export function ProductGallery({ images, alt }: ProductGalleryProps) {
             <button
               key={image + index}
               type="button"
-              onClick={() => setActive(index)}
+              onClick={() => handleThumbClick(index)}
               className={`relative aspect-square overflow-hidden border transition-colors ${
-                active === index
+                active === index || selectedImage === image
                   ? "border-earth"
                   : "border-transparent hover:border-chocolate/20"
               }`}

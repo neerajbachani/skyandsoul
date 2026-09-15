@@ -138,6 +138,9 @@ export async function getProductBySlug(slug: string) {
       category: {
         select: { id: true, slug: true, name: true },
       },
+      variants: {
+        orderBy: { sortOrder: "asc" },
+      },
     },
   });
 

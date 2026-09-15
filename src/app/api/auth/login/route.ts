@@ -15,6 +15,9 @@ const loginSchema = z.object({
     .array(
       z.object({
         productId: z.string().min(1),
+        variantId: z.string().min(1).nullable().optional(),
+        selectedPatternImage: z.string().min(1).nullable().optional(),
+        selectedPatternLabel: z.string().min(1).nullable().optional(),
         quantity: z.number().int().min(1),
       }),
     )

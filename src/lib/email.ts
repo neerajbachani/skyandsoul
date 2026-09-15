@@ -18,6 +18,16 @@ function createTransporter() {
   });
 }
 
+type OrderEmailItem = {
+  productName: string;
+  quantity: number;
+  price: number;
+  total: number;
+  productImage?: string;
+  selectedPatternImage?: string | null;
+  selectedPatternLabel?: string | null;
+};
+
 type OrderEmailData = {
   id: string;
   orderNumber: string;
@@ -31,13 +41,28 @@ type OrderEmailData = {
   shippingCity: string;
   shippingState: string;
   shippingPincode: string;
-  items: Array<{
-    productName: string;
-    quantity: number;
-    price: number;
-    total: number;
-  }>;
+  items: OrderEmailItem[];
 };
+
+function renderOrderItemRow(item: OrderEmailItem) {
+  const patternLine = item.selectedPatternLabel
+    ? `<br/><span style="font-size:13px;color:#6b5344;">Pattern: ${item.selectedPatternLabel}</span>`
+    : "";
+  const imageUrl = item.selectedPatternImage ?? item.productImage;
+  const imageCell = imageUrl
+    ? `<td style="padding:8px 12px 8px 0;border-bottom:1px solid #eee;vertical-align:top;width:56px;">
+         <img src="${imageUrl}" alt="" width="48" height="48" style="object-fit:cover;border-radius:4px;" />
+       </td>`
+    : "";
+
+  return `<tr>
+    ${imageCell}
+    <td style="padding:8px 0;border-bottom:1px solid #eee;vertical-align:top;">
+      ${item.productName} × ${item.quantity}${patternLine}
+    </td>
+    <td style="padding:8px 0;border-bottom:1px solid #eee;text-align:right;vertical-align:top;">${formatInr(item.total)}</td>
+  </tr>`;
+}
 
 export async function sendOrderConfirmationEmail(
   order: OrderEmailData,
@@ -55,15 +80,7 @@ export async function sendOrderConfirmationEmail(
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const orderUrl = `${appUrl}/orders/${order.id}`;
 
-    const itemRows = order.items
-      .map(
-        (item) =>
-          `<tr>
-            <td style="padding:8px 0;border-bottom:1px solid #eee;">${item.productName} × ${item.quantity}</td>
-            <td style="padding:8px 0;border-bottom:1px solid #eee;text-align:right;">${formatInr(item.total)}</td>
-          </tr>`,
-      )
-      .join("");
+    const itemRows = order.items.map(renderOrderItemRow).join("");
 
     const customerHtml = `
       <div style="font-family:Georgia,serif;padding:24px;color:#4b3222;max-width:560px;">
@@ -85,6 +102,17 @@ export async function sendOrderConfirmationEmail(
       </div>
     `;
 
+    const adminItemRows = order.items
+      .map((item) => {
+        const imageUrl = item.selectedPatternImage ?? item.productImage;
+        return `<li style="margin-bottom:12px;">
+          <strong>${item.productName}</strong> × ${item.quantity}
+          ${item.selectedPatternLabel ? `<br/>Pattern: ${item.selectedPatternLabel}` : ""}
+          ${imageUrl ? `<br/><img src="${imageUrl}" alt="" width="64" height="64" style="object-fit:cover;margin-top:6px;" />` : ""}
+        </li>`;
+      })
+      .join("");
+
     const adminEmail = process.env.ADMIN_CONTACT_EMAIL;
     const results = await Promise.allSettled([
       transporter.sendMail({
@@ -104,6 +132,7 @@ export async function sendOrderConfirmationEmail(
                   <h2>New paid order</h2>
                   <p><strong>${order.orderNumber}</strong> · ${formatInr(order.total)}</p>
                   <p>Customer: ${userName} (${userEmail})</p>
+                  <ul style="padding-left:18px;">${adminItemRows}</ul>
                   <p><a href="${orderUrl}">Open order</a></p>
                 </div>
               `,

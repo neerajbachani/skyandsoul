@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { CartItemRow } from "@/components/cart/CartItem";
@@ -14,6 +15,11 @@ type GuestProduct = {
   id: string;
   slug: string;
   name: string;
+  displayName: string;
+  variantId: string | null;
+  selectedPatternImage: string | null;
+  selectedPatternLabel: string | null;
+  lineImage: string;
   price: number;
   images: string[];
   imageAlt: string;
@@ -21,19 +27,36 @@ type GuestProduct = {
   quantity: number;
 };
 
+function lineKey(item: {
+  productId: string;
+  variantId?: string | null;
+  selectedPatternImage?: string | null;
+}) {
+  return `${item.productId}::${item.variantId ?? ""}::${item.selectedPatternImage ?? ""}`;
+}
+
 async function fetchGuestProducts(): Promise<GuestProduct[]> {
   const items = getGuestCart().items;
   if (items.length === 0) return [];
 
   const ids = items.map((item) => item.productId).join(",");
-  const res = await fetch(`/api/products/resolve?ids=${encodeURIComponent(ids)}`);
+  const variantIds = items.map((item) => item.variantId ?? "").join(",");
+  const patternImages = items
+    .map((item) => encodeURIComponent(item.selectedPatternImage ?? ""))
+    .join(",");
+  const patternLabels = items
+    .map((item) => encodeURIComponent(item.selectedPatternLabel ?? ""))
+    .join(",");
+  const res = await fetch(
+    `/api/products/resolve?ids=${encodeURIComponent(ids)}&variantIds=${encodeURIComponent(variantIds)}&patternImages=${patternImages}&patternLabels=${patternLabels}`,
+  );
   if (!res.ok) throw new Error("Failed to load guest cart");
-  const data: { products: GuestProduct[] } = await res.json();
-  const qtyMap = new Map(items.map((item) => [item.productId, item.quantity]));
+  const data: { products: Omit<GuestProduct, "quantity">[] } = await res.json();
+  const qtyMap = new Map(items.map((item) => [lineKey(item), item.quantity]));
 
-  return (data.products || []).map((product) => ({
+  return (data.products || []).map((product, index) => ({
     ...product,
-    quantity: qtyMap.get(product.id) ?? 1,
+    quantity: qtyMap.get(lineKey(items[index])) ?? 1,
   }));
 }
 
@@ -77,23 +100,39 @@ export function CartPageClient() {
               </p>
               {guestProducts.map((item) => (
                 <div
-                  key={item.id}
-                  className="flex items-center justify-between border-b border-chocolate/10 py-5"
+                  key={`${item.id}-${item.variantId ?? "default"}-${item.selectedPatternImage ?? "none"}`}
+                  className="flex items-center gap-4 border-b border-chocolate/10 py-5"
                 >
-                  <div>
-                    <Link
-                      href={`/products/${item.slug}`}
-                      className="font-serif text-xl text-chocolate hover:text-earth"
-                    >
-                      {item.name}
-                    </Link>
-                    <p className="mt-1 font-sans text-sm text-chocolate/60">
-                      Qty {item.quantity} · {formatInr(item.price)}
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden bg-sky/20">
+                    <Image
+                      src={item.lineImage}
+                      alt={item.imageAlt}
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-1 items-center justify-between gap-3">
+                    <div>
+                      <Link
+                        href={`/products/${item.slug}`}
+                        className="font-serif text-xl text-chocolate hover:text-earth"
+                      >
+                        {item.displayName}
+                      </Link>
+                      {item.selectedPatternLabel ? (
+                        <p className="mt-1 font-sans text-sm text-chocolate/70">
+                          Pattern: {item.selectedPatternLabel}
+                        </p>
+                      ) : null}
+                      <p className="mt-1 font-sans text-sm text-chocolate/60">
+                        Qty {item.quantity} · {formatInr(item.price)}
+                      </p>
+                    </div>
+                    <p className="font-sans text-sm font-medium">
+                      {formatInr(item.price * item.quantity)}
                     </p>
                   </div>
-                  <p className="font-sans text-sm font-medium">
-                    {formatInr(item.price * item.quantity)}
-                  </p>
                 </div>
               ))}
             </div>

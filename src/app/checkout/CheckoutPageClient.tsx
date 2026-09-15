@@ -92,8 +92,11 @@ export function CheckoutPageClient() {
             const order = await createOrder.mutateAsync({
               items: cart.items.map((item) => ({
                 productId: item.productId,
+                variantId: item.variantId,
+                selectedPatternImage: item.selectedPatternImage,
+                selectedPatternLabel: item.selectedPatternLabel,
                 quantity: item.quantity,
-                price: item.product.price,
+                price: item.unitPrice,
               })),
               total: cart.total,
               shippingDetails: { ...form, phone },
@@ -250,7 +253,12 @@ export function CheckoutPageClient() {
                     className="flex justify-between gap-3 font-serif text-base text-chocolate"
                   >
                     <span>
-                      {item.product.name} × {item.quantity}
+                      {item.displayName} × {item.quantity}
+                      {item.selectedPatternLabel ? (
+                        <span className="block font-sans text-sm text-chocolate/65">
+                          Pattern: {item.selectedPatternLabel}
+                        </span>
+                      ) : null}
                     </span>
                     <span>{formatInr(item.lineTotal)}</span>
                   </li>

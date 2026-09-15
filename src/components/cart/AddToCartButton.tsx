@@ -1,17 +1,29 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { useAddToCart } from "@/hooks/useCart";
 import { useAuthStatus } from "@/hooks/useAuth";
-import Link from "next/link";
 
 type AddToCartButtonProps = {
   productId: string;
   productName: string;
+  variantId?: string;
+  requireVariant?: boolean;
+  requirePattern?: boolean;
+  selectedPatternImage?: string | null;
+  selectedPatternLabel?: string | null;
 };
 
-export function AddToCartButton({ productId }: AddToCartButtonProps) {
+export function AddToCartButton({
+  productId,
+  variantId,
+  requireVariant = false,
+  requirePattern = false,
+  selectedPatternImage,
+  selectedPatternLabel,
+}: AddToCartButtonProps) {
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState("");
   const addToCart = useAddToCart();
@@ -19,8 +31,25 @@ export function AddToCartButton({ productId }: AddToCartButtonProps) {
 
   async function handleAdd() {
     setMessage("");
+
+    if (requireVariant && !variantId) {
+      setMessage("Please choose a pack size.");
+      return;
+    }
+
+    if (requirePattern && !selectedPatternImage) {
+      setMessage("Please choose a pattern.");
+      return;
+    }
+
     try {
-      await addToCart.mutateAsync({ productId, quantity });
+      await addToCart.mutateAsync({
+        productId,
+        quantity,
+        variantId: variantId ?? null,
+        selectedPatternImage: selectedPatternImage ?? null,
+        selectedPatternLabel: selectedPatternLabel ?? null,
+      });
       setMessage(
         isAuthenticated
           ? "Added to your cart."
@@ -58,12 +87,6 @@ export function AddToCartButton({ productId }: AddToCartButtonProps) {
         >
           {addToCart.isPending ? "Adding…" : "Add to Cart"}
         </Button>
-        <Link
-          href="/contact"
-          className="font-sans text-xs font-medium uppercase tracking-[0.14em] text-earth underline underline-offset-[6px]"
-        >
-          Contact us
-        </Link>
       </div>
       {message ? (
         <p className="font-serif text-base text-earth">

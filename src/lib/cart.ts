@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { patternLabelForImage } from "@/lib/patterns";
 import {
   FIRST_ORDER_DISCOUNT_PERCENT,
   FREE_SHIPPING_THRESHOLD,
@@ -22,6 +23,12 @@ const cartProductSelect = {
       slug: true,
     },
   },
+} as const;
+
+const cartVariantSelect = {
+  id: true,
+  name: true,
+  price: true,
 } as const;
 
 export async function computeCartTotals(
@@ -62,6 +69,9 @@ function mapCartItems(
   items: Array<{
     id: string;
     productId: string;
+    variantId: string | null;
+    selectedPatternImage: string | null;
+    selectedPatternLabel: string | null;
     quantity: number;
     product: {
       id: string;
@@ -72,15 +82,36 @@ function mapCartItems(
       price: number;
       category: { name: string; slug: string };
     };
+    variant: {
+      id: string;
+      name: string;
+      price: number;
+    } | null;
   }>,
 ): CartLineItem[] {
-  return items.map((item) => ({
-    id: item.id,
-    productId: item.productId,
-    quantity: item.quantity,
-    product: item.product,
-    lineTotal: item.product.price * item.quantity,
-  }));
+  return items.map((item) => {
+    const unitPrice = item.variant?.price ?? item.product.price;
+    const variantName = item.variant?.name ?? null;
+    const lineImage =
+      item.selectedPatternImage ?? item.product.images[0] ?? "/logo.png";
+
+    return {
+      id: item.id,
+      productId: item.productId,
+      variantId: item.variantId,
+      variantName,
+      selectedPatternImage: item.selectedPatternImage,
+      selectedPatternLabel: item.selectedPatternLabel,
+      displayName: variantName
+        ? `${item.product.name} — ${variantName}`
+        : item.product.name,
+      quantity: item.quantity,
+      product: item.product,
+      unitPrice,
+      lineTotal: unitPrice * item.quantity,
+      lineImage,
+    };
+  });
 }
 
 export async function getUserCart(userId: string): Promise<CartResponse> {
@@ -88,6 +119,7 @@ export async function getUserCart(userId: string): Promise<CartResponse> {
     where: { userId },
     include: {
       product: { select: cartProductSelect },
+      variant: { select: cartVariantSelect },
     },
     orderBy: { createdAt: "asc" },
   });
@@ -103,6 +135,81 @@ export async function getUserCart(userId: string): Promise<CartResponse> {
   };
 }
 
+async function findExistingCartItem(
+  userId: string,
+  productId: string,
+  variantId?: string | null,
+  selectedPatternImage?: string | null,
+) {
+  return prisma.cartItem.findFirst({
+    where: {
+      userId,
+      productId,
+      variantId: variantId ?? null,
+      selectedPatternImage: selectedPatternImage ?? null,
+    },
+  });
+}
+
+type PatternInput = {
+  selectedPatternImage?: string | null;
+  selectedPatternLabel?: string | null;
+};
+
+async function validateProductVariant(
+  productId: string,
+  variantId?: string | null,
+  pattern?: PatternInput,
+) {
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    include: { variants: true },
+  });
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  const hasVariants = product.variants.length > 0;
+
+  if (hasVariants) {
+    if (!variantId) {
+      throw new Error("Pack size is required");
+    }
+
+    const variant = product.variants.find((entry) => entry.id === variantId);
+    if (!variant) {
+      throw new Error("Variant not found");
+    }
+  } else if (variantId) {
+    throw new Error("Variant not allowed for this product");
+  }
+
+  if (product.requiresPatternSelection) {
+    if (!pattern?.selectedPatternImage) {
+      throw new Error("Pattern selection is required");
+    }
+
+    if (!product.images.includes(pattern.selectedPatternImage)) {
+      throw new Error("Invalid pattern selection");
+    }
+  } else if (pattern?.selectedPatternImage) {
+    throw new Error("Pattern selection is not allowed for this product");
+  }
+
+  const selectedPatternLabel =
+    product.requiresPatternSelection && pattern?.selectedPatternImage
+      ? pattern.selectedPatternLabel ??
+        patternLabelForImage(pattern.selectedPatternImage, product.images)
+      : null;
+
+  return {
+    product,
+    selectedPatternImage: pattern?.selectedPatternImage ?? null,
+    selectedPatternLabel,
+  };
+}
+
 export async function mergeGuestCart(
   userId: string,
   guestItems: GuestCartPayloadItem[],
@@ -110,20 +217,26 @@ export async function mergeGuestCart(
   for (const item of guestItems) {
     if (!item.productId || item.quantity < 1) continue;
 
-    const product = await prisma.product.findUnique({
-      where: { id: item.productId },
-      select: { id: true },
-    });
-    if (!product) continue;
-
-    const existing = await prisma.cartItem.findUnique({
-      where: {
-        userId_productId: {
-          userId,
-          productId: item.productId,
+    let validated;
+    try {
+      validated = await validateProductVariant(
+        item.productId,
+        item.variantId ?? null,
+        {
+          selectedPatternImage: item.selectedPatternImage ?? null,
+          selectedPatternLabel: item.selectedPatternLabel ?? null,
         },
-      },
-    });
+      );
+    } catch {
+      continue;
+    }
+
+    const existing = await findExistingCartItem(
+      userId,
+      item.productId,
+      item.variantId ?? null,
+      validated.selectedPatternImage,
+    );
 
     if (existing) {
       await prisma.cartItem.update({
@@ -135,6 +248,9 @@ export async function mergeGuestCart(
         data: {
           userId,
           productId: item.productId,
+          variantId: item.variantId ?? null,
+          selectedPatternImage: validated.selectedPatternImage,
+          selectedPatternLabel: validated.selectedPatternLabel,
           quantity: item.quantity,
         },
       });
@@ -146,33 +262,46 @@ export async function addCartItem(
   userId: string,
   productId: string,
   quantity: number,
+  variantId?: string | null,
+  pattern?: PatternInput,
 ) {
-  const product = await prisma.product.findUnique({
-    where: { id: productId },
-    select: { id: true },
-  });
+  const validated = await validateProductVariant(
+    productId,
+    variantId ?? null,
+    pattern,
+  );
 
-  if (!product) {
-    throw new Error("Product not found");
-  }
-
-  const existing = await prisma.cartItem.findUnique({
-    where: {
-      userId_productId: { userId, productId },
-    },
-  });
+  const existing = await findExistingCartItem(
+    userId,
+    productId,
+    variantId ?? null,
+    validated.selectedPatternImage,
+  );
 
   if (existing) {
     return prisma.cartItem.update({
       where: { id: existing.id },
       data: { quantity: existing.quantity + quantity },
-      include: { product: { select: cartProductSelect } },
+      include: {
+        product: { select: cartProductSelect },
+        variant: { select: cartVariantSelect },
+      },
     });
   }
 
   return prisma.cartItem.create({
-    data: { userId, productId, quantity },
-    include: { product: { select: cartProductSelect } },
+    data: {
+      userId,
+      productId,
+      variantId: variantId ?? null,
+      selectedPatternImage: validated.selectedPatternImage,
+      selectedPatternLabel: validated.selectedPatternLabel,
+      quantity,
+    },
+    include: {
+      product: { select: cartProductSelect },
+      variant: { select: cartVariantSelect },
+    },
   });
 }
 

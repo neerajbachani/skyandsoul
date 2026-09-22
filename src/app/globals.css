@@ -21,6 +21,16 @@
   --color-canvas: #fafaf8;
   --font-sans: var(--font-inter);
   --font-serif: var(--font-cormorant);
+  --animate-marquee: marquee 45s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 body {

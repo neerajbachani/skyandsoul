@@ -18,6 +18,10 @@ export function ProductGallery({
 }: ProductGalleryProps) {
   const gallery = images.length > 0 ? images : ["/logo.png"];
   const [active, setActive] = useState(0);
+  const selectedIndex = selectedImage
+    ? gallery.findIndex((image) => image === selectedImage)
+    : -1;
+  const displayIndex = selectedIndex >= 0 ? selectedIndex : active;
 
   function handleThumbClick(index: number) {
     setActive(index);
@@ -28,7 +32,7 @@ export function ProductGallery({
     <div>
       <div className="relative aspect-[4/5] overflow-hidden bg-sky/20">
         <Image
-          src={gallery[active]}
+          src={gallery[displayIndex] ?? gallery[0]}
           alt={alt}
           fill
           sizes="(max-width: 1024px) 100vw, 50vw"
@@ -44,7 +48,7 @@ export function ProductGallery({
               type="button"
               onClick={() => handleThumbClick(index)}
               className={`relative aspect-square overflow-hidden border transition-colors ${
-                active === index || selectedImage === image
+                displayIndex === index
                   ? "border-earth"
                   : "border-transparent hover:border-chocolate/20"
               }`}

@@ -8,6 +8,10 @@ import { ProductInfo } from "@/components/catalog/ProductInfo";
 import { ProductPurchaseSection } from "@/components/catalog/ProductPurchaseSection";
 import type { PackVariant } from "@/components/catalog/PackSizePicker";
 import { patternLabelForIndex } from "@/lib/patterns";
+import {
+  teaCoasterImageForView,
+  teaCoasterMatchForImage,
+} from "@/lib/catalog-images";
 
 type GalleryView = "singles" | string;
 
@@ -64,6 +68,38 @@ export function ProductDetailClient({
     return variant?.images?.length ? variant.images : singles;
   }, [galleryView, singles, variants]);
 
+  const packView = useMemo(() => {
+    if (galleryView === "singles") return "individual" as const;
+    const variant = variants.find((entry) => entry.id === galleryView);
+    if (variant?.slug === "set-of-6") return "set6" as const;
+    if (variant?.slug === "set-of-4") return "set4" as const;
+    return "individual" as const;
+  }, [galleryView, variants]);
+
+  const selectedPatternIndex = selectedPatternImage
+    ? singles.indexOf(selectedPatternImage)
+    : -1;
+  const mappedGalleryImage = selectedPatternImage
+    ? teaCoasterImageForView(selectedPatternImage, packView)
+    : undefined;
+  const selectedGalleryImage =
+    mappedGalleryImage && activeImages.includes(mappedGalleryImage)
+      ? mappedGalleryImage
+      : selectedPatternIndex >= 0 && selectedPatternIndex < activeImages.length
+        ? activeImages[selectedPatternIndex]
+        : mappedGalleryImage ?? null;
+  const galleryImages =
+    selectedGalleryImage && !activeImages.includes(selectedGalleryImage)
+      ? [selectedGalleryImage, ...activeImages]
+      : activeImages;
+
+  function handleGalleryTab(view: GalleryView) {
+    setGalleryView(view);
+    if (view !== "singles") {
+      setSelectedVariantId(view);
+    }
+  }
+
   function handleVariantSelect(variantId: string) {
     setSelectedVariantId(variantId);
     setGalleryView(variantId);
@@ -74,9 +110,15 @@ export function ProductDetailClient({
     setSelectedPatternLabel(label);
   }
 
-  function handleGalleryPatternSelect(image: string, index: number) {
-    if (galleryView !== "singles") return;
-    handlePatternSelect(image, patternLabelForIndex(index));
+  function handleGalleryImageSelect(image: string, index: number) {
+    const match = teaCoasterMatchForImage(image);
+    const patternImage = match?.individual ?? singles[index];
+    if (!patternImage) return;
+    const labelIndex = singles.indexOf(patternImage);
+    handlePatternSelect(
+      patternImage,
+      patternLabelForIndex(labelIndex >= 0 ? labelIndex : index),
+    );
   }
 
   return (
@@ -86,25 +128,23 @@ export function ProductDetailClient({
           <GalleryTab
             label="Individual designs"
             active={galleryView === "singles"}
-            onClick={() => setGalleryView("singles")}
+            onClick={() => handleGalleryTab("singles")}
           />
           {variants.map((variant) => (
             <GalleryTab
               key={variant.id}
               label={variant.name}
               active={galleryView === variant.id}
-              onClick={() => setGalleryView(variant.id)}
+              onClick={() => handleGalleryTab(variant.id)}
             />
           ))}
         </div>
         <ProductGallery
           key={galleryView}
-          images={activeImages}
+          images={galleryImages}
           alt={imageAlt}
-          selectedImage={galleryView === "singles" ? selectedPatternImage : null}
-          onImageSelect={
-            galleryView === "singles" ? handleGalleryPatternSelect : undefined
-          }
+          selectedImage={selectedGalleryImage}
+          onImageSelect={handleGalleryImageSelect}
         />
       </div>
 

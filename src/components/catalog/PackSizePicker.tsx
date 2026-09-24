@@ -15,17 +15,19 @@ type PackSizePickerProps = {
   variants: PackVariant[];
   selectedId: string;
   onSelect: (variantId: string) => void;
+  label?: string;
 };
 
 export function PackSizePicker({
   variants,
   selectedId,
   onSelect,
+  label = "Choose pack size",
 }: PackSizePickerProps) {
   return (
     <div className="space-y-3">
       <p className="font-sans text-[11px] font-medium uppercase tracking-[0.14em] text-chocolate/55">
-        Choose pack size
+        {label}
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
         {variants.map((variant) => {

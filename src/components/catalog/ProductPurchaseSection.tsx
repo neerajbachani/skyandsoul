@@ -16,6 +16,7 @@ type ProductPurchaseSectionProps = {
   requirePattern?: boolean;
   selectedPatternImage?: string | null;
   selectedPatternLabel?: string | null;
+  pickerLabel?: string;
 };
 
 export function ProductPurchaseSection({
@@ -28,6 +29,7 @@ export function ProductPurchaseSection({
   requirePattern = false,
   selectedPatternImage = null,
   selectedPatternLabel = null,
+  pickerLabel = "Choose pack size",
 }: ProductPurchaseSectionProps) {
   const hasVariants = variants.length > 0;
   const [internalVariantId, setInternalVariantId] = useState(variants[0]?.id ?? "");
@@ -60,6 +62,7 @@ export function ProductPurchaseSection({
           variants={variants}
           selectedId={selectedVariantId}
           onSelect={handleVariantSelect}
+          label={pickerLabel}
         />
       ) : null}
 

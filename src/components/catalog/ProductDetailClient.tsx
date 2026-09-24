@@ -125,11 +125,13 @@ export function ProductDetailClient({
     <>
       <div>
         <div className="mb-4 flex flex-wrap gap-2">
-          <GalleryTab
-            label="Individual designs"
-            active={galleryView === "singles"}
-            onClick={() => handleGalleryTab("singles")}
-          />
+          {requiresPatternSelection ? (
+            <GalleryTab
+              label="Individual designs"
+              active={galleryView === "singles"}
+              onClick={() => handleGalleryTab("singles")}
+            />
+          ) : null}
           {variants.map((variant) => (
             <GalleryTab
               key={variant.id}
@@ -207,6 +209,9 @@ export function ProductDetailClient({
             requirePattern={requiresPatternSelection}
             selectedPatternImage={selectedPatternImage}
             selectedPatternLabel={selectedPatternLabel}
+            pickerLabel={
+              requiresPatternSelection ? "Choose pack size" : "Choose style"
+            }
           />
         </div>
 

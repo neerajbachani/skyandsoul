@@ -165,6 +165,10 @@ export const CLOUDINARY = {
     "https://res.cloudinary.com/dix9x012c/image/upload/v1788507345/skyandsoul/doc2/frame-little-curve-2.jpg",
   littleCurveThird:
     "https://res.cloudinary.com/dix9x012c/image/upload/v1788507348/skyandsoul/doc2/frame-little-curve-3.png",
+  littleMeadow:
+    "https://res.cloudinary.com/dix9x012c/image/upload/v1788507345/skyandsoul/doc2/frame-little-curve-2.jpg",
+  littleWorld:
+    "https://res.cloudinary.com/dix9x012c/image/upload/v1788507348/skyandsoul/doc2/frame-little-curve-3.png",
   rattanHeart: framePlaceholder,
   teaCoasterGallery: TEA_COASTER_PATTERNS.map((pattern) => pattern.individual),
   teaCoasterSet4Gallery: TEA_COASTER_PATTERNS.map((pattern) => pattern.set4),

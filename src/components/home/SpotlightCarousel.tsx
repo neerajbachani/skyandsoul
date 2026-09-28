@@ -190,7 +190,7 @@ export function SpotlightCarousel({ products }: SpotlightCarouselProps) {
 
   return (
     <section
-      className="overflow-hidden bg-sky py-20 sm:py-28"
+      className="overflow-hidden bg-canvas py-20 sm:py-28"
       aria-roledescription="carousel"
       aria-label={`${SITE.name} spotlight`}
       onMouseEnter={() => setPaused(true)}

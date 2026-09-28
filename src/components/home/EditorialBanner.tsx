@@ -2,18 +2,45 @@ import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { CLOUDINARY } from "@/lib/catalog-images";
 
+const COLLAGE = [
+  {
+    src: CLOUDINARY.categoryBlankets,
+    alt: "Rainbow Nest crochet baby blanket folded in a kraft gift box",
+    objectPosition: "object-center",
+  },
+  {
+    src: CLOUDINARY.crochetPilotBearToy,
+    alt: "Handmade crochet pilot bear with a blue muffler and goggles",
+    objectPosition: "object-[center_32%]",
+  },
+  {
+    src: CLOUDINARY.littleRootsAlt,
+    alt: "Little Roots nursery frame with a wooden tree, crochet animals, and a name plaque",
+    objectPosition: "object-center",
+  },
+  {
+    src: CLOUDINARY.bunnyKeychain,
+    alt: "Pink crochet bunny keychain hanging from a wooden peg",
+    objectPosition: "object-[center_42%]",
+  },
+] as const;
+
 export function EditorialBanner() {
   return (
     <section className="bg-sky">
       <div className="mx-auto grid max-w-7xl lg:grid-cols-2">
-        <div className="relative min-h-[320px] lg:min-h-[480px]">
-          <Image
-            src={CLOUDINARY.categoryFrameItYourWay}
-            alt="Personalized cloud nursery frame with crochet animals"
-            fill
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover"
-          />
+        <div className="grid min-h-[420px] grid-cols-2 grid-rows-2 gap-1.5 p-1.5 sm:min-h-[520px] lg:h-full">
+          {COLLAGE.map((image) => (
+            <div key={image.src} className="relative min-h-0 overflow-hidden">
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                sizes="(max-width: 1024px) 50vw, 25vw"
+                className={`object-cover ${image.objectPosition}`}
+              />
+            </div>
+          ))}
         </div>
         <div className="flex items-center px-5 py-16 sm:px-12 lg:px-16 lg:py-20">
           <div className="max-w-md">
@@ -24,12 +51,12 @@ export function EditorialBanner() {
               The Perfect Gift for New Beginnings
             </h2>
             <p className="mt-5 font-serif text-lg leading-relaxed text-chocolate/80">
-              Heirloom blankets, crochet companions, and Frame It Your Way keepsakes —
-              ready to welcome the ones we love.
+              Heirloom blankets, crochet companions, named nursery frames, and
+              little extras — a whole welcome, ready to give.
             </p>
             <div className="mt-8">
-              <Button href="/collections/blankets" showArrow>
-                Shop Blankets
+              <Button href="/collections" showArrow>
+                Shop All Gifts
               </Button>
             </div>
           </div>

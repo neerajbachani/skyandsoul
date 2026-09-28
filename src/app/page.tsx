@@ -44,7 +44,7 @@ export default async function HomePage() {
             label="Featured product banners"
           />
         </div>
-        <ValueProps />
+        
         {/* <FeaturedProducts products={featured.products.slice(0, 4)} /> */}
         {/* <CategoryGrid categories={categories} /> */}
         <SpotlightCarousel
@@ -57,6 +57,7 @@ export default async function HomePage() {
             category: product.category,
           }))}
         />
+        <ValueProps />
         <EditorialBanner />
         <InstagramFeed />
         <Testimonials />  

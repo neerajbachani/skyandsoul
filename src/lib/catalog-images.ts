@@ -176,16 +176,17 @@ export const CLOUDINARY = {
   teaCoaster:
     "https://res.cloudinary.com/dix9x012c/image/upload/v1789287357/skyandsoul/docs3/tea-coaster-1.png",
   bunnyKeychain:
-    "https://res.cloudinary.com/dix9x012c/image/upload/v1788507354/skyandsoul/doc2/keychain-bunny.png",
+    "https://res.cloudinary.com/dix9x012c/image/upload/v1790627521/skyandsoul/doc-keychains/keychain-bunny.png",
   donkeyKeychain:
     "https://res.cloudinary.com/dix9x012c/image/upload/v1788507359/skyandsoul/doc2/keychain-donkey.jpg",
   dogKeychain:
-    "https://res.cloudinary.com/dix9x012c/image/upload/v1788507356/skyandsoul/doc2/keychain-dog.png",
+    "https://res.cloudinary.com/dix9x012c/image/upload/v1790627518/skyandsoul/doc-keychains/keychain-dog.png",
   lionKeychain:
     "https://res.cloudinary.com/dix9x012c/image/upload/v1788507361/skyandsoul/doc2/keychain-lion.jpg",
   dollKeychain:
     "https://res.cloudinary.com/dix9x012c/image/upload/v1788507357/skyandsoul/doc2/keychain-doll.jpg",
   giraffeKeychain:
     "https://res.cloudinary.com/dix9x012c/image/upload/v1788507360/skyandsoul/doc2/keychain-giraffe.jpg",
-  stitchKeychain: categoryLittleExtras,
+  stitchKeychain:
+    "https://res.cloudinary.com/dix9x012c/image/upload/v1790628547/skyandsoul/doc-keychains/keychain-stitch.jpg",
 } as const;

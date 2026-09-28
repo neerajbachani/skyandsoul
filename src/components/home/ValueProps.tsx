@@ -17,7 +17,7 @@ const ICONS = {
 
 export function ValueProps() {
   return (
-    <section className="bg-canvas px-5 py-20 sm:px-8 sm:py-24">
+    <section className="bg-white px-5 py-20 sm:px-8 sm:py-24">
       <div className="mx-auto grid max-w-7xl gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
         {VALUE_PROPS.map((prop) => (
           <div key={prop.id} className="text-center lg:text-left">

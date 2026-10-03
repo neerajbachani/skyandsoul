@@ -8,9 +8,8 @@ import { ProductGrid } from "@/components/catalog/ProductGrid";
 import { ProductInfo } from "@/components/catalog/ProductInfo";
 import { ProductPurchaseSection } from "@/components/catalog/ProductPurchaseSection";
 import { SiteShell } from "@/components/layout/SiteShell";
-import {
-  getProductBySlug,
-} from "@/lib/catalog";
+import { getProductBySlug } from "@/lib/catalog";
+import { CLOUDINARY } from "@/lib/catalog-images";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -36,13 +35,21 @@ export default async function ProductPage({ params }: PageProps) {
   if (!product) notFound();
 
   const hasVariants = product.variants.length > 0;
+  const teaCoaster = product.slug === "crochet-tea-coaster";
+  const singles = teaCoaster ? [...CLOUDINARY.teaCoasterGallery] : product.images;
   const packVariants = product.variants.map((variant) => ({
     id: variant.id,
     slug: variant.slug,
     name: variant.name,
     price: variant.price,
     badge: variant.badge,
-    images: variant.images,
+    images: teaCoaster
+      ? variant.slug === "set-of-6"
+        ? [...CLOUDINARY.teaCoasterSet6Gallery]
+        : variant.slug === "set-of-4"
+          ? [...CLOUDINARY.teaCoasterSet4Gallery]
+          : variant.images
+      : variant.images,
   }));
 
   return (
@@ -77,7 +84,7 @@ export default async function ProductPage({ params }: PageProps) {
                 categorySlug={product.category.slug}
                 basePrice={product.price}
                 imageAlt={product.imageAlt}
-                singles={product.images}
+                singles={singles}
                 variants={packVariants}
                 requiresPatternSelection={product.requiresPatternSelection}
               />

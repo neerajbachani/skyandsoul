@@ -5,12 +5,14 @@ import { patternLabelForIndex } from "@/lib/patterns";
 
 type PatternPickerProps = {
   patterns: string[];
+  labels?: string[];
   selectedImage: string | null;
   onSelect: (image: string, label: string) => void;
 };
 
 export function PatternPicker({
   patterns,
+  labels,
   selectedImage,
   onSelect,
 }: PatternPickerProps) {
@@ -22,7 +24,7 @@ export function PatternPicker({
       <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
         {patterns.map((image, index) => {
           const selected = selectedImage === image;
-          const label = patternLabelForIndex(index);
+          const label = labels?.[index] ?? patternLabelForIndex(index);
 
           return (
             <button
@@ -51,7 +53,8 @@ export function PatternPicker({
       {selectedImage ? (
         <p className="font-serif text-sm text-earth">
           Selected: {patterns.findIndex((p) => p === selectedImage) >= 0
-            ? patternLabelForIndex(patterns.findIndex((p) => p === selectedImage))
+            ? (labels?.[patterns.findIndex((p) => p === selectedImage)] ??
+              patternLabelForIndex(patterns.findIndex((p) => p === selectedImage)))
             : "Selected design"}
         </p>
       ) : (

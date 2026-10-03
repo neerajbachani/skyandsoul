@@ -1,4 +1,5 @@
 import { FRAME_DESIGNS } from "@/lib/catalog-content";
+import { CLOUDINARY } from "@/lib/catalog-images";
 import type { NavLink, SocialLink, Testimonial, ValueProp } from "./types";
 
 export const SITE = {
@@ -112,16 +113,41 @@ export const TESTIMONIALS: Testimonial[] = [
   },
 ];
 
-export const HERO = {
-  headline: "Out of Love, Built to Last.",
-  subheadline: "For Sky, for Soul, and the little moments that define us.",
-  cta: "Discover the Collection",
-  ctaHref: "/collections",
-  image:
-    "https://images.pexels.com/photos/30631384/pexels-photo-30631384.jpeg?auto=compress&cs=tinysrgb&w=2400",
-  imageAlt:
-    "Sleeping newborn wrapped in a soft cream cable-knit blanket",
-} as const;
+export const HERO_SLIDES = [
+  {
+    eyebrow: "Blankets",
+    headline: "Out of Love, Built to Last.",
+    subheadline: "For Sky, for Soul, and the little moments that define us.",
+    cta: "Discover the Collection",
+    ctaHref: "/collections",
+    image: CLOUDINARY.rainbowNest,
+    imageAlt:
+      "Rainbow Nest striped crochet baby blanket with cloud appliqués in a kraft gift box",
+    objectPosition: "object-center",
+  },
+  {
+    eyebrow: "Frames",
+    headline: "A name, a nest, a beginning.",
+    subheadline:
+      "Personalized nursery frames, handmade to hold the first details of a life.",
+    cta: "Shop Frames",
+    ctaHref: "/collections/frames",
+    image: CLOUDINARY.welcomeToTheWorld,
+    imageAlt:
+      "Welcome to the World nursery frame with a crochet lion, balloons, and a name",
+    objectPosition: "object-center",
+  },
+  {
+    eyebrow: "Toys",
+    headline: "Soft companions, stitched by hand.",
+    subheadline: "Crochet friends made to be held, loved, and kept.",
+    cta: "Shop Toys",
+    ctaHref: "/collections/toys",
+    image: CLOUDINARY.crochetPilotBearToyGallery[3],
+    imageAlt: "Handmade crochet pilot bear with a blue muffler and goggles, held in an open hand",
+    objectPosition: "object-[center_42%]",
+  },
+] as const;
 
 export const BRAND_STORY = {
   quote: "Two brothers. One endless sky. A lifetime of memories.",

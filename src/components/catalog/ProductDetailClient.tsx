@@ -9,7 +9,8 @@ import { ProductPurchaseSection } from "@/components/catalog/ProductPurchaseSect
 import type { PackVariant } from "@/components/catalog/PackSizePicker";
 import { patternLabelForIndex } from "@/lib/patterns";
 import {
-  teaCoasterImageForView,
+  teaCoasterImagesForView,
+  teaCoasterLabelForImage,
   teaCoasterMatchForImage,
 } from "@/lib/catalog-images";
 
@@ -76,22 +77,10 @@ export function ProductDetailClient({
     return "individual" as const;
   }, [galleryView, variants]);
 
-  const selectedPatternIndex = selectedPatternImage
-    ? singles.indexOf(selectedPatternImage)
-    : -1;
-  const mappedGalleryImage = selectedPatternImage
-    ? teaCoasterImageForView(selectedPatternImage, packView)
+  const patternGallery = selectedPatternImage
+    ? teaCoasterImagesForView(selectedPatternImage, packView)
     : undefined;
-  const selectedGalleryImage =
-    mappedGalleryImage && activeImages.includes(mappedGalleryImage)
-      ? mappedGalleryImage
-      : selectedPatternIndex >= 0 && selectedPatternIndex < activeImages.length
-        ? activeImages[selectedPatternIndex]
-        : mappedGalleryImage ?? null;
-  const galleryImages =
-    selectedGalleryImage && !activeImages.includes(selectedGalleryImage)
-      ? [selectedGalleryImage, ...activeImages]
-      : activeImages;
+  const galleryImages = patternGallery?.length ? patternGallery : activeImages;
 
   function handleGalleryTab(view: GalleryView) {
     setGalleryView(view);
@@ -110,14 +99,22 @@ export function ProductDetailClient({
     setSelectedPatternLabel(label);
   }
 
+  const patternLabels = singles.map(
+    (image, index) =>
+      teaCoasterLabelForImage(image) ?? patternLabelForIndex(index),
+  );
+
   function handleGalleryImageSelect(image: string, index: number) {
     const match = teaCoasterMatchForImage(image);
-    const patternImage = match?.individual ?? singles[index];
+    const patternImage = match?.individual[0] ?? singles[index];
     if (!patternImage) return;
     const labelIndex = singles.indexOf(patternImage);
+    const resolvedIndex = labelIndex >= 0 ? labelIndex : index;
     handlePatternSelect(
       patternImage,
-      patternLabelForIndex(labelIndex >= 0 ? labelIndex : index),
+      patternLabels[resolvedIndex] ??
+        match?.name ??
+        patternLabelForIndex(resolvedIndex),
     );
   }
 
@@ -142,10 +139,9 @@ export function ProductDetailClient({
           ))}
         </div>
         <ProductGallery
-          key={galleryView}
+          key={`${galleryView}-${selectedPatternImage ?? "all"}`}
           images={galleryImages}
           alt={imageAlt}
-          selectedImage={selectedGalleryImage}
           onImageSelect={handleGalleryImageSelect}
         />
       </div>
@@ -192,6 +188,7 @@ export function ProductDetailClient({
           <div className="mt-8">
             <PatternPicker
               patterns={singles}
+              labels={patternLabels}
               selectedImage={selectedPatternImage}
               onSelect={handlePatternSelect}
             />

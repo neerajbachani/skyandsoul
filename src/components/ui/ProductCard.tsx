@@ -4,9 +4,12 @@ import { formatInr, productHref } from "@/lib/money";
 import type { ProductWithCategory } from "@/lib/types";
 
 type ProductCardProps = {
-  product: Pick<
-    ProductWithCategory,
-    "slug" | "name" | "price" | "images" | "imageAlt" | "category"
+  product: Omit<
+    Pick<
+      ProductWithCategory,
+      "slug" | "name" | "price" | "images" | "imageAlt" | "category"
+    >,
+    "category"
   > & {
     category: string | Pick<ProductWithCategory["category"], "name" | "slug">;
   };

@@ -368,6 +368,7 @@ export const CLOUDINARY = {
   lavenderBlissGallery,
   crochetLionToy: crochetLionToyGallery[0],
   crochetLionToyGallery,
+  crochetLionToyBanner: crochetLionToyGallery[4],
   crochetBearToy: crochetBearToyGallery[0],
   crochetBearToyGallery,
   crochetPilotBearToy: crochetPilotBearToyGallery[0],

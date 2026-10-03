@@ -25,17 +25,18 @@ export const PRIMARY_BANNERS: BannerSet = {
     label: "Blankets",
   },
   left: {
-    src: CLOUDINARY.crochetPilotBearToy,
-    alt: "Handmade crochet pilot bear toy with blue muffler and goggles",
+    src: CLOUDINARY.crochetLionToyBanner,
+    alt: "Handmade crochet lion toy in a lime sweater, held up to show the full figure",
     href: collectionHref("toys"),
     label: "Toys",
-    objectPosition: "object-[center_35%]",
+    objectPosition: "object-[center_42%]",
   },
   right: {
-    src: CLOUDINARY.littleRootsAlt,
-    alt: "Little Roots nursery frame with a wooden tree and crochet animals",
+    src: CLOUDINARY.littleCurveThird,
+    alt: "Little Curve cloud nursery frame with a crochet girl, puppy, flowers, and a name plaque",
     href: collectionHref("frames"),
     label: "Frames",
+    objectPosition: "object-center",
   },
 };
 

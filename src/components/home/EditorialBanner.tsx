@@ -9,14 +9,14 @@ const COLLAGE = [
     objectPosition: "object-center",
   },
   {
-    src: CLOUDINARY.crochetPilotBearToy,
-    alt: "Handmade crochet pilot bear with a blue muffler and goggles",
-    objectPosition: "object-[center_32%]",
+    src: CLOUDINARY.crochetLionToyBanner,
+    alt: "Handmade crochet lion toy in a lime sweater, held up to show the full figure",
+    objectPosition: "object-[center_38%]",
   },
   {
-    src: CLOUDINARY.littleRootsAlt,
-    alt: "Little Roots nursery frame with a wooden tree, crochet animals, and a name plaque",
-    objectPosition: "object-center",
+    src: CLOUDINARY.littleCurveThird,
+    alt: "Little Curve cloud nursery frame with a crochet girl, puppy, flowers, and a name plaque",
+    objectPosition: "object-[center_22%]",
   },
   {
     src: CLOUDINARY.bunnyKeychain,

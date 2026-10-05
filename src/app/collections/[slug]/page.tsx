@@ -8,6 +8,7 @@ import { FrameItLanding } from "@/components/catalog/FrameItLanding";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { Button } from "@/components/ui/Button";
 import { getCategoryBySlug } from "@/lib/catalog";
+import { LITTLE_EXTRAS_HERO_SLIDES } from "@/lib/catalog-images";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -56,6 +57,7 @@ export default async function CollectionSlugPage({ params }: PageProps) {
         description={category.description}
         image={category.image}
         imageAlt={category.imageAlt}
+        slides={slug === "little-extras" ? LITTLE_EXTRAS_HERO_SLIDES : undefined}
       />
       <section className="bg-white px-5 py-14 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-7xl">

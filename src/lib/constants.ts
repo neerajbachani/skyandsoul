@@ -1,5 +1,4 @@
 import { FRAME_DESIGNS } from "@/lib/catalog-content";
-import { CLOUDINARY } from "@/lib/catalog-images";
 import type { NavLink, SocialLink, Testimonial, ValueProp } from "./types";
 
 export const SITE = {
@@ -120,9 +119,22 @@ export const HERO_SLIDES = [
     subheadline: "For Sky, for Soul, and the little moments that define us.",
     cta: "Discover the Collection",
     ctaHref: "/collections",
-    image: CLOUDINARY.rainbowNest,
+    image:
+      "https://res.cloudinary.com/dix9x012c/image/upload/v1791178694/Colorful_Crochet_Blanket_Gift_Box_gwbghy.png",
     imageAlt:
-      "Rainbow Nest striped crochet baby blanket with cloud appliqués in a kraft gift box",
+      "Striped crochet baby blanket with white cloud appliqués folded in an open kraft gift box",
+    objectPosition: "object-center",
+  },
+  {
+    eyebrow: "Toys",
+    headline: "Soft companions, stitched by hand.",
+    subheadline: "Crochet friends made to be held, loved, and kept.",
+    cta: "Shop Toys",
+    ctaHref: "/collections/toys",
+    image:
+      "https://res.cloudinary.com/dix9x012c/image/upload/v1791176363/Crocheted_Aviator_Bear_in_Blue_Scarf_tqxpa1.png",
+    imageAlt:
+      "Crochet pilot bear in a blue aviator cap and scarf, sitting on a warm linen surface",
     objectPosition: "object-center",
   },
   {
@@ -132,20 +144,11 @@ export const HERO_SLIDES = [
       "Personalized nursery frames, handmade to hold the first details of a life.",
     cta: "Shop Frames",
     ctaHref: "/collections/frames",
-    image: CLOUDINARY.welcomeToTheWorld,
+    image:
+      "https://res.cloudinary.com/dix9x012c/image/upload/v1791178703/Mint_Nursery_Lion_Birth_Announcement_daixnp.png",
     imageAlt:
-      "Welcome to the World nursery frame with a crochet lion, balloons, and a name",
+      "Mint nursery frame with a crochet lion, balloons, and a birth announcement",
     objectPosition: "object-center",
-  },
-  {
-    eyebrow: "Toys",
-    headline: "Soft companions, stitched by hand.",
-    subheadline: "Crochet friends made to be held, loved, and kept.",
-    cta: "Shop Toys",
-    ctaHref: "/collections/toys",
-    image: CLOUDINARY.crochetPilotBearToyGallery[3],
-    imageAlt: "Handmade crochet pilot bear with a blue muffler and goggles, held in an open hand",
-    objectPosition: "object-[center_42%]",
   },
 ] as const;
 

@@ -424,3 +424,14 @@ export const CLOUDINARY = {
   stitchKeychain: stitchKeychainGallery[0],
   stitchKeychainGallery,
 } as const;
+
+export const LITTLE_EXTRAS_HERO_SLIDES = [
+  {
+    src: bunnyKeychainGallery[0],
+    alt: "Bunny crochet keychain",
+  },
+  {
+    src: TEA_COASTER_PATTERNS[0].individual[1],
+    alt: "Blue granny square tea coaster with a light frame",
+  },
+] as const;

@@ -2,11 +2,19 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/Button";
-import { HERO_SLIDES } from "@/lib/constants";
 
-const AUTOPLAY_MS = 6000;
+const AUTOPLAY_MS = 5000;
 const SWIPE_THRESHOLD = 48;
+
+export type CollectionHeroSlide = {
+  src: string;
+  alt: string;
+};
+
+type CollectionHeroSliderProps = {
+  slides: readonly CollectionHeroSlide[];
+  label?: string;
+};
 
 function Chevron({ direction }: { direction: "prev" | "next" }) {
   return (
@@ -30,14 +38,16 @@ function Chevron({ direction }: { direction: "prev" | "next" }) {
   );
 }
 
-export function Hero() {
-  const count = HERO_SLIDES.length;
+export function CollectionHeroSlider({
+  slides,
+  label = "Collection highlights",
+}: CollectionHeroSliderProps) {
+  const count = slides.length;
   const pointerIdRef = useRef<number | null>(null);
   const startXRef = useRef(0);
   const startYRef = useRef(0);
   const deltaXRef = useRef(0);
   const draggingRef = useRef(false);
-  const suppressClickRef = useRef(false);
 
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -80,7 +90,7 @@ export function Hero() {
     startYRef.current = event.clientY;
     deltaXRef.current = 0;
     draggingRef.current = false;
-    suppressClickRef.current = false;
+    event.currentTarget.setPointerCapture(event.pointerId);
   }
 
   function onPointerMove(event: React.PointerEvent<HTMLElement>) {
@@ -94,7 +104,6 @@ export function Hero() {
       }
       if (Math.abs(deltaX) < 8) return;
       draggingRef.current = true;
-      suppressClickRef.current = true;
     }
     deltaXRef.current = deltaX;
   }
@@ -111,13 +120,6 @@ export function Hero() {
     else if (delta >= SWIPE_THRESHOLD) go(-1);
   }
 
-  function onClickCapture(event: React.MouseEvent<HTMLElement>) {
-    if (!suppressClickRef.current) return;
-    event.preventDefault();
-    event.stopPropagation();
-    suppressClickRef.current = false;
-  }
-
   function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
     if (event.key === "ArrowRight") {
       event.preventDefault();
@@ -128,19 +130,19 @@ export function Hero() {
     }
   }
 
-  const fade = reduceMotion
+  const slideMotion = reduceMotion
     ? ""
-    : "transition-opacity duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none";
+    : "transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none";
   const navButtonClass =
-    "flex size-11 items-center justify-center text-chocolate transition-colors duration-300 hover:text-earth focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth";
-  const slide = HERO_SLIDES[index];
+    "flex size-11 items-center justify-center text-white transition-opacity duration-300 hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+  const active = slides[index];
 
   return (
-    <section
+    <div
       tabIndex={0}
-      className="relative min-h-[70vh] w-full touch-pan-y overflow-hidden bg-sky/40 select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-earth lg:min-h-[78vh]"
+      className="relative aspect-[4/3] touch-pan-y overflow-hidden bg-sky/20 select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-earth"
       aria-roledescription="carousel"
-      aria-label="Featured collections"
+      aria-label={label}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -151,68 +153,37 @@ export function Hero() {
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
-      onClickCapture={onClickCapture}
       onKeyDown={onKeyDown}
     >
-      {HERO_SLIDES.map((item, slideIndex) => {
-        const active = slideIndex === index;
-        return (
-          <div
-            key={item.image}
-            className="absolute inset-0"
-            aria-hidden={!active}
-          >
-            <Image
-              src={item.image}
-              alt={active ? item.imageAlt : ""}
-              fill
-              priority={slideIndex === 0}
-              sizes="100vw"
-              className={`object-cover object-[right_center] md:object-center ${fade} ${
-                active ? "opacity-100" : "opacity-0"
-              }`}
-            />
-          </div>
-        );
-      })}
-
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-canvas/80 via-canvas/45 to-transparent sm:hidden" />
-
-      <div className="relative mx-auto flex min-h-[70vh] max-w-7xl items-center px-5 pt-20 pb-24 sm:px-8 lg:min-h-[78vh]">
-        <div className="grid max-w-xl">
-          {HERO_SLIDES.map((item, slideIndex) => {
-            const active = slideIndex === index;
-            const Heading = active ? "h1" : "p";
-            return (
-              <div
-                key={item.eyebrow}
-                className={`col-start-1 row-start-1 ${fade} ${
-                  active ? "opacity-100" : "pointer-events-none opacity-0"
-                }`}
-                aria-hidden={!active}
-                {...(active ? {} : { inert: true })}
-              >
-                <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage">
-                  {item.eyebrow}
-                </p>
-                <Heading className="mt-4 font-serif text-5xl font-medium leading-[1.1] text-balance text-chocolate sm:text-6xl lg:text-7xl">
-                  {item.headline}
-                </Heading>
-                <p className="mt-6 font-serif text-xl italic leading-relaxed text-earth sm:text-2xl">
-                  {item.subheadline}
-                </p>
-                <div className="mt-10">
-                  <Button href={item.ctaHref} showArrow>
-                    {item.cta}
-                  </Button>
-                </div>
-              </div>
-            );
-          })}
+      <div className="absolute inset-0 overflow-hidden">
+        <div
+          className={`flex h-full ${slideMotion}`}
+          style={{
+            width: `${count * 100}%`,
+            transform: `translateX(-${(index * 100) / count}%)`,
+          }}
+        >
+          {slides.map((slide, slideIndex) => (
+            <div
+              key={slide.src}
+              className="relative h-full"
+              style={{ width: `${100 / count}%` }}
+              aria-hidden={slideIndex !== index}
+            >
+              <Image
+                src={slide.src}
+                alt={slideIndex === index ? slide.alt : ""}
+                fill
+                priority={slideIndex === 0}
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="absolute inset-x-0 bottom-4 z-10 flex items-center justify-center gap-2 sm:bottom-6">
+      <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center gap-1 bg-gradient-to-t from-chocolate/40 to-transparent pb-1 pt-10">
         <button
           type="button"
           className={navButtonClass}
@@ -221,22 +192,22 @@ export function Hero() {
         >
           <Chevron direction="prev" />
         </button>
-        <div className="flex items-center justify-center gap-1" role="tablist" aria-label="Hero slides">
-          {HERO_SLIDES.map((item, slideIndex) => {
-            const active = slideIndex === index;
+        <div className="flex items-center justify-center gap-1" role="tablist" aria-label={label}>
+          {slides.map((slide, slideIndex) => {
+            const selected = slideIndex === index;
             return (
               <button
-                key={item.eyebrow}
+                key={slide.src}
                 type="button"
                 role="tab"
-                aria-label={`Go to ${item.eyebrow}`}
-                aria-selected={active}
-                className="flex size-11 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth"
+                aria-label={`Go to ${slide.alt}`}
+                aria-selected={selected}
+                className="flex size-11 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 onClick={() => setIndex(slideIndex)}
               >
                 <span
-                  className={`block size-2 rounded-full bg-chocolate transition-opacity duration-300 ${
-                    active ? "opacity-100" : "opacity-30 hover:opacity-55"
+                  className={`block size-2 rounded-full bg-white transition-opacity duration-300 ${
+                    selected ? "opacity-100" : "opacity-45 hover:opacity-70"
                   }`}
                 />
               </button>
@@ -254,8 +225,8 @@ export function Hero() {
       </div>
 
       <p className="sr-only" aria-live="polite">
-        {slide.headline}
+        {active?.alt}
       </p>
-    </section>
+    </div>
   );
 }

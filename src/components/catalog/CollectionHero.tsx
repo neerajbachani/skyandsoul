@@ -1,4 +1,8 @@
 import Image from "next/image";
+import {
+  CollectionHeroSlider,
+  type CollectionHeroSlide,
+} from "@/components/catalog/CollectionHeroSlider";
 
 type CollectionHeroProps = {
   eyebrow?: string;
@@ -6,6 +10,7 @@ type CollectionHeroProps = {
   description: string;
   image?: string;
   imageAlt?: string;
+  slides?: readonly CollectionHeroSlide[];
 };
 
 export function CollectionHero({
@@ -14,6 +19,7 @@ export function CollectionHero({
   description,
   image,
   imageAlt,
+  slides,
 }: CollectionHeroProps) {
   return (
     <section className="border-b border-chocolate/10 bg-canvas">
@@ -29,7 +35,9 @@ export function CollectionHero({
             {description}
           </p>
         </div>
-        {image ? (
+        {slides && slides.length > 1 ? (
+          <CollectionHeroSlider slides={slides} label={title} />
+        ) : image ? (
           <div className="relative aspect-[4/3] overflow-hidden bg-sky/20">
             <Image
               src={image}

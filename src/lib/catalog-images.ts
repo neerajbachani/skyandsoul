@@ -408,7 +408,7 @@ export const CLOUDINARY = {
   teaCoasterSet6Gallery: TEA_COASTER_PATTERNS.map((pattern) =>
     teaCoasterPhotos(pattern, "set6")[0],
   ),
-  teaCoaster: TEA_COASTER_PATTERNS[0].individual[0],
+  teaCoaster: TEA_COASTER_PATTERNS[0].individual[1],
   bunnyKeychain: bunnyKeychainGallery[0],
   bunnyKeychainGallery,
   donkeyKeychain: donkeyKeychainGallery[0],

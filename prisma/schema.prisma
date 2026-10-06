@@ -39,6 +39,9 @@ model Product {
   category         Category         @relation(fields: [categoryId], references: [id])
   isFeatured               Boolean          @default(false)
   requiresPatternSelection Boolean          @default(false)
+  isPublished              Boolean          @default(true)
+  trackStock               Boolean          @default(false)
+  stockQuantity            Int              @default(0)
   sortOrder                Int              @default(0)
   variants                 ProductVariant[]
   cartItems        CartItem[]
@@ -57,9 +60,11 @@ model ProductVariant {
   slug      String
   name      String
   price     Int
-  badge     String?
-  images    String[]
-  sortOrder Int        @default(0)
+  badge         String?
+  images        String[]
+  trackStock    Boolean @default(false)
+  stockQuantity Int     @default(0)
+  sortOrder     Int     @default(0)
   cartItems CartItem[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -69,15 +74,50 @@ model ProductVariant {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  password  String
-  name      String?
-  phone     String?
-  cartItems CartItem[]
-  orders    Order[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id                  String               @id @default(uuid())
+  email               String               @unique
+  password            String
+  name                String?
+  phone               String?
+  role                UserRole             @default(CUSTOMER)
+  cartItems           CartItem[]
+  orders              Order[]
+  addresses           Address[]
+  passwordResetTokens PasswordResetToken[]
+  orderEvents         OrderEvent[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+}
+
+model Address {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label         String?
+  recipientName String
+  phone         String
+  line1         String
+  city          String
+  state         String
+  pincode       String
+  isDefault     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
 }
 
 model CartItem {
@@ -120,11 +160,18 @@ model Order {
   shippingCity      String
   shippingState     String
   shippingPincode   String
+  carrier           String?
+  trackingNumber    String?
+  trackingUrl       String?
+  internalNote      String?
+  stockAdjusted     Boolean       @default(false)
+  events            OrderEvent[]
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
   @@index([userId])
   @@index([orderNumber])
+  @@index([status])
 }
 
 model OrderItem {
@@ -134,8 +181,10 @@ model OrderItem {
   productId            String
   product              Product @relation(fields: [productId], references: [id])
   productName          String
+  variantId            String?
   variantName          String?
   productImage         String
+  stockTaken           Int     @default(0)
   selectedPatternImage String?
   selectedPatternLabel String?
   quantity             Int
@@ -144,6 +193,40 @@ model OrderItem {
   createdAt            DateTime @default(now())
 
   @@index([orderId])
+  @@index([variantId])
+}
+
+model OrderEvent {
+  id         String         @id @default(uuid())
+  orderId    String
+  order      Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actorId    String?
+  actor      User?          @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  type       OrderEventType
+  fromStatus OrderStatus?
+  toStatus   OrderStatus?
+  note       String?
+  createdAt  DateTime       @default(now())
+
+  @@index([orderId])
+  @@index([actorId])
+}
+
+model HomePage {
+  id        String   @id @default("home")
+  content   Json
+  updatedAt DateTime @updatedAt
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderEventType {
+  STATUS
+  NOTE
+  TRACKING
 }
 
 enum OrderStatus {

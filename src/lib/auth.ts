@@ -2,10 +2,14 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
+import type { User, UserRole } from "@prisma/client";
+import { ApiError } from "@/middleware/errorHandler";
+import { prisma } from "@/lib/prisma";
 
 export type JWTPayload = {
   userId: string;
   email: string;
+  role?: UserRole;
   iat?: number;
   exp?: number;
 };
@@ -15,6 +19,7 @@ export type AuthUser = {
   email: string;
   name?: string | null;
   phone?: string | null;
+  role: UserRole;
 };
 
 export async function hashPassword(password: string): Promise<string> {
@@ -88,6 +93,50 @@ export async function requireAuth(request: NextRequest): Promise<JWTPayload> {
   const user = await getUserFromRequest(request);
   if (!user?.userId) {
     throw new Error("Authentication required");
+  }
+  return user;
+}
+
+export function publicUser(user: Pick<User, "id" | "email" | "name" | "phone" | "role" | "createdAt">) {
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    phone: user.phone,
+    role: user.role,
+    createdAt: user.createdAt,
+  };
+}
+
+export function adminEmails(): string[] {
+  return (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export function isAllowlistedAdmin(email: string): boolean {
+  return adminEmails().includes(email.toLowerCase());
+}
+
+export async function requireUser(request?: NextRequest) {
+  const auth = await getUserFromRequest(request);
+  if (!auth?.userId) {
+    throw new ApiError("Unauthorized", 401);
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: auth.userId } });
+  if (!user) {
+    throw new ApiError("Unauthorized", 401);
+  }
+
+  return user;
+}
+
+export async function requireAdmin(request?: NextRequest) {
+  const user = await requireUser(request);
+  if (user.role !== "ADMIN") {
+    throw new ApiError("Forbidden", 403);
   }
   return user;
 }

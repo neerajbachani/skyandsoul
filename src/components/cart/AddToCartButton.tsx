@@ -14,6 +14,8 @@ type AddToCartButtonProps = {
   requirePattern?: boolean;
   selectedPatternImage?: string | null;
   selectedPatternLabel?: string | null;
+  available?: number | null;
+  soldOut?: boolean;
 };
 
 export function AddToCartButton({
@@ -23,6 +25,8 @@ export function AddToCartButton({
   requirePattern = false,
   selectedPatternImage,
   selectedPatternLabel,
+  available = null,
+  soldOut = false,
 }: AddToCartButtonProps) {
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState("");
@@ -70,11 +74,13 @@ export function AddToCartButton({
           <input
             type="number"
             min={1}
-            max={99}
+            max={available ?? 99}
             value={quantity}
-            onChange={(event) =>
-              setQuantity(Math.max(1, Number(event.target.value) || 1))
-            }
+            disabled={soldOut}
+            onChange={(event) => {
+              const next = Math.max(1, Number(event.target.value) || 1);
+              setQuantity(available ? Math.min(available, next) : next);
+            }}
             className="h-11 w-16 border border-chocolate/20 bg-white px-2 text-center font-sans text-sm focus:border-earth focus:outline-none"
           />
         </label>
@@ -82,12 +88,17 @@ export function AddToCartButton({
           type="button"
           variant="filled"
           onClick={handleAdd}
-          disabled={addToCart.isPending}
+          disabled={addToCart.isPending || soldOut}
           className="min-h-11"
         >
-          {addToCart.isPending ? "Adding…" : "Add to Cart"}
+          {soldOut ? "Sold out" : addToCart.isPending ? "Adding…" : "Add to Cart"}
         </Button>
       </div>
+      {available !== null && available > 0 ? (
+        <p className="font-sans text-xs uppercase tracking-[0.12em] text-earth">
+          {available === 1 ? "Only 1 left" : `Only ${available} left`}
+        </p>
+      ) : null}
       {message ? (
         <p className="font-serif text-base text-earth">
           {message}{" "}

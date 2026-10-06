@@ -4,9 +4,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { HERO_SLIDES } from "@/lib/constants";
 
-const AUTOPLAY_MS = 6000;
+export type HeroSlideContent = {
+  id: string;
+  eyebrow: string;
+  headline: string;
+  subheadline: string;
+  cta: string;
+  ctaHref: string;
+  image: string;
+  imageAlt: string;
+};
+
+const AUTOPLAY_MS = 3000;
 const SWIPE_THRESHOLD = 48;
 
 function Chevron({
@@ -37,8 +47,8 @@ function Chevron({
   );
 }
 
-export function Hero() {
-  const count = HERO_SLIDES.length;
+export function Hero({ slides }: { slides: readonly HeroSlideContent[] }) {
+  const count = slides.length;
   const pointerIdRef = useRef<number | null>(null);
   const startXRef = useRef(0);
   const startYRef = useRef(0);
@@ -140,7 +150,8 @@ export function Hero() {
     : "transition-opacity duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none";
   const navButtonClass =
     "flex size-11 items-center justify-center text-chocolate transition-colors duration-300 hover:text-earth focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth";
-  const slide = HERO_SLIDES[index];
+  const slide = slides[index];
+  if (!slide) return null;
 
   return (
     <section
@@ -148,8 +159,6 @@ export function Hero() {
       className="relative flex w-full flex-col touch-pan-y bg-canvas select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-earth md:block md:min-h-[70vh] md:overflow-hidden md:bg-sky/40 lg:min-h-[78vh]"
       aria-roledescription="carousel"
       aria-label="Featured collections"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false);
@@ -161,12 +170,16 @@ export function Hero() {
       onClickCapture={onClickCapture}
       onKeyDown={onKeyDown}
     >
-      <div className="relative h-[64vh] max-h-[30rem] min-h-[18.5rem] w-full shrink-0 overflow-hidden bg-sky/40 md:absolute md:inset-0 md:h-auto md:max-h-none md:min-h-[70vh] lg:min-h-[78vh]">
-        {HERO_SLIDES.map((item, slideIndex) => {
+      <div
+        className="relative h-[64vh] max-h-[30rem] min-h-[18.5rem] w-full shrink-0 overflow-hidden bg-sky/40 md:absolute md:inset-0 md:h-auto md:max-h-none md:min-h-[70vh] lg:min-h-[78vh]"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
+        {slides.map((item, slideIndex) => {
           const active = slideIndex === index;
           return (
             <div
-              key={item.image}
+              key={item.id}
               className="absolute inset-y-0 right-0 w-[138%] max-md:left-auto max-md:max-w-none md:inset-0 md:w-full"
               aria-hidden={!active}
             >
@@ -184,11 +197,12 @@ export function Hero() {
           );
         })}
 
-        <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-10 flex items-center justify-center gap-2 bg-gradient-to-t from-chocolate/35 via-chocolate/10 to-transparent pb-2 pt-10 md:bottom-6 md:from-transparent md:via-transparent md:pb-0 md:pt-0">
+        <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-20 flex items-center justify-center gap-2 bg-gradient-to-t from-chocolate/35 via-chocolate/10 to-transparent pb-2 pt-10 md:bottom-6 md:from-transparent md:via-transparent md:pb-0 md:pt-0">
           <button
             type="button"
             className={`${navButtonClass} max-md:text-white max-md:hover:text-white/85`}
             aria-label="Previous slide"
+            onPointerDown={(event) => event.stopPropagation()}
             onClick={() => go(-1)}
           >
             <Chevron direction="prev" />
@@ -198,16 +212,17 @@ export function Hero() {
             role="tablist"
             aria-label="Hero slides"
           >
-            {HERO_SLIDES.map((item, slideIndex) => {
+            {slides.map((item, slideIndex) => {
               const active = slideIndex === index;
               return (
                 <button
-                  key={item.eyebrow}
+                  key={item.id}
                   type="button"
                   role="tab"
                   aria-label={`Go to ${item.eyebrow}`}
                   aria-selected={active}
                   className="flex size-11 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth max-md:focus-visible:outline-white"
+                  onPointerDown={(event) => event.stopPropagation()}
                   onClick={() => setIndex(slideIndex)}
                 >
                   <span
@@ -223,6 +238,7 @@ export function Hero() {
             type="button"
             className={`${navButtonClass} max-md:text-white max-md:hover:text-white/85`}
             aria-label="Next slide"
+            onPointerDown={(event) => event.stopPropagation()}
             onClick={() => go(1)}
           >
             <Chevron direction="next" />
@@ -230,14 +246,14 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pt-8 pb-10 sm:px-8 md:flex md:min-h-[70vh] md:items-center md:pt-20 md:pb-24 lg:min-h-[78vh]">
-        <div className="grid max-w-xl">
-          {HERO_SLIDES.map((item, slideIndex) => {
+      <div className="pointer-events-none relative z-10 mx-auto w-full max-w-7xl px-5 pt-8 pb-10 sm:px-8 md:flex md:min-h-[70vh] md:items-center md:pt-20 md:pb-24 lg:min-h-[78vh]">
+        <div className="pointer-events-auto grid max-w-xl">
+          {slides.map((item, slideIndex) => {
             const active = slideIndex === index;
             const Heading = active ? "h1" : "p";
             return (
               <div
-                key={item.eyebrow}
+                key={item.id}
                 className={`col-start-1 row-start-1 ${fade} ${
                   active ? "opacity-100" : "pointer-events-none opacity-0"
                 }`}

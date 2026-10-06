@@ -4,6 +4,7 @@ import {
   generateToken,
   hashPassword,
   isValidPassword,
+  publicUser,
   setAuthCookie,
 } from "@/lib/auth";
 import { mergeGuestCart } from "@/lib/cart";
@@ -62,6 +63,7 @@ export async function POST(request: NextRequest) {
     const token = generateToken({
       userId: user.id,
       email: user.email,
+      role: user.role,
     });
     await setAuthCookie(token);
 
@@ -75,14 +77,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          phone: user.phone,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
+        user: publicUser(user),
       },
       { status: 201 },
     );

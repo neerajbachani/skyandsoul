@@ -5,6 +5,8 @@ import { generateOrderNumber, getUserCart } from "@/lib/cart";
 import { sendOrderConfirmationEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 import { verifyRazorpaySignature } from "@/lib/razorpay";
+import { takeStockForLines, stockErrorStatus } from "@/lib/stock";
+import { toPublicOrder } from "@/lib/public-order";
 
 const createOrderSchema = z.object({
   items: z
@@ -47,7 +49,7 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ orders });
+    return NextResponse.json({ orders: orders.map(toPublicOrder) });
   } catch (error) {
     console.error("List orders error:", error);
     return NextResponse.json(
@@ -83,7 +85,7 @@ export async function POST(request: NextRequest) {
       where: { razorpayPaymentId: body.razorpayPaymentId },
     });
     if (existingPayment) {
-      return NextResponse.json(existingPayment);
+      return NextResponse.json(toPublicOrder(existingPayment));
     }
 
     const cart = await getUserCart(auth.userId);
@@ -123,6 +125,16 @@ export async function POST(request: NextRequest) {
     const shippingName = `${body.shippingDetails.firstName} ${body.shippingDetails.lastName}`.trim();
 
     const order = await prisma.$transaction(async (tx) => {
+      const stockLines = await takeStockForLines(
+        tx,
+        cart.items.map((item) => ({
+          productId: item.productId,
+          variantId: item.variantId,
+          quantity: item.quantity,
+        })),
+      );
+      const stockAdjusted = stockLines.some((line) => line.taken > 0);
+
       const created = await tx.order.create({
         data: {
           orderNumber: generateOrderNumber(),
@@ -143,18 +155,28 @@ export async function POST(request: NextRequest) {
           shippingCity: body.shippingDetails.city,
           shippingState: body.shippingDetails.state,
           shippingPincode: body.shippingDetails.pincode,
+          stockAdjusted,
           items: {
-            create: cart.items.map((item) => ({
-              productId: item.productId,
-              productName: item.displayName,
-              variantName: item.variantName,
-              productImage: item.lineImage,
-              selectedPatternImage: item.selectedPatternImage,
-              selectedPatternLabel: item.selectedPatternLabel,
-              quantity: item.quantity,
-              price: item.unitPrice,
-              total: item.lineTotal,
-            })),
+            create: cart.items.map((item) => {
+              const stock = stockLines.find(
+                (line) =>
+                  line.productId === item.productId &&
+                  line.variantId === item.variantId,
+              );
+              return {
+                productId: item.productId,
+                productName: item.displayName,
+                variantId: item.variantId,
+                variantName: item.variantName,
+                productImage: item.lineImage,
+                selectedPatternImage: item.selectedPatternImage,
+                selectedPatternLabel: item.selectedPatternLabel,
+                quantity: item.quantity,
+                price: item.unitPrice,
+                total: item.lineTotal,
+                stockTaken: stock?.taken ?? 0,
+              };
+            }),
           },
         },
         include: { items: true },
@@ -191,13 +213,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(order, { status: 201 });
+    return NextResponse.json(toPublicOrder(order), { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.flatten() },
         { status: 400 },
       );
+    }
+    const stockMessage = stockErrorStatus(error);
+    if (stockMessage) {
+      return NextResponse.json({ error: stockMessage }, { status: 400 });
     }
     console.error("Create order error:", error);
     return NextResponse.json(

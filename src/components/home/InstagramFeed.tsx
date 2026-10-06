@@ -1,11 +1,9 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
-import { SOCIAL_LINKS } from "@/lib/constants";
 
-const INSTAGRAM = SOCIAL_LINKS.find((link) => link.network === "instagram");
-const INSTAGRAM_HANDLE = "skynsoul.co";
+export const INSTAGRAM_HANDLE = "skynsoul.co";
 
-const POSTS = [
+export const INSTAGRAM_POSTS = [
   {
     id: "DdWR1EnMAri",
     href: "https://www.instagram.com/skynsoul.co/reel/DdWR1EnMAri/",
@@ -118,13 +116,31 @@ function PlayGlyph() {
   );
 }
 
-function FeedRow({ duplicate = false }: { duplicate?: boolean }) {
+export type InstagramFeedContent = {
+  handle: string;
+  href: string;
+  posts: readonly {
+    id: string;
+    href: string;
+    src: string;
+    alt: string;
+    kind: "reel" | "post";
+  }[];
+};
+
+function FeedRow({
+  posts,
+  duplicate = false,
+}: {
+  posts: InstagramFeedContent["posts"];
+  duplicate?: boolean;
+}) {
   return (
     <div
       className={`flex gap-2.5 pr-2.5 sm:gap-[10px] sm:pr-[10px]${duplicate ? " motion-reduce:hidden" : ""}`}
       aria-hidden={duplicate || undefined}
     >
-      {POSTS.map((post, index) => (
+      {posts.map((post, index) => (
         <a
           key={`${post.id}-${duplicate ? "copy" : "live"}`}
           href={post.href}
@@ -151,8 +167,9 @@ function FeedRow({ duplicate = false }: { duplicate?: boolean }) {
   );
 }
 
-export function InstagramFeed() {
-  if (!INSTAGRAM) return null;
+export function InstagramFeed({ content }: { content: InstagramFeedContent }) {
+  if (content.posts.length === 0) return null;
+  const external = content.href.startsWith("https://");
 
   return (
     <section className="overflow-hidden bg-white py-20 sm:py-28" aria-label="Follow us on Instagram">
@@ -164,16 +181,21 @@ export function InstagramFeed() {
           Follow us on Instagram
         </h2>
         <div className="mt-6">
-          <Button href={INSTAGRAM.href} target="_blank" rel="noopener noreferrer" showArrow>
-            @{INSTAGRAM_HANDLE}
+          <Button
+            href={content.href}
+            target={external ? "_blank" : undefined}
+            rel={external ? "noopener noreferrer" : undefined}
+            showArrow
+          >
+            @{content.handle}
           </Button>
         </div>
       </div>
 
       <div className="overflow-hidden motion-reduce:overflow-x-auto">
         <div className="flex w-max animate-marquee hover:[animation-play-state:paused] motion-reduce:animate-none">
-          <FeedRow />
-          <FeedRow duplicate />
+          <FeedRow posts={content.posts} />
+          <FeedRow posts={content.posts} duplicate />
         </div>
       </div>
     </section>

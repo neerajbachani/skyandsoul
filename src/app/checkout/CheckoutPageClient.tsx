@@ -40,6 +40,7 @@ export function CheckoutPageClient() {
     pincode: "",
     phone: "",
   });
+  const [addressReady, setAddressReady] = useState(false);
   const phone = form.phone || user?.phone || "";
 
   useEffect(() => {
@@ -47,6 +48,40 @@ export function CheckoutPageClient() {
       router.replace(`/auth/login?redirect=${encodeURIComponent("/checkout")}`);
     }
   }, [authLoading, isAuthenticated, router]);
+
+  useEffect(() => {
+    if (!isAuthenticated || addressReady) return;
+    let cancelled = false;
+    async function loadAddress() {
+      const res = await fetch("/api/account/addresses", { credentials: "include" });
+      if (!res.ok) {
+        setAddressReady(true);
+        return;
+      }
+      const data = await res.json();
+      const saved = (data.addresses ?? []).find(
+        (address: { isDefault: boolean }) => address.isDefault,
+      ) ?? data.addresses?.[0];
+      if (!cancelled && saved) {
+        const [firstName, ...rest] = String(saved.recipientName).split(" ");
+        setForm((current) => ({
+          ...current,
+          firstName: current.firstName || firstName || "",
+          lastName: current.lastName || rest.join(" "),
+          address: current.address || saved.line1,
+          city: current.city || saved.city,
+          state: current.state || saved.state,
+          pincode: current.pincode || saved.pincode,
+          phone: current.phone || saved.phone,
+        }));
+      }
+      if (!cancelled) setAddressReady(true);
+    }
+    void loadAddress();
+    return () => {
+      cancelled = true;
+    };
+  }, [addressReady, isAuthenticated]);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();

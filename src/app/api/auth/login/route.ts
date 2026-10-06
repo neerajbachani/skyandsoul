@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import {
   generateToken,
+  isAllowlistedAdmin,
+  publicUser,
   setAuthCookie,
   verifyPassword,
 } from "@/lib/auth";
@@ -40,9 +42,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let role = user.role;
+    if (isAllowlistedAdmin(user.email) && role !== "ADMIN") {
+      const updated = await prisma.user.update({
+        where: { id: user.id },
+        data: { role: "ADMIN" },
+      });
+      role = updated.role;
+    }
+
     const token = generateToken({
       userId: user.id,
       email: user.email,
+      role,
     });
     await setAuthCookie(token);
 
@@ -55,14 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
+      user: publicUser({ ...user, role }),
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

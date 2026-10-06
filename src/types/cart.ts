@@ -93,6 +93,9 @@ export type OrderSummary = {
   shippingCity: string;
   shippingState: string;
   shippingPincode: string;
+  carrier?: string | null;
+  trackingNumber?: string | null;
+  trackingUrl?: string | null;
   createdAt: string;
   items: Array<{
     id: string;

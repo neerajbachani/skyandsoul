@@ -50,6 +50,8 @@ export default async function ProductPage({ params }: PageProps) {
           ? [...CLOUDINARY.teaCoasterSet4Gallery]
           : variant.images
       : variant.images,
+    trackStock: variant.trackStock,
+    stockQuantity: variant.stockQuantity,
   }));
 
   return (
@@ -87,6 +89,8 @@ export default async function ProductPage({ params }: PageProps) {
                 singles={singles}
                 variants={packVariants}
                 requiresPatternSelection={product.requiresPatternSelection}
+                trackStock={product.trackStock}
+                stockQuantity={product.stockQuantity}
               />
             ) : (
               <>
@@ -166,6 +170,8 @@ function StandardProductDetails({ product }: { product: ProductWithDetails }) {
           productId={product.id}
           productName={product.name}
           basePrice={product.price}
+          trackStock={product.trackStock}
+          stockQuantity={product.stockQuantity}
         />
       </div>
 

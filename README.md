@@ -35,7 +35,9 @@ docker start skyandsoul-db 2>/dev/null || docker run -d --name skyandsoul-db \
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Client Checkout.js key |
 | `SMTP_*` / `SMTP_FROM` | Order confirmation email |
 | `ADMIN_CONTACT_EMAIL` | Admin order notification |
+| `ADMIN_EMAILS` | Optional comma-separated emails promoted to admin on login |
 | `NEXT_PUBLIC_APP_URL` | Links in emails (e.g. `http://localhost:3000`) |
+| `CLOUDINARY_*` | Admin image uploads |
 
 Without Razorpay keys, checkout fails when creating a payment. Without SMTP, order emails are skipped (order still saves).
 
@@ -60,6 +62,15 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run db:push` | Sync Prisma schema to DB |
 | `npm run db:seed` | Seed categories + Google Doc blanket copy |
 | `npm run db:studio` | Prisma Studio |
+| `npm run admin:promote -- you@example.com` | Grant admin to an existing account |
+
+## Phase C — Accounts and operations
+
+Customers can update their profile, change their password, reset a forgotten password by email, and save shipping addresses. Checkout prefills the default address.
+
+Admins use `/admin` after `npm run admin:promote`. The studio covers the order queue (status, tracking, internal notes, and customer emails), products and collections, optional stock, and a read-only customer list. Unpublished products stay off the shop. Stock is enforced only when tracking is turned on for a product or option. Cancelling or refunding an order restores the stock that checkout took. Recording a refund does not call Razorpay; issue the refund in the Razorpay dashboard, then tick “Record the Razorpay refund”.
+
+Low stock on the overview means tracked quantity of 3 or fewer. `ADMIN_EMAILS` can also promote those addresses the next time they sign in. Signup never creates an admin.
 
 ## Phase B — Cart & Checkout
 
@@ -97,6 +108,8 @@ Catalog pages are rendered dynamically at request time, so the build does **not*
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | For checkout | Client Checkout.js key |
 | `SMTP_*` / `SMTP_FROM` | Optional | Order emails skipped if unset |
 | `ADMIN_CONTACT_EMAIL` | Optional | Admin order notifications |
+| `ADMIN_EMAILS` | Optional | Comma-separated emails promoted to admin on login |
+| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | For admin uploads | Product image uploads |
 
 3. After first deploy, run migrations and seed against production (from your machine or CI):
 

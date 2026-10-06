@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { CLOUDINARY } from "@/lib/catalog-images";
 
-const COLLAGE = [
+export const EDITORIAL_IMAGES = [
   {
     src: CLOUDINARY.categoryBlankets,
     alt: "Rainbow Nest crochet baby blanket folded in a kraft gift box",
@@ -25,19 +25,40 @@ const COLLAGE = [
   },
 ] as const;
 
-export function EditorialBanner() {
+export const EDITORIAL_COPY = {
+  eyebrow: "Gifting",
+  heading: "The Perfect Gift for New Beginnings",
+  body: "Heirloom blankets, crochet companions, named nursery frames, and little extras — a whole welcome, ready to give.",
+  cta: "Shop All Gifts",
+  ctaHref: "/collections",
+} as const;
+
+export type EditorialBannerContent = {
+  eyebrow: string;
+  heading: string;
+  body: string;
+  cta: string;
+  ctaHref: string;
+  images: readonly {
+    src: string;
+    alt: string;
+    objectPosition?: string;
+  }[];
+};
+
+export function EditorialBanner({ content }: { content: EditorialBannerContent }) {
   return (
     <section className="bg-sky">
       <div className="mx-auto grid max-w-7xl lg:grid-cols-2">
         <div className="grid min-h-[420px] grid-cols-2 grid-rows-2 gap-1.5 p-1.5 sm:min-h-[520px] lg:h-full">
-          {COLLAGE.map((image) => (
-            <div key={image.src} className="relative min-h-0 overflow-hidden">
+          {content.images.map((image, index) => (
+            <div key={`${image.src}-${index}`} className="relative min-h-0 overflow-hidden">
               <Image
                 src={image.src}
                 alt={image.alt}
                 fill
                 sizes="(max-width: 1024px) 50vw, 25vw"
-                className={`object-cover ${image.objectPosition}`}
+                className={`object-cover ${image.objectPosition ?? "object-center"}`}
               />
             </div>
           ))}
@@ -45,18 +66,17 @@ export function EditorialBanner() {
         <div className="flex items-center px-5 py-16 sm:px-12 lg:px-16 lg:py-20">
           <div className="max-w-md">
             <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-earth">
-              Gifting
+              {content.eyebrow}
             </p>
             <h2 className="mt-4 font-serif text-3xl font-medium leading-snug text-chocolate sm:text-4xl">
-              The Perfect Gift for New Beginnings
+              {content.heading}
             </h2>
             <p className="mt-5 font-serif text-lg leading-relaxed text-chocolate/80">
-              Heirloom blankets, crochet companions, named nursery frames, and
-              little extras — a whole welcome, ready to give.
+              {content.body}
             </p>
             <div className="mt-8">
-              <Button href="/collections" showArrow>
-                Shop All Gifts
+              <Button href={content.ctaHref} showArrow>
+                {content.cta}
               </Button>
             </div>
           </div>

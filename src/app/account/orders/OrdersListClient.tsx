@@ -32,9 +32,9 @@ export function OrdersListClient() {
   if (!isAuthenticated) return null;
 
   return (
-    <div className="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
+    <div>
       <p className="font-sans text-[11px] uppercase tracking-[0.18em] text-sage">
-        Account
+        Orders
       </p>
       <h1 className="mt-3 font-serif text-4xl font-medium text-chocolate">
         Your Orders

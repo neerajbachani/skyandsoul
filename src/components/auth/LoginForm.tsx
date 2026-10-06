@@ -74,7 +74,15 @@ export function LoginForm() {
       >
         {login.isPending ? "Signing in…" : "Sign In"}
       </Button>
-      <p className="text-center font-serif text-base text-chocolate/70">
+        <p className="text-center font-serif text-base text-chocolate/70">
+          <Link
+            href="/auth/forgot-password"
+            className="text-earth underline underline-offset-4"
+          >
+            Forgot password?
+          </Link>
+        </p>
+        <p className="text-center font-serif text-base text-chocolate/70">
         New here?{" "}
         <Link
           href={`/auth/signup?redirect=${encodeURIComponent(redirect)}`}

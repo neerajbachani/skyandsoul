@@ -1,3 +1,4 @@
+import { assertCanPurchase, availableQuantity } from "@/lib/inventory";
 import { prisma } from "@/lib/prisma";
 import { patternLabelForImage } from "@/lib/patterns";
 import {
@@ -166,7 +167,7 @@ async function validateProductVariant(
     include: { variants: true },
   });
 
-  if (!product) {
+  if (!product || !product.isPublished) {
     throw new Error("Product not found");
   }
 
@@ -203,11 +204,24 @@ async function validateProductVariant(
         patternLabelForImage(pattern.selectedPatternImage, product.images)
       : null;
 
+  const selectedVariant = hasVariants
+    ? product.variants.find((entry) => entry.id === variantId) ?? null
+    : null;
+
   return {
     product,
+    variant: selectedVariant,
     selectedPatternImage: pattern?.selectedPatternImage ?? null,
     selectedPatternLabel,
   };
+}
+
+function assertLineQuantity(
+  product: Awaited<ReturnType<typeof validateProductVariant>>["product"],
+  variant: Awaited<ReturnType<typeof validateProductVariant>>["variant"],
+  quantity: number,
+) {
+  assertCanPurchase(product, variant, quantity);
 }
 
 export async function mergeGuestCart(
@@ -238,10 +252,19 @@ export async function mergeGuestCart(
       validated.selectedPatternImage,
     );
 
+    const available = availableQuantity(validated.product, validated.variant);
+    const requested = (existing?.quantity ?? 0) + item.quantity;
+    let nextQuantity = requested;
+    if (available !== null) {
+      nextQuantity = Math.min(requested, available);
+      if (nextQuantity < 1) continue;
+      if (existing && nextQuantity === existing.quantity) continue;
+    }
+
     if (existing) {
       await prisma.cartItem.update({
         where: { id: existing.id },
-        data: { quantity: existing.quantity + item.quantity },
+        data: { quantity: nextQuantity },
       });
     } else {
       await prisma.cartItem.create({
@@ -251,7 +274,7 @@ export async function mergeGuestCart(
           variantId: item.variantId ?? null,
           selectedPatternImage: validated.selectedPatternImage,
           selectedPatternLabel: validated.selectedPatternLabel,
-          quantity: item.quantity,
+          quantity: nextQuantity,
         },
       });
     }
@@ -278,10 +301,13 @@ export async function addCartItem(
     validated.selectedPatternImage,
   );
 
+  const nextQuantity = (existing?.quantity ?? 0) + quantity;
+  assertLineQuantity(validated.product, validated.variant, nextQuantity);
+
   if (existing) {
     return prisma.cartItem.update({
       where: { id: existing.id },
-      data: { quantity: existing.quantity + quantity },
+      data: { quantity: nextQuantity },
       include: {
         product: { select: cartProductSelect },
         variant: { select: cartVariantSelect },
@@ -302,6 +328,40 @@ export async function addCartItem(
       product: { select: cartProductSelect },
       variant: { select: cartVariantSelect },
     },
+  });
+}
+
+export async function updateCartItemQuantity(
+  userId: string,
+  cartItemId: string,
+  quantity: number,
+) {
+  const item = await prisma.cartItem.findFirst({
+    where: { id: cartItemId, userId },
+  });
+
+  if (!item) {
+    throw new Error("Cart item not found");
+  }
+
+  if (quantity === 0) {
+    await prisma.cartItem.delete({ where: { id: cartItemId } });
+    return;
+  }
+
+  const validated = await validateProductVariant(
+    item.productId,
+    item.variantId,
+    {
+      selectedPatternImage: item.selectedPatternImage,
+      selectedPatternLabel: item.selectedPatternLabel,
+    },
+  );
+  assertLineQuantity(validated.product, validated.variant, quantity);
+
+  await prisma.cartItem.update({
+    where: { id: cartItemId },
+    data: { quantity },
   });
 }
 

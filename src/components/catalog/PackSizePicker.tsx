@@ -9,6 +9,8 @@ export type PackVariant = {
   price: number;
   badge: string | null;
   images?: string[];
+  trackStock?: boolean;
+  stockQuantity?: number;
 };
 
 type PackSizePickerProps = {

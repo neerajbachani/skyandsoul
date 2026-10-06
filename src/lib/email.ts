@@ -156,3 +156,100 @@ export async function sendOrderConfirmationEmail(
     return { success: false, error };
   }
 }
+
+export async function sendPasswordResetEmail(
+  userEmail: string,
+  userName: string | null,
+  token: string,
+) {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn("SMTP not configured — skipping password reset email");
+    return { success: false, skipped: true };
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const resetUrl = `${appUrl}/auth/reset-password?token=${encodeURIComponent(token)}`;
+
+  try {
+    const transporter = createTransporter();
+    await transporter.sendMail({
+      from: getFromAddress(),
+      to: userEmail,
+      subject: "Reset your Sky n Soul password",
+      html: `
+        <div style="font-family:Georgia,serif;padding:24px;color:#4b3222;max-width:560px;">
+          <h2 style="color:#80592C;font-weight:500;">Reset your password</h2>
+          <p>Hello ${userName || "there"},</p>
+          <p>We received a request to reset the password for your Sky n Soul account. This link expires in one hour.</p>
+          <p><a href="${resetUrl}" style="color:#80592C;">Choose a new password</a></p>
+          <p>If you did not ask for this, you can ignore this email.</p>
+          <p style="color:#889A6F;">With love,<br/>Sky n Soul</p>
+        </div>
+      `,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    return { success: false, error };
+  }
+}
+
+export async function sendOrderStatusEmail(
+  order: {
+    id: string;
+    orderNumber: string;
+    status: string;
+    carrier?: string | null;
+    trackingNumber?: string | null;
+    trackingUrl?: string | null;
+  },
+  userEmail: string,
+  userName: string,
+) {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn("SMTP not configured — skipping order status email");
+    return { success: false, skipped: true };
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const orderUrl = `${appUrl}/orders/${order.id}`;
+  const labels: Record<string, string> = {
+    PROCESSING: "is being prepared",
+    SHIPPED: "has shipped",
+    DELIVERED: "has been delivered",
+    CANCELLED: "has been cancelled",
+    REFUNDED: "has been refunded",
+  };
+  const line = labels[order.status] ?? `is now ${order.status.toLowerCase()}`;
+  const tracking =
+    order.status === "SHIPPED" && order.trackingNumber
+      ? `<p>Tracking${order.carrier ? ` (${order.carrier})` : ""}: ${
+          order.trackingUrl
+            ? `<a href="${order.trackingUrl}" style="color:#80592C;">${order.trackingNumber}</a>`
+            : order.trackingNumber
+        }</p>`
+      : "";
+
+  try {
+    const transporter = createTransporter();
+    await transporter.sendMail({
+      from: getFromAddress(),
+      to: userEmail,
+      subject: `Order ${order.orderNumber} ${line}`,
+      html: `
+        <div style="font-family:Georgia,serif;padding:24px;color:#4b3222;max-width:560px;">
+          <h2 style="color:#80592C;font-weight:500;">Order update</h2>
+          <p>Hello ${userName || "there"},</p>
+          <p>Your Sky n Soul order <strong>${order.orderNumber}</strong> ${line}.</p>
+          ${tracking}
+          <p><a href="${orderUrl}" style="color:#80592C;">View your order</a></p>
+          <p style="color:#889A6F;">With love,<br/>Sky n Soul</p>
+        </div>
+      `,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending order status email:", error);
+    return { success: false, error };
+  }
+}

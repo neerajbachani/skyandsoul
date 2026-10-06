@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { useOrder } from "@/hooks/useCart";
+import { ORDER_STATUS_LABELS } from "@/lib/order-status";
 import { formatInr } from "@/lib/money";
 
 export function OrderDetailClient() {
@@ -35,14 +36,13 @@ export function OrderDetailClient() {
   return (
     <div className="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
       <p className="font-sans text-[11px] uppercase tracking-[0.18em] text-sage">
-        Order confirmed
+        {ORDER_STATUS_LABELS[order.status as keyof typeof ORDER_STATUS_LABELS] ?? order.status}
       </p>
       <h1 className="mt-3 font-serif text-4xl font-medium text-chocolate">
-        Thank you
+        {order.orderNumber}
       </h1>
       <p className="mt-3 font-serif text-lg text-chocolate/75">
-        Order <strong>{order.orderNumber}</strong> is paid and on its way into
-        our nest for packing.
+        Payment {order.paymentStatus.toLowerCase()}.
       </p>
 
       <div className="mt-10 border border-chocolate/10 bg-white p-6 sm:p-8">
@@ -52,7 +52,7 @@ export function OrderDetailClient() {
               Status
             </dt>
             <dd className="mt-1 font-serif text-lg text-chocolate">
-              {order.paymentStatus} · {order.status}
+              {ORDER_STATUS_LABELS[order.status as keyof typeof ORDER_STATUS_LABELS] ?? order.status}
             </dd>
           </div>
           <div>
@@ -110,6 +110,24 @@ export function OrderDetailClient() {
           <br />
           {order.shippingPhone}
         </p>
+        {order.trackingNumber ? (
+          <div className="mt-6">
+            <h2 className="font-serif text-2xl text-chocolate">Tracking</h2>
+            <p className="mt-3 font-serif text-base text-chocolate/80">
+              {order.carrier ? `${order.carrier} · ` : ""}
+              {order.trackingUrl ? (
+                <a
+                  href={order.trackingUrl}
+                  className="text-earth underline underline-offset-4"
+                >
+                  {order.trackingNumber}
+                </a>
+              ) : (
+                order.trackingNumber
+              )}
+            </p>
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-8 flex flex-wrap gap-4">

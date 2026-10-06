@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getUserFromRequest } from "@/lib/auth";
-import { getUserCart } from "@/lib/cart";
-import { prisma } from "@/lib/prisma";
+import { getUserCart, updateCartItemQuantity } from "@/lib/cart";
+import { isClientStockError } from "@/lib/inventory";
 
 const updateSchema = z.object({
   cartItemId: z.string().min(1),
@@ -18,21 +18,19 @@ export async function PUT(request: NextRequest) {
 
     const { cartItemId, quantity } = updateSchema.parse(await request.json());
 
-    const item = await prisma.cartItem.findFirst({
-      where: { id: cartItemId, userId: auth.userId },
-    });
-
-    if (!item) {
-      return NextResponse.json({ error: "Cart item not found" }, { status: 404 });
-    }
-
-    if (quantity === 0) {
-      await prisma.cartItem.delete({ where: { id: cartItemId } });
-    } else {
-      await prisma.cartItem.update({
-        where: { id: cartItemId },
-        data: { quantity },
-      });
+    try {
+      await updateCartItemQuantity(auth.userId, cartItemId, quantity);
+    } catch (error) {
+      if (error instanceof Error && error.message === "Cart item not found") {
+        return NextResponse.json({ error: error.message }, { status: 404 });
+      }
+      if (
+        error instanceof Error &&
+        (isClientStockError(error.message) || error.message === "Product not found")
+      ) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+      throw error;
     }
 
     return NextResponse.json(await getUserCart(auth.userId));

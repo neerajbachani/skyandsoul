@@ -29,7 +29,11 @@ export async function listCategories() {
   const categories = await prisma.category.findMany({
     orderBy: { sortOrder: "asc" },
     include: {
-      _count: { select: { products: true } },
+      _count: {
+        select: {
+          products: { where: { isPublished: true } },
+        },
+      },
     },
   });
 
@@ -50,7 +54,7 @@ export async function getCategoryBySlug(
 
   if (!category) return null;
 
-  const where = { categoryId: category.id };
+  const where = { categoryId: category.id, isPublished: true };
   const skip = (page - 1) * limit;
 
   const [products, total] = await Promise.all([
@@ -85,7 +89,7 @@ export async function listProducts({
   page = 1,
   limit = 12,
 }: ProductListParams = {}) {
-  const where: Prisma.ProductWhereInput = {};
+  const where: Prisma.ProductWhereInput = { isPublished: true };
 
   if (search) {
     where.OR = [
@@ -144,11 +148,12 @@ export async function getProductBySlug(slug: string) {
     },
   });
 
-  if (!product) return null;
+  if (!product || !product.isPublished) return null;
 
   const related = await prisma.product.findMany({
     where: {
       categoryId: product.categoryId,
+      isPublished: true,
       NOT: { id: product.id },
     },
     include: {

@@ -115,12 +115,28 @@ export function Header() {
                       {user?.email}
                     </p>
                     <Link
+                      href="/account"
+                      className="block px-4 py-2 font-sans text-xs uppercase tracking-[0.12em] text-chocolate hover:bg-canvas"
+                      onClick={() => setAccountOpen(false)}
+                    >
+                      Account
+                    </Link>
+                    <Link
                       href="/account/orders"
                       className="block px-4 py-2 font-sans text-xs uppercase tracking-[0.12em] text-chocolate hover:bg-canvas"
                       onClick={() => setAccountOpen(false)}
                     >
                       Orders
                     </Link>
+                    {user?.role === "ADMIN" ? (
+                      <Link
+                        href="/admin"
+                        className="block px-4 py-2 font-sans text-xs uppercase tracking-[0.12em] text-chocolate hover:bg-canvas"
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        Admin
+                      </Link>
+                    ) : null}
                     <button
                       type="button"
                       className="block w-full px-4 py-2 text-left font-sans text-xs uppercase tracking-[0.12em] text-chocolate hover:bg-canvas"

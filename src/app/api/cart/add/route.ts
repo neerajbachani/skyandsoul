@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getUserFromRequest } from "@/lib/auth";
 import { addCartItem, getUserCart } from "@/lib/cart";
+import { isClientStockError } from "@/lib/inventory";
 
 const addSchema = z.object({
   productId: z.string().min(1),
@@ -48,7 +49,10 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    if (error instanceof Error && clientErrors.has(error.message)) {
+    if (
+      error instanceof Error &&
+      (clientErrors.has(error.message) || isClientStockError(error.message))
+    ) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     console.error("Add to cart error:", error);

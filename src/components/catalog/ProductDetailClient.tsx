@@ -33,6 +33,8 @@ type ProductDetailClientProps = {
   singles: string[];
   variants: PackVariant[];
   requiresPatternSelection?: boolean;
+  trackStock?: boolean;
+  stockQuantity?: number;
 };
 
 export function ProductDetailClient({
@@ -52,6 +54,8 @@ export function ProductDetailClient({
   singles,
   variants,
   requiresPatternSelection = false,
+  trackStock = false,
+  stockQuantity = 0,
 }: ProductDetailClientProps) {
   const defaultVariantId = variants[0]?.id ?? "";
   const [selectedVariantId, setSelectedVariantId] = useState(defaultVariantId);
@@ -200,6 +204,8 @@ export function ProductDetailClient({
             productId={productId}
             productName={productName}
             basePrice={basePrice}
+            trackStock={trackStock}
+            stockQuantity={stockQuantity}
             variants={variants}
             selectedVariantId={selectedVariantId}
             onVariantChange={handleVariantSelect}

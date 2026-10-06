@@ -10,6 +10,8 @@ type ProductPurchaseSectionProps = {
   productId: string;
   productName: string;
   basePrice: number;
+  trackStock?: boolean;
+  stockQuantity?: number;
   variants?: PackVariant[];
   selectedVariantId?: string;
   onVariantChange?: (variantId: string) => void;
@@ -23,6 +25,8 @@ export function ProductPurchaseSection({
   productId,
   productName,
   basePrice,
+  trackStock = false,
+  stockQuantity = 0,
   variants = [],
   selectedVariantId: controlledVariantId,
   onVariantChange,
@@ -42,6 +46,13 @@ export function ProductPurchaseSection({
   );
 
   const displayPrice = selectedVariant?.price ?? basePrice;
+  const tracked = hasVariants ? Boolean(selectedVariant?.trackStock) : trackStock;
+  const available = tracked
+    ? hasVariants
+      ? (selectedVariant?.stockQuantity ?? 0)
+      : stockQuantity
+    : null;
+  const soldOut = available !== null && available <= 0;
 
   function handleVariantSelect(variantId: string) {
     if (isControlled) {
@@ -74,6 +85,8 @@ export function ProductPurchaseSection({
         requirePattern={requirePattern}
         selectedPatternImage={selectedPatternImage}
         selectedPatternLabel={selectedPatternLabel}
+        available={available}
+        soldOut={soldOut}
       />
 
       <p>

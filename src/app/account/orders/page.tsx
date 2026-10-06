@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { OrdersListClient } from "@/app/account/orders/OrdersListClient";
-import { SiteShell } from "@/components/layout/SiteShell";
 
 export const metadata: Metadata = {
   title: "Your Orders",
@@ -8,9 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function AccountOrdersPage() {
-  return (
-    <SiteShell>
-      <OrdersListClient />
-    </SiteShell>
-  );
+  return <OrdersListClient />;
 }

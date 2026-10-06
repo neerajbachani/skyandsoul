@@ -9,6 +9,7 @@ export type AuthUser = {
   email: string;
   name?: string | null;
   phone?: string | null;
+  role: "CUSTOMER" | "ADMIN";
 };
 
 async function fetchMe(): Promise<AuthUser | null> {

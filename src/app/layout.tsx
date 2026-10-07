@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import { SkipToContent } from "@/components/layout/SkipToContent";
 import { SITE } from "@/lib/constants";
 import { QueryProvider } from "@/providers/QueryProvider";
@@ -12,8 +12,8 @@ const cormorant = Cormorant_Garamond({
   style: ["normal", "italic"],
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const sans = Plus_Jakarta_Sans({
+  variable: "--font-sans-ui",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
 });
@@ -60,7 +60,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${inter.variable} h-full antialiased`}
+      className={`${cormorant.variable} ${sans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-canvas text-chocolate">
         <QueryProvider>

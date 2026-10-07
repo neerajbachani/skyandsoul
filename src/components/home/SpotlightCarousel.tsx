@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/Button";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { SITE } from "@/lib/constants";
@@ -190,7 +191,7 @@ export function SpotlightCarousel({ products }: SpotlightCarouselProps) {
 
   return (
     <section
-      className="overflow-hidden bg-canvas py-20 sm:py-28"
+      className="overflow-hidden bg-canvas py-24 sm:py-32"
       aria-roledescription="carousel"
       aria-label={`${SITE.name} spotlight`}
       onMouseEnter={() => setPaused(true)}
@@ -198,14 +199,20 @@ export function SpotlightCarousel({ products }: SpotlightCarouselProps) {
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      <div className="mb-10 px-5 text-center sm:mb-14 sm:px-8">
-        <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage">
+      <Reveal className="mb-10 px-5 text-center sm:mb-14 sm:px-8">
+        <p
+          data-reveal
+          className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage"
+        >
           Spotlight
         </p>
-        <h2 className="mt-3 font-serif text-3xl font-medium text-chocolate sm:text-4xl">
+        <h2
+          data-reveal
+          className="mt-3 font-serif text-3xl font-medium text-chocolate sm:text-4xl"
+        >
           {SITE.name} Spotlight
         </h2>
-      </div>
+      </Reveal>
 
       <div className="relative">
         <div

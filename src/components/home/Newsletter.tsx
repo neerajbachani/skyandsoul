@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/Button";
 
 export function Newsletter() {
@@ -14,17 +15,28 @@ export function Newsletter() {
   }
 
   return (
-    <section className="bg-white px-5 py-20 sm:px-8 sm:py-24">
+    <section className="bg-white px-5 py-24 sm:px-8 sm:py-32">
       <div className="mx-auto max-w-2xl text-center">
-        <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage">
-          Stay Close
-        </p>
-        <h2 className="mt-3 font-serif text-3xl font-medium text-chocolate sm:text-4xl">
-          Join Our Nest
-        </h2>
-        <p className="mt-4 font-serif text-lg leading-relaxed text-chocolate/75">
-          Stories, new arrivals, and little moments — delivered gently to your inbox.
-        </p>
+        <Reveal>
+          <p
+            data-reveal
+            className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage"
+          >
+            Stay Close
+          </p>
+          <h2
+            data-reveal
+            className="mt-3 font-serif text-3xl font-medium text-chocolate sm:text-4xl"
+          >
+            Join Our Nest
+          </h2>
+          <p
+            data-reveal
+            className="mt-4 font-serif text-lg leading-relaxed text-chocolate/75"
+          >
+            Stories, new arrivals, and little moments — delivered gently to your inbox.
+          </p>
+        </Reveal>
 
         {submitted ? (
           <p className="mt-10 font-serif text-xl text-earth">

@@ -24,7 +24,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={productHref(product.slug)} className="group block">
-      <div className="relative mb-4 aspect-[4/5] overflow-hidden bg-sky/20">
+      <div className="relative mb-4 aspect-[4/5] overflow-hidden bg-sky/20 outline outline-1 -outline-offset-1 outline-[oklch(0_0_0/0.1)]">
         <Image
           src={image}
           alt={product.imageAlt}

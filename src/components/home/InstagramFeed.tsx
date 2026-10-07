@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/Button";
 
 export const INSTAGRAM_HANDLE = "skynsoul.co";
@@ -158,6 +159,10 @@ function FeedRow({
             priority={!duplicate && index < 4}
             className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 outline outline-1 -outline-offset-1 outline-[oklch(0_0_0/0.1)]"
+          />
           <span className="absolute inset-0 flex items-center justify-center bg-chocolate/45 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:duration-0">
             {post.kind === "reel" ? <PlayGlyph /> : <InstagramGlyph />}
           </span>
@@ -172,12 +177,18 @@ export function InstagramFeed({ content }: { content: InstagramFeedContent }) {
   const external = content.href.startsWith("https://");
 
   return (
-    <section className="overflow-hidden bg-white py-20 sm:py-28" aria-label="Follow us on Instagram">
-      <div className="mb-10 px-5 text-center sm:mb-14 sm:px-8">
-        <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage">
+    <section className="overflow-hidden bg-white py-24 sm:py-32" aria-label="Follow us on Instagram">
+      <Reveal className="mb-10 px-5 text-center sm:mb-14 sm:px-8">
+        <p
+          data-reveal
+          className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage"
+        >
           Follow Along
         </p>
-        <h2 className="mt-3 font-serif text-3xl font-medium text-chocolate sm:text-4xl">
+        <h2
+          data-reveal
+          className="mt-3 font-serif text-3xl font-medium text-chocolate sm:text-4xl"
+        >
           Follow us on Instagram
         </h2>
         <div className="mt-6">
@@ -190,7 +201,7 @@ export function InstagramFeed({ content }: { content: InstagramFeedContent }) {
             @{content.handle}
           </Button>
         </div>
-      </div>
+      </Reveal>
 
       <div className="overflow-hidden motion-reduce:overflow-x-auto">
         <div className="flex w-max animate-marquee hover:[animation-play-state:paused] motion-reduce:animate-none">

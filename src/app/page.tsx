@@ -24,7 +24,7 @@ export default async function HomePage() {
       <main id="main-content" className="flex-1">
         <Hero slides={content.hero.slides} />
         <BrandStory />
-        <div className="flex flex-col gap-2 bg-canvas sm:gap-3 lg:gap-4">
+        <div className="flex flex-col gap-8 bg-canvas sm:gap-12 lg:gap-16">
           <BannerMosaic
             banners={content.shopByCollection.banners}
             eyebrow={content.shopByCollection.eyebrow}

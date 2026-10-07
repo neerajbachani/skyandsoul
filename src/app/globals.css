@@ -19,9 +19,11 @@
   --color-sky: #c3d4e4;
   --color-sage: #889a6f;
   --color-canvas: #fafaf8;
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-sans-ui);
   --font-serif: var(--font-cormorant);
   --animate-marquee: marquee 45s linear infinite;
+  --animate-sky-drift: sky-drift 18s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite
+    alternate;
 }
 
 @keyframes marquee {
@@ -30,6 +32,15 @@
   }
   to {
     transform: translateX(-50%);
+  }
+}
+
+@keyframes sky-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(8%, -3%, 0);
   }
 }
 

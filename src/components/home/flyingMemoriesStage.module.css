@@ -1,0 +1,5 @@
+.stage {
+  position: relative;
+  overflow: visible;
+  background: var(--color-canvas, #fafaf8);
+}

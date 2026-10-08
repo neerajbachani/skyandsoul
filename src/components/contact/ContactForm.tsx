@@ -14,18 +14,21 @@ export function ContactForm() {
 
   if (submitted) {
     return (
-      <p className="rounded-sm border border-sage/40 bg-sky/30 px-5 py-6 font-serif text-xl text-earth">
+      <p className="rounded-sm border border-sage/40 bg-sky/30 px-5 py-6 font-sans text-xl leading-relaxed text-chocolate">
         Thank you — we have your note. We will reply soon.
       </p>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-6 border-t border-chocolate/10 pt-10">
+      <p className="font-sans text-sm font-semibold uppercase tracking-wide text-earth">
+        Send a message
+      </p>
       <div>
         <label
           htmlFor="name"
-          className="mb-2 block font-sans text-[11px] uppercase tracking-[0.14em] text-chocolate/60"
+          className="mb-2 block font-sans text-base font-medium text-chocolate"
         >
           Name
         </label>
@@ -33,13 +36,13 @@ export function ContactForm() {
           id="name"
           name="name"
           required
-          className="min-h-12 w-full border border-chocolate/20 bg-white px-4 font-sans text-sm text-chocolate focus:border-earth focus:outline-none"
+          className="min-h-14 w-full border border-chocolate/25 bg-white px-4 font-sans text-base text-chocolate placeholder:text-chocolate/45 focus:border-earth focus:outline-none focus:ring-2 focus:ring-earth/20"
         />
       </div>
       <div>
         <label
           htmlFor="email"
-          className="mb-2 block font-sans text-[11px] uppercase tracking-[0.14em] text-chocolate/60"
+          className="mb-2 block font-sans text-base font-medium text-chocolate"
         >
           Email
         </label>
@@ -48,13 +51,13 @@ export function ContactForm() {
           name="email"
           type="email"
           required
-          className="min-h-12 w-full border border-chocolate/20 bg-white px-4 font-sans text-sm text-chocolate focus:border-earth focus:outline-none"
+          className="min-h-14 w-full border border-chocolate/25 bg-white px-4 font-sans text-base text-chocolate placeholder:text-chocolate/45 focus:border-earth focus:outline-none focus:ring-2 focus:ring-earth/20"
         />
       </div>
       <div>
         <label
           htmlFor="message"
-          className="mb-2 block font-sans text-[11px] uppercase tracking-[0.14em] text-chocolate/60"
+          className="mb-2 block font-sans text-base font-medium text-chocolate"
         >
           Message
         </label>
@@ -62,16 +65,22 @@ export function ContactForm() {
           id="message"
           name="message"
           required
-          rows={5}
-          className="w-full border border-chocolate/20 bg-white px-4 py-3 font-sans text-sm text-chocolate focus:border-earth focus:outline-none"
+          rows={6}
+          className="w-full border border-chocolate/25 bg-white px-4 py-3 font-sans text-base leading-relaxed text-chocolate placeholder:text-chocolate/45 focus:border-earth focus:outline-none focus:ring-2 focus:ring-earth/20"
         />
       </div>
       <Button type="submit" variant="filled">
         Send Message
       </Button>
-      <p className="font-sans text-xs text-chocolate/55">
+      <p className="font-sans text-base leading-relaxed text-chocolate/75">
         Form submissions are local in Phase A — for a guaranteed reply, email{" "}
-        {SITE.email}.
+        <a
+          href={`mailto:${SITE.email}`}
+          className="text-earth underline underline-offset-2"
+        >
+          {SITE.email}
+        </a>
+        .
       </p>
     </form>
   );

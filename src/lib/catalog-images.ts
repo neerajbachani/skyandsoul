@@ -169,6 +169,15 @@ const crochetLionToyGallery = [
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790928033/skyandsoul/client-drive/toys/simba-lion-toy/dsc00973.jpg",
 ] as const;
 
+const sunnySamDogToyGallery = [
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1791397462/skyandsoul/client-drive/toys/sunny-sam-dog-toy/dsc00778.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1791397474/skyandsoul/client-drive/toys/sunny-sam-dog-toy/dsc00831.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1791397475/skyandsoul/client-drive/toys/sunny-sam-dog-toy/dsc00871.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1791397478/skyandsoul/client-drive/toys/sunny-sam-dog-toy/dsc00947.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1791397479/skyandsoul/client-drive/toys/sunny-sam-dog-toy/dsc00948.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1791397481/skyandsoul/client-drive/toys/sunny-sam-dog-toy/dsc00971.jpg",
+] as const;
+
 const crochetGirlToyGallery = [
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790928047/skyandsoul/client-drive/toys/twirl-and-tale-girl-toy/dsc00776.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790928048/skyandsoul/client-drive/toys/twirl-and-tale-girl-toy/dsc00896.jpg",
@@ -377,6 +386,8 @@ export const CLOUDINARY = {
   crochetGirlToyGallery,
   crochetBoyToy: crochetBoyToyGallery[0],
   crochetBoyToyGallery,
+  sunnySamDogToy: sunnySamDogToyGallery[0],
+  sunnySamDogToyGallery,
   wingsOfJoy: framePlaceholder,
   cloudNest:
     "https://res.cloudinary.com/dix9x012c/image/upload/v1788507343/skyandsoul/doc2/frame-cloud-nest.png",
@@ -428,7 +439,7 @@ export const CLOUDINARY = {
 export const LITTLE_EXTRAS_HERO_SLIDES = [
   {
     src: bunnyKeychainGallery[0],
-    alt: "Bunny crochet keychain",
+    alt: "Cotton Candy Bunny Keychain",
   },
   {
     src: TEA_COASTER_PATTERNS[0].individual[1],

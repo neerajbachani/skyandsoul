@@ -172,13 +172,20 @@ function FeedRow({
   );
 }
 
-export function InstagramFeed({ content }: { content: InstagramFeedContent }) {
+type InstagramFeedProps = {
+  content: InstagramFeedContent;
+};
+
+export function InstagramFeed({ content }: InstagramFeedProps) {
   if (content.posts.length === 0) return null;
   const external = content.href.startsWith("https://");
 
   return (
-    <section className="overflow-hidden bg-white py-24 sm:py-32" aria-label="Follow us on Instagram">
-      <Reveal className="mb-10 px-5 text-center sm:mb-14 sm:px-8">
+    <section
+      className="overflow-hidden py-24 sm:py-32"
+      aria-label="Follow us on Instagram"
+    >
+      <Reveal className="mb-10 px-5 text-center sm:px-8">
         <p
           data-reveal
           className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage"

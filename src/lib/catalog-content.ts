@@ -115,6 +115,14 @@ export const HELP_DESK_FAQS = [
     a: "Shipping is free on orders above ₹999. For orders below ₹999, a standard delivery fee applies at checkout based on your pincode.",
   },
   {
+    q: "What is your return policy?",
+    a: "All sales are final. We do not accept returns or exchanges on any orders.",
+  },
+  {
+    q: "Can I cancel my order?",
+    a: "Contact our team within 24 hours of placing your order to request a cancellation. Orders cannot be cancelled after 24 hours. Customized orders — including personalized frames and made-to-order pieces — cannot be cancelled at any time.",
+  },
+  {
     q: "How do I place bulk orders?",
     a: "For bulk or corporate gifting, write to us through the contact page with quantities, products, and your timeline. We will prepare a custom quote.",
   },

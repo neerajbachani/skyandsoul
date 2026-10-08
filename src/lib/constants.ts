@@ -37,7 +37,6 @@ export const FOOTER_SHOP_LINKS: NavLink[] = [
 export const FOOTER_CARE_LINKS: NavLink[] = [
   { label: "Shipping & Returns", href: "/shipping" },
   { label: "Care Guide", href: "/care-guide" },
-  { label: "Gift Wrapping", href: "/gift-wrapping" },
   { label: "Contact Us", href: "/contact" },
   { label: "Help Desk", href: "/faq" },
 ];

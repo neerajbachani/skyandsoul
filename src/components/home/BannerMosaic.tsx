@@ -22,7 +22,7 @@ type BannerSet = {
 export const PRIMARY_BANNERS: BannerSet = {
   wide: {
     src: CLOUDINARY.bedtimeBuddies,
-    alt: "Bedtime Buddies granny-square crochet blanket with colorful animal faces",
+    alt: "Bed Time Buddies granny-square crochet blanket with colorful animal faces",
     href: collectionHref("blankets"),
     label: "Blankets",
   },
@@ -59,9 +59,9 @@ export const SECONDARY_BANNERS: BannerSet = {
   },
   right: {
     src: CLOUDINARY.dollKeychain,
-    alt: "Doll crochet keychain",
+    alt: "Plum Doll Keychain",
     href: productHref("doll-keychain"),
-    label: "Doll Keychain",
+    label: "Plum Doll Keychain",
     objectPosition: "object-[center_35%]",
   },
 };

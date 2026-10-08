@@ -4,7 +4,12 @@ import { useState, type FormEvent } from "react";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/Button";
 
-export function Newsletter() {
+type NewsletterProps = {
+  /** When true, top spacing comes from the flying-memories successor wrapper (SCTA-style). */
+  afterFlyingMemories?: boolean;
+};
+
+export function Newsletter({ afterFlyingMemories = false }: NewsletterProps) {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -15,7 +20,11 @@ export function Newsletter() {
   }
 
   return (
-    <section className="bg-white px-5 py-24 sm:px-8 sm:py-32">
+    <section
+      className={`bg-white px-5 sm:px-8 ${
+        afterFlyingMemories ? "pb-24 pt-0 sm:pb-32" : "py-24 sm:py-32"
+      }`}
+    >
       <div className="mx-auto max-w-2xl text-center">
         <Reveal>
           <p

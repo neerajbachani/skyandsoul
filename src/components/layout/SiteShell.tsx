@@ -1,6 +1,7 @@
 import { AnnouncementBar } from "@/components/home/AnnouncementBar";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { WhatsAppChatButton } from "@/components/layout/WhatsAppChatButton";
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <Footer />
+      <WhatsAppChatButton />
     </>
   );
 }

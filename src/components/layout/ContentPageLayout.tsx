@@ -1,9 +1,12 @@
 import { SiteShell } from "@/components/layout/SiteShell";
+import { cn } from "@/lib/utils";
 
 type ContentPageLayoutProps = {
   eyebrow?: string;
   title: string;
   intro?: string;
+  introClassName?: string;
+  bodyClassName?: string;
   children: React.ReactNode;
 };
 
@@ -11,6 +14,8 @@ export function ContentPageLayout({
   eyebrow = "Sky n Soul",
   title,
   intro,
+  introClassName,
+  bodyClassName,
   children,
 }: ContentPageLayoutProps) {
   return (
@@ -25,14 +30,24 @@ export function ContentPageLayout({
               {title}
             </h1>
             {intro ? (
-              <p className="mx-auto mt-5 max-w-2xl font-serif text-lg leading-relaxed text-chocolate/75">
+              <p
+                className={cn(
+                  "mx-auto mt-5 max-w-2xl font-serif text-lg leading-relaxed text-chocolate/75",
+                  introClassName,
+                )}
+              >
                 {intro}
               </p>
             ) : null}
           </div>
         </header>
         <div className="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-16">
-          <div className="space-y-8 font-serif text-lg leading-relaxed text-chocolate/80">
+          <div
+            className={cn(
+              "space-y-8 font-serif text-lg leading-relaxed text-chocolate/80",
+              bodyClassName,
+            )}
+          >
             {children}
           </div>
         </div>

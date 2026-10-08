@@ -10,40 +10,47 @@ export const metadata: Metadata = {
     "Get in touch with the Sky n Soul team for orders, gifts, and custom keepsakes.",
 };
 
-export default function ContactPage() {
-  const fullAddress = `${SITE.address.line1}, ${SITE.address.city}, ${SITE.address.pincode}`;
+const contactDetailValue =
+  "font-serif text-lg font-medium leading-relaxed tracking-[0.01em] text-chocolate sm:text-xl";
 
+export default function ContactPage() {
   return (
     <ContentPageLayout
       eyebrow="Customer Care"
       title="Speak to Us"
       intro="Tell us what you are looking for — a blanket, a toy, a Frame It Your Way idea, or a gift note."
+      introClassName="font-sans text-lg sm:text-xl text-chocolate/90"
+      bodyClassName="space-y-10 font-sans text-base leading-relaxed text-chocolate sm:text-lg sm:leading-7"
     >
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div>
-          <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-earth">
+          <p className="font-sans text-sm font-semibold uppercase tracking-wide text-earth">
             Address
           </p>
-          <p className="mt-2 font-serif text-lg leading-relaxed text-chocolate/80">
-            {fullAddress}
+          <p className={`mt-3 ${contactDetailValue}`}>
+            {SITE.address.line1}
+            <br />
+            {SITE.address.city}
+            <br />
+            {SITE.address.pincode}
           </p>
         </div>
 
         <div>
-          <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-earth">
+          <p className="font-sans text-sm font-semibold uppercase tracking-wide text-earth">
             Hours
           </p>
-          <p className="mt-2 font-serif text-lg text-chocolate/80">{SITE.hours}</p>
+          <p className={`mt-3 ${contactDetailValue}`}>{SITE.hours}</p>
         </div>
 
         <div>
-          <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-earth">
+          <p className="font-sans text-sm font-semibold uppercase tracking-wide text-earth">
             Email
           </p>
-          <p className="mt-2">
+          <p className={`mt-3 ${contactDetailValue}`}>
             <a
               href={`mailto:${SITE.email}`}
-              className="font-serif text-lg text-chocolate/80 underline-offset-4 hover:text-earth hover:underline"
+              className="underline decoration-chocolate/35 underline-offset-[6px] transition-colors hover:text-earth hover:decoration-earth"
             >
               {SITE.email}
             </a>
@@ -51,15 +58,15 @@ export default function ContactPage() {
         </div>
 
         <div>
-          <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-earth">
+          <p className="font-sans text-sm font-semibold uppercase tracking-wide text-earth">
             Phone
           </p>
-          <ul className="mt-2 space-y-2">
+          <ul className={`mt-3 space-y-3 ${contactDetailValue}`}>
             {SITE.phones.map((phone) => (
               <li key={phone}>
                 <a
                   href={`tel:${phone}`}
-                  className="font-serif text-lg text-chocolate/80 underline-offset-4 hover:text-earth hover:underline"
+                  className="underline decoration-chocolate/35 underline-offset-[6px] transition-colors hover:text-earth hover:decoration-earth"
                 >
                   {phone}
                 </a>

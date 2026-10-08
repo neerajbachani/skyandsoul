@@ -11,6 +11,7 @@ export type HeroSlideContent = {
   cta: string;
   ctaHref: string;
   image: string;
+  imageMobile?: string;
   imageAlt: string;
 };
 
@@ -19,6 +20,54 @@ const SWIPE_THRESHOLD = 48;
 
 const photoFade =
   "transition-opacity duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none";
+
+function HeroSlidePicture({
+  slide,
+  slideIndex,
+  active,
+}: {
+  slide: HeroSlideContent;
+  slideIndex: number;
+  active: boolean;
+}) {
+  const fade = `${photoFade} ${active ? "opacity-100" : "opacity-0"}`;
+  const alt = active ? slide.imageAlt : "";
+  const priority = slideIndex === 0;
+
+  if (slide.imageMobile) {
+    return (
+      <>
+        <Image
+          src={slide.imageMobile}
+          alt={alt}
+          fill
+          priority={priority}
+          sizes="100vw"
+          className={`object-cover object-center md:hidden ${fade}`}
+        />
+        <Image
+          src={slide.image}
+          alt={alt}
+          fill
+          priority={priority}
+          sizes="100vw"
+          className={`hidden object-cover object-center md:block ${fade}`}
+        />
+      </>
+    );
+  }
+
+  return (
+    <Image
+      src={slide.image}
+      alt={alt}
+      fill
+      priority={priority}
+      sizes="100vw"
+      className={`object-cover object-center ${fade}`}
+    />
+  );
+}
 
 function Chevron({
   direction,
@@ -192,16 +241,7 @@ export function Hero({ slides }: { slides: readonly HeroSlideContent[] }) {
               className="absolute inset-0"
               aria-hidden={!active}
             >
-              <Image
-                src={item.image}
-                alt={active ? item.imageAlt : ""}
-                fill
-                priority={slideIndex === 0}
-                sizes="100vw"
-                className={`object-cover object-center ${photoFade} ${
-                  active ? "opacity-100" : "opacity-0"
-                }`}
-              />
+              <HeroSlidePicture slide={item} slideIndex={slideIndex} active={active} />
             </div>
           );
         })}

@@ -113,6 +113,7 @@ const heroSlideSchema = z.object({
   cta: z.string().trim().min(1, "Add a hero button label").max(80),
   ctaHref: siteLink,
   image: imageUrl,
+  imageMobile: imageUrl.optional(),
   imageAlt,
 });
 

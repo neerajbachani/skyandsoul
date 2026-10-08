@@ -81,10 +81,14 @@ function Field({
 }
 
 function ImageField({
+  label,
+  hint,
   src,
   onUploaded,
   onError,
 }: {
+  label?: string;
+  hint?: string;
   src: string;
   onUploaded: (url: string) => void;
   onError: (message: string) => void;
@@ -92,7 +96,11 @@ function ImageField({
   const [pending, setPending] = useState(false);
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="space-y-1">
+      {label ? (
+        <p className="font-sans text-xs uppercase tracking-[0.12em] text-chocolate/50">{label}</p>
+      ) : null}
+      <div className="flex items-center gap-3">
       <div className="size-16 shrink-0 overflow-hidden bg-sky/30">
         {src ? <img src={src} alt="" className="size-full object-cover" /> : null}
       </div>
@@ -118,6 +126,8 @@ function ImageField({
           }}
         />
       </label>
+      </div>
+      {hint ? <p className="font-sans text-xs text-chocolate/45">{hint}</p> : null}
     </div>
   );
 }
@@ -337,6 +347,7 @@ export function HomepageAdmin() {
               </div>
             </div>
             <ImageField
+              label="Desktop image"
               src={slide.image}
               onError={setError}
               onUploaded={(image) =>
@@ -345,6 +356,22 @@ export function HomepageAdmin() {
                   hero: {
                     slides: current.hero.slides.map((item) =>
                       item.id === slide.id ? { ...item, image } : item,
+                    ),
+                  },
+                }))
+              }
+            />
+            <ImageField
+              label="Mobile image (optional)"
+              hint="Used below the md breakpoint when set. Leave empty to use the desktop image on all screens."
+              src={slide.imageMobile ?? ""}
+              onError={setError}
+              onUploaded={(image) =>
+                update((current) => ({
+                  ...current,
+                  hero: {
+                    slides: current.hero.slides.map((item) =>
+                      item.id === slide.id ? { ...item, imageMobile: image } : item,
                     ),
                   },
                 }))

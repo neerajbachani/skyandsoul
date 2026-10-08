@@ -120,6 +120,8 @@ export const HERO_SLIDES = [
     ctaHref: "/collections",
     image:
       "https://res.cloudinary.com/dix9x012c/image/upload/v1791481000/Handmade_Cloud_Blanket_Ad_ydds3o.png",
+    imageMobile:
+      "https://res.cloudinary.com/dix9x012c/image/upload/v1791482050/Handmade_Clouds__Wrap_It_Up_yrbpvx.png",
     imageAlt:
       "Colorful handmade crochet cloud blanket draped on a red chair against a blue wall",
     objectPosition: "object-center",

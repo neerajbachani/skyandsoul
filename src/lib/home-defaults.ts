@@ -15,6 +15,9 @@ export const rawHomeDefaults = {
       cta: slide.cta,
       ctaHref: slide.ctaHref,
       image: slide.image,
+      ...("imageMobile" in slide && slide.imageMobile
+        ? { imageMobile: slide.imageMobile }
+        : {}),
       imageAlt: slide.imageAlt,
     })),
   },

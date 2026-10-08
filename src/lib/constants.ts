@@ -133,9 +133,11 @@ export const HERO_SLIDES = [
     cta: "Shop Toys",
     ctaHref: "/collections/toys",
     image:
-      "https://res.cloudinary.com/dix9x012c/image/upload/v1791176363/Crocheted_Aviator_Bear_in_Blue_Scarf_tqxpa1.png",
+      "https://res.cloudinary.com/dix9x012c/image/upload/v1791483496/Ready_for_Takeoff__Made_With_Love_a634jn.png",
+    imageMobile:
+      "https://res.cloudinary.com/dix9x012c/image/upload/v1791483666/Ready_for_Takeoff__Handmade_Pilot_Bear_djtiqs.png",
     imageAlt:
-      "Crochet pilot bear in a blue aviator cap and scarf, sitting on a warm linen surface",
+      "Ready for Takeoff hero with a crochet pilot bear, Made With Love, and Shop Now",
     objectPosition: "object-center",
   },
   {

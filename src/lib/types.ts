@@ -33,6 +33,13 @@ export type ProductWithCategory = Product & {
   category: Pick<Category, "id" | "slug" | "name">;
 };
 
+export type SpotlightProduct = Pick<
+  ProductWithCategory,
+  "slug" | "name" | "price" | "images" | "imageAlt"
+> & {
+  category: string | Pick<ProductWithCategory["category"], "name" | "slug">;
+};
+
 export type ProductDetail = ProductWithCategory & {
   related?: ProductWithCategory[];
 };

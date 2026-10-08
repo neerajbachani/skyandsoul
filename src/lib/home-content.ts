@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import type { SpotlightProduct } from "@/components/home/SpotlightCarousel";
+import type { SpotlightProduct } from "@/lib/types";
 import { homeContentSchema, type HomeContent } from "@/lib/admin-schemas";
 import { listProducts } from "@/lib/catalog";
 import { rawHomeDefaults } from "@/lib/home-defaults";
@@ -35,12 +35,37 @@ function toSpotlightProduct(product: SpotlightRecord): SpotlightProduct {
   };
 }
 
+/** Keep saved hero copy in the DB while syncing image URLs from code defaults. */
+export function mergeHeroSlidesFromDefaults(content: HomeContent): HomeContent {
+  const defaultsById = new Map(
+    DEFAULT_HOME_CONTENT.hero.slides.map((slide) => [slide.id, slide]),
+  );
+
+  return {
+    ...content,
+    hero: {
+      slides: content.hero.slides.map((slide) => {
+        const defaults = defaultsById.get(slide.id);
+        if (!defaults) return slide;
+
+        const { imageMobile: _removed, ...rest } = slide;
+        return {
+          ...rest,
+          image: defaults.image,
+          imageAlt: defaults.imageAlt,
+          ...(defaults.imageMobile ? { imageMobile: defaults.imageMobile } : {}),
+        };
+      }),
+    },
+  };
+}
+
 export async function readHomeContent(): Promise<{ content: HomeContent; saved: boolean }> {
   const row = await prisma.homePage.findUnique({ where: { id: HOME_PAGE_ID } });
   if (!row) return { content: DEFAULT_HOME_CONTENT, saved: false };
   const parsed = homeContentSchema.safeParse(row.content);
   if (!parsed.success) return { content: DEFAULT_HOME_CONTENT, saved: false };
-  return { content: parsed.data, saved: true };
+  return { content: mergeHeroSlidesFromDefaults(parsed.data), saved: true };
 }
 
 async function resolveSpotlight(ids: string[]): Promise<SpotlightProduct[]> {

@@ -49,7 +49,7 @@ export type EditorialBannerContent = {
 
 export function EditorialBanner({ content }: { content: EditorialBannerContent }) {
   return (
-    <section className="bg-sky">
+    <section className="bg-white">
       <Reveal className="mx-auto grid max-w-7xl lg:grid-cols-2">
         <div className="grid min-h-[420px] grid-cols-2 grid-rows-2 gap-1.5 p-1.5 sm:min-h-[520px] lg:h-full">
           {content.images.map((image, index) => (

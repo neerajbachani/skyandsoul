@@ -9,7 +9,6 @@ import stageStyles from "@/components/home/flyingMemoriesStage.module.css";
 import { FlyingMemories } from "@/components/home/FlyingMemories";
 import { FlyingMemoriesCta, FlyingMemoriesInvite } from "@/components/home/FlyingMemoriesCta";
 import { PolaroidGallery } from "@/components/home/PolaroidGallery";
-import { SpotlightCarousel } from "@/components/home/SpotlightCarousel";
 import { Testimonials } from "@/components/home/Testimonials";
 import { ValueProps } from "@/components/home/ValueProps";
 import { Footer } from "@/components/layout/Footer";
@@ -24,12 +23,15 @@ export default async function HomePage() {
 
   return (
     <>
-      <AnnouncementBar />
-      <Header />
-      <main id="main-content" className="flex-1 overflow-clip">
+      <div className="grid min-h-svh grid-rows-[auto_auto_minmax(0,1fr)]">
+        <AnnouncementBar />
+        <Header />
         <Hero slides={content.hero.slides} />
-        <BrandStory />
-        <div className="flex flex-col gap-8 bg-canvas sm:gap-12 lg:gap-16">
+      </div>
+      <main id="main-content" className="flex-1 overflow-clip">
+      <ValueProps />
+        
+        <div className="flex flex-col gap-8 bg-white sm:gap-12 lg:gap-16">
           <BannerMosaic
             banners={content.shopByCollection.banners}
             eyebrow={content.shopByCollection.eyebrow}
@@ -40,9 +42,8 @@ export default async function HomePage() {
             label="Featured product banners"
           />
         </div>
-        <PolaroidGallery />
-        <SpotlightCarousel products={spotlightProducts} />
-        <ValueProps />
+        <PolaroidGallery products={spotlightProducts} />
+        <BrandStory />
         <EditorialBanner content={content.editorial} />
         <Testimonials />
         <div className={stageStyles.stage} data-flying-stage>

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export type HeroSlideContent = {
@@ -214,7 +215,7 @@ export function Hero({ slides }: { slides: readonly HeroSlideContent[] }) {
   return (
     <section
       tabIndex={0}
-      className="relative w-full touch-pan-y bg-canvas select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-earth md:min-h-[70vh] md:overflow-hidden md:bg-sky/40 lg:min-h-[78vh]"
+      className="relative h-full min-h-0 w-full touch-pan-y overflow-hidden bg-sky/40 select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-earth"
       aria-roledescription="carousel"
       aria-label="Featured collections"
       onFocus={() => setPaused(true)}
@@ -229,7 +230,7 @@ export function Hero({ slides }: { slides: readonly HeroSlideContent[] }) {
       onKeyDown={onKeyDown}
     >
       <div
-        className="relative h-[64vh] max-h-[30rem] min-h-[18.5rem] w-full shrink-0 overflow-hidden bg-sky/40 md:absolute md:inset-0 md:h-auto md:max-h-none md:min-h-[70vh] lg:min-h-[78vh]"
+        className="absolute inset-0"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
@@ -238,10 +239,28 @@ export function Hero({ slides }: { slides: readonly HeroSlideContent[] }) {
           return (
             <div
               key={item.id}
-              className="absolute inset-0"
+              className={`absolute inset-0 ${active ? "z-[1]" : "pointer-events-none z-0"}`}
               aria-hidden={!active}
             >
-              <HeroSlidePicture slide={item} slideIndex={slideIndex} active={active} />
+              {active && item.ctaHref ? (
+                <Link
+                  href={item.ctaHref}
+                  className="absolute inset-0 block cursor-pointer"
+                  aria-label={`${item.cta} — ${item.eyebrow}`}
+                >
+                  <HeroSlidePicture
+                    slide={item}
+                    slideIndex={slideIndex}
+                    active={active}
+                  />
+                </Link>
+              ) : (
+                <HeroSlidePicture
+                  slide={item}
+                  slideIndex={slideIndex}
+                  active={active}
+                />
+              )}
             </div>
           );
         })}

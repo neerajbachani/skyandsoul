@@ -2,6 +2,7 @@
 
 import { Caveat } from "next/font/google";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   motion,
@@ -23,6 +24,7 @@ export type PolaroidImage = {
   src: string;
   alt: string;
   caption?: string;
+  href?: string;
 };
 
 export type PolaroidStackSliderProps = {
@@ -32,6 +34,8 @@ export type PolaroidStackSliderProps = {
   className?: string;
   /** "wheel" hijacks the wheel over the stage. "page-scroll" ties progress to a sticky section. */
   mode?: "wheel" | "page-scroll";
+  /** Replaces the default interaction hint under the controls. */
+  clickHint?: string;
 };
 
 type Pose = {
@@ -287,7 +291,9 @@ export function PolaroidStackSlider({
   visibleCount = 6,
   className,
   mode = "wheel",
+  clickHint,
 }: PolaroidStackSliderProps) {
+  const router = useRouter();
   const count = images.length;
   const depth = Math.min(visibleCount, Math.max(1, count - 2));
   const scrollRootRef = useRef<HTMLDivElement>(null);
@@ -492,7 +498,11 @@ export function PolaroidStackSlider({
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
-    if (!drag.moved) return;
+    if (!drag.moved) {
+      const href = images[modulo(activeIndex, count)]?.href;
+      if (href) router.push(href);
+      return;
+    }
 
     if (mode === "page-scroll") {
       const root = scrollRootRef.current;
@@ -595,9 +605,10 @@ export function PolaroidStackSlider({
         {label}
       </p>
       <p className="mt-1 text-center font-sans text-[11px] tracking-wide text-chocolate/55">
-        {mode === "page-scroll"
-          ? "Scroll the page to flip. Arrow keys work too."
-          : "Scroll, drag, or use the arrow keys."}
+        {clickHint ??
+          (mode === "page-scroll"
+            ? "Scroll the page to flip. Arrow keys work too."
+            : "Scroll, drag, or use the arrow keys.")}
       </p>
     </div>
   );

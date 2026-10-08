@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CloudShader } from "@/components/ui/cloud-shader";
 import {
   FOOTER_CARE_LINKS,
   FOOTER_LEGAL_LINKS,
@@ -12,27 +11,18 @@ import type { SocialLink as SocialLinkType } from "@/lib/types";
 
 export function Footer() {
   return (
-    <footer className="bg-chocolate text-white">
+    <footer className="border-t border-sky bg-chocolate text-white">
       <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 lg:grid-cols-12 lg:gap-8 lg:py-20">
         <div className="lg:col-span-4">
           <Link href="/" className="inline-flex bg-canvas p-1.5">
-            <CloudShader
-              className="!h-auto !min-h-0 !w-auto px-4 py-3 sm:px-5"
-              speed={0.45}
-              count={4}
-              cloudColor="#ffffff"
-              skyTopColor="#c3d4e4"
-              skyBottomColor="#fafaf8"
-            >
-              <Image
-                src="/logo-horizontal.png"
-                alt={`${SITE.name} — ${SITE.tagline}`}
-                width={450}
-                height={106}
-                className="h-16 w-auto object-contain sm:h-20"
-                style={{ width: "auto", height: "auto", maxHeight: "5rem" }}
-              />
-            </CloudShader>
+            <Image
+              src="/logo-horizontal.png"
+              alt={`${SITE.name} — ${SITE.tagline}`}
+              width={450}
+              height={106}
+              className="h-16 w-auto object-contain sm:h-20"
+              style={{ width: "auto", height: "auto", maxHeight: "5rem" }}
+            />
           </Link>
           <p className="mt-6 max-w-sm font-serif text-lg leading-relaxed text-white/80">
             Handmade keepsakes for the little moments that become forever.

@@ -1,3 +1,4 @@
+import { LineGrid } from "@/components/home/LineGrid";
 import { Reveal } from "@/components/motion/reveal";
 import { TESTIMONIALS } from "@/lib/constants";
 
@@ -9,18 +10,18 @@ const PLACEMENT = [
 
 export function Testimonials() {
   return (
-    <section className="bg-canvas px-5 py-24 sm:px-8 sm:py-32">
+    <LineGrid className="px-5 py-24 sm:px-8 sm:py-32" ariaLabel="Kind words">
       <div className="mx-auto max-w-7xl">
         <Reveal className="mb-12 max-w-xl sm:mb-16">
           <p
             data-reveal
-            className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage"
+            className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-white"
           >
             Kind Words
           </p>
           <h2
             data-reveal
-            className="mt-3 font-serif text-3xl font-medium text-chocolate sm:text-4xl"
+            className="mt-3 font-serif text-3xl font-medium text-white sm:text-4xl"
           >
             Loved by Growing Families
           </h2>
@@ -55,6 +56,6 @@ export function Testimonials() {
           ))}
         </Reveal>
       </div>
-    </section>
+    </LineGrid>
   );
 }

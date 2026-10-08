@@ -21,6 +21,11 @@ type FlyingMemoriesSceneProps = {
 
 const STAR_COUNT = 10;
 const HEADLINE_LINES = ["Where", "little", "memories", "begin"] as const;
+const FLOWER_CENTER = 38.9;
+const PETAL_PATH =
+  "M38.9 34.2C29.6 32.6 19.4 27.2 16.8 18.2C14.6 10.6 20.2 4.2 29.2 5.2C33.4 5.6 36.6 8.4 38.9 12.6C41.2 8.4 44.4 5.6 48.6 5.2C57.6 4.2 63.2 10.6 61 18.2C58.4 27.2 48.2 32.6 38.9 34.2Z";
+const FRONT_PETAL_ANGLES = [0, 60, 120, 180, 240, 300] as const;
+const BACK_PETAL_ANGLES = [30, 90, 150, 210, 270, 330] as const;
 
 export function FlyingMemoriesScene({ frames, ariaLabel }: FlyingMemoriesSceneProps) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -63,8 +68,49 @@ export function FlyingMemoriesScene({ frames, ariaLabel }: FlyingMemoriesScenePr
         viewBox="0 0 77.8 77.8"
         aria-hidden
       >
-        <circle cx="38.9" cy="38.9" r="38.9" />
-        <path d="M38.9 77.8c-2 0-4.1-.2-6.2-.5C11.6 73.9-2.9 53.9.5 32.8 2.1 22.5 7.7 13.5 16.1 7.4c8.4-6.1 18.7-8.5 29-6.9 10.3 1.6 19.3 7.2 25.4 15.6 6.1 8.4 8.5 18.7 6.9 29-3.1 19.1-19.7 32.7-38.5 32.7zM38.8 1c-7.9 0-15.6 2.5-22.1 7.2C8.5 14.1 3.1 22.9 1.5 32.9-1.8 53.5 12.3 73 32.9 76.3 53.5 79.6 73 65.5 76.3 44.9l.5.1-.5-.1c1.6-10-.8-20-6.7-28.2S54.9 3.1 44.9 1.5c-2-.3-4.1-.5-6.1-.5zM25.5 23.1c-1.9 0-3.5 2-4.1 5.1l-.1.3 3 2.2-2.9 2.2.1.3c.6 2.5 1.5 5.1 4.1 5.1 2.4 0 4.2-3.3 4.2-7.6s-2.4-7.6-4.3-7.6zm26.6 0c-1.9 0-3.5 2-4.1 5.1v.3l3 2.2-3 2.2.1.3c.6 2.5 1.5 5.1 4.1 5.1 2.4 0 4.2-3.3 4.2-7.6s-2.3-7.6-4.3-7.6zM62 39c0-.3-.2-.5-.5-.5s-.5.2-.5.5c0 12.2-9.9 22.1-22.1 22.1-12.2 0-22.1-9.9-22.1-22.1 0-.3-.2-.5-.5-.5s-.5.2-.5.5c0 12.7 10.4 23.1 23.1 23.1S62 51.7 62 39z" />
+        <circle cx={FLOWER_CENTER} cy={FLOWER_CENTER} r={FLOWER_CENTER} />
+        <g transform={`translate(${FLOWER_CENTER} ${FLOWER_CENTER}) scale(1.05) translate(${-FLOWER_CENTER} ${-FLOWER_CENTER})`}>
+          {BACK_PETAL_ANGLES.map((angle) => (
+            <path
+              key={`back-${angle}`}
+              className={styles.petalBack}
+              d={PETAL_PATH}
+              transform={`rotate(${angle} ${FLOWER_CENTER} ${FLOWER_CENTER})`}
+            />
+          ))}
+        </g>
+        {FRONT_PETAL_ANGLES.map((angle) => (
+          <path
+            key={`petal-${angle}`}
+            className={styles.petal}
+            d={PETAL_PATH}
+            transform={`rotate(${angle} ${FLOWER_CENTER} ${FLOWER_CENTER})`}
+          />
+        ))}
+        {FRONT_PETAL_ANGLES.map((angle) => (
+          <path
+            key={`vein-${angle}`}
+            className={styles.petalVein}
+            d={`M${FLOWER_CENTER} 28.8L${FLOWER_CENTER} 15.2`}
+            transform={`rotate(${angle} ${FLOWER_CENTER} ${FLOWER_CENTER})`}
+          />
+        ))}
+        <circle className={styles.flowerCenter} cx={FLOWER_CENTER} cy={FLOWER_CENTER} r="8.4" />
+        <circle className={styles.flowerCore} cx={FLOWER_CENTER} cy={FLOWER_CENTER} r="4.6" />
+        {FRONT_PETAL_ANGLES.map((angle) => {
+          const radians = ((angle - 90) * Math.PI) / 180;
+          const ring = 6.15;
+          return (
+            <circle
+              key={`stamen-${angle}`}
+              className={styles.stamen}
+              cx={FLOWER_CENTER + Math.cos(radians) * ring}
+              cy={FLOWER_CENTER + Math.sin(radians) * ring}
+              r="1.35"
+            />
+          );
+        })}
+        <circle className={styles.flowerHeart} cx={FLOWER_CENTER} cy={FLOWER_CENTER} r="1.7" />
       </svg>
 
       <div className={`${styles.objects} js-objects`}>

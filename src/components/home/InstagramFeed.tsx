@@ -188,13 +188,13 @@ export function InstagramFeed({ content }: InstagramFeedProps) {
       <Reveal className="mb-10 px-5 text-center sm:px-8">
         <p
           data-reveal
-          className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage"
+          className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-white"
         >
           Follow Along
         </p>
         <h2
           data-reveal
-          className="mt-3 font-serif text-3xl font-medium text-chocolate sm:text-4xl"
+          className="mt-3 font-serif text-3xl font-medium text-white sm:text-4xl"
         >
           Follow us on Instagram
         </h2>
@@ -204,6 +204,7 @@ export function InstagramFeed({ content }: InstagramFeedProps) {
             target={external ? "_blank" : undefined}
             rel={external ? "noopener noreferrer" : undefined}
             showArrow
+            className="!text-white decoration-white/50 hover:!text-canvas hover:decoration-canvas"
           >
             @{content.handle}
           </Button>

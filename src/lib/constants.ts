@@ -119,9 +119,9 @@ export const HERO_SLIDES = [
     cta: "Discover the Collection",
     ctaHref: "/collections",
     image:
-      "https://res.cloudinary.com/dix9x012c/image/upload/v1791178694/Colorful_Crochet_Blanket_Gift_Box_gwbghy.png",
+      "https://res.cloudinary.com/dix9x012c/image/upload/v1791481000/Handmade_Cloud_Blanket_Ad_ydds3o.png",
     imageAlt:
-      "Striped crochet baby blanket with white cloud appliqués folded in an open kraft gift box",
+      "Colorful handmade crochet cloud blanket draped on a red chair against a blue wall",
     objectPosition: "object-center",
   },
   {

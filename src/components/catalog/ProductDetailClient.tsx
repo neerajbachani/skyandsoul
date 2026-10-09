@@ -15,6 +15,7 @@ import {
 } from "@/lib/catalog-images";
 
 type GalleryView = "singles" | string;
+type PackView = "individual" | "set4" | "set6";
 
 type ProductDetailClientProps = {
   productId: string;
@@ -33,6 +34,8 @@ type ProductDetailClientProps = {
   singles: string[];
   variants: PackVariant[];
   requiresPatternSelection?: boolean;
+  /** Locks gallery photos to one pack, for products sold as a single set size. */
+  fixedPackView?: PackView;
   trackStock?: boolean;
   stockQuantity?: number;
 };
@@ -54,6 +57,7 @@ export function ProductDetailClient({
   singles,
   variants,
   requiresPatternSelection = false,
+  fixedPackView,
   trackStock = false,
   stockQuantity = 0,
 }: ProductDetailClientProps) {
@@ -74,12 +78,13 @@ export function ProductDetailClient({
   }, [galleryView, singles, variants]);
 
   const packView = useMemo(() => {
+    if (fixedPackView) return fixedPackView;
     if (galleryView === "singles") return "individual" as const;
     const variant = variants.find((entry) => entry.id === galleryView);
     if (variant?.slug === "set-of-6") return "set6" as const;
     if (variant?.slug === "set-of-4") return "set4" as const;
     return "individual" as const;
-  }, [galleryView, variants]);
+  }, [fixedPackView, galleryView, variants]);
 
   const patternGallery = selectedPatternImage
     ? teaCoasterImagesForView(selectedPatternImage, packView)
@@ -110,7 +115,10 @@ export function ProductDetailClient({
 
   function handleGalleryImageSelect(image: string, index: number) {
     const match = teaCoasterMatchForImage(image);
-    const patternImage = match?.individual[0] ?? singles[index];
+    const patternImage = match
+      ? (singles.find((single) => teaCoasterMatchForImage(single) === match) ??
+        singles[index])
+      : singles[index];
     if (!patternImage) return;
     const labelIndex = singles.indexOf(patternImage);
     const resolvedIndex = labelIndex >= 0 ? labelIndex : index;
@@ -125,23 +133,25 @@ export function ProductDetailClient({
   return (
     <>
       <div>
-        <div className="mb-4 flex flex-wrap gap-2">
-          {requiresPatternSelection ? (
-            <GalleryTab
-              label="Individual designs"
-              active={galleryView === "singles"}
-              onClick={() => handleGalleryTab("singles")}
-            />
-          ) : null}
-          {variants.map((variant) => (
-            <GalleryTab
-              key={variant.id}
-              label={variant.name}
-              active={galleryView === variant.id}
-              onClick={() => handleGalleryTab(variant.id)}
-            />
-          ))}
-        </div>
+        {variants.length > 0 ? (
+          <div className="mb-4 flex flex-wrap gap-2">
+            {requiresPatternSelection ? (
+              <GalleryTab
+                label="Individual designs"
+                active={galleryView === "singles"}
+                onClick={() => handleGalleryTab("singles")}
+              />
+            ) : null}
+            {variants.map((variant) => (
+              <GalleryTab
+                key={variant.id}
+                label={variant.name}
+                active={galleryView === variant.id}
+                onClick={() => handleGalleryTab(variant.id)}
+              />
+            ))}
+          </div>
+        ) : null}
         <ProductGallery
           key={`${galleryView}-${selectedPatternImage ?? "all"}`}
           images={galleryImages}

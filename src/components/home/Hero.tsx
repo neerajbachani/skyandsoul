@@ -215,7 +215,7 @@ export function Hero({ slides }: { slides: readonly HeroSlideContent[] }) {
   return (
     <section
       tabIndex={0}
-      className="relative h-full min-h-0 w-full touch-pan-y overflow-hidden bg-sky/40 select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-earth"
+      className="relative w-full aspect-[4/5] md:aspect-[2/1] touch-pan-y overflow-hidden bg-sky/40 select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-earth"
       aria-roledescription="carousel"
       aria-label="Featured collections"
       onFocus={() => setPaused(true)}

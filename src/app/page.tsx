@@ -1,5 +1,5 @@
 import { AnnouncementBar } from "@/components/home/AnnouncementBar";
-import { BannerMosaic } from "@/components/home/BannerMosaic";
+import { BannerMosaic, FeaturedBannerRow } from "@/components/home/BannerMosaic";
 import { BrandStory } from "@/components/home/BrandStory";
 import { EditorialBanner } from "@/components/home/EditorialBanner";
 import { Hero } from "@/components/home/Hero";
@@ -23,24 +23,19 @@ export default async function HomePage() {
 
   return (
     <>
-      <div className="grid min-h-svh grid-rows-[auto_auto_minmax(0,1fr)]">
-        <AnnouncementBar />
-        <Header />
-        <Hero slides={content.hero.slides} />
-      </div>
+      <AnnouncementBar />
+      <Header />
+      <Hero slides={content.hero.slides} />
       <main id="main-content" className="flex-1 overflow-clip">
       <ValueProps />
         
-        <div className="flex flex-col gap-8 bg-white sm:gap-12 lg:gap-16">
+        <div className="flex flex-col gap-4 bg-white sm:gap-8 lg:gap-12">
           <BannerMosaic
             banners={content.shopByCollection.banners}
             eyebrow={content.shopByCollection.eyebrow}
             title={content.shopByCollection.title}
           />
-          <BannerMosaic
-            banners={content.featuredBanners}
-            label="Featured product banners"
-          />
+          <FeaturedBannerRow banners={content.featuredBanners} />
         </div>
         <PolaroidGallery products={spotlightProducts} />
         <BrandStory />

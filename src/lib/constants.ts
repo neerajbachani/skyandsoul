@@ -149,6 +149,8 @@ export const HERO_SLIDES = [
     ctaHref: "/collections/frames",
     image:
       "https://res.cloudinary.com/dix9x012c/image/upload/v1791178703/Mint_Nursery_Lion_Birth_Announcement_daixnp.png",
+    imageMobile:
+      "https://res.cloudinary.com/dix9x012c/image/upload/v1788507353/skyandsoul/doc2/frame-welcome-to-the-world.jpg",
     imageAlt:
       "Mint nursery frame with a crochet lion, balloons, and a birth announcement",
     objectPosition: "object-center",

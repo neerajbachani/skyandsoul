@@ -99,10 +99,13 @@ const bannerSchema = z.object({
   objectPosition: z.string().trim().max(80).optional(),
 });
 
-const bannerSetSchema = z.object({
-  wide: bannerSchema,
+const bannerPairSchema = z.object({
   left: bannerSchema,
   right: bannerSchema,
+});
+
+const bannerSetSchema = bannerPairSchema.extend({
+  wide: bannerSchema,
 });
 
 const heroSlideSchema = z.object({
@@ -144,7 +147,7 @@ export const homeContentSchema = z.object({
     title: z.string().trim().min(1, "Add a Shop by Collection title").max(120),
     banners: bannerSetSchema,
   }),
-  featuredBanners: bannerSetSchema,
+  featuredBanners: bannerPairSchema,
   editorial: z.object({
     eyebrow: z.string().trim().min(1, "Add a gift collage eyebrow").max(80),
     heading: z.string().trim().min(1, "Add a gift collage heading").max(160),

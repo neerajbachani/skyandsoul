@@ -643,29 +643,33 @@ export const frameProducts: SeedProduct[] = [
   },
 ];
 
+const TEA_COASTER_FEATURES = [
+  "Unique photo-frame-inspired design",
+  "Beautifully handcrafted with cotton yarn",
+  "Perfect for tea, coffee and everyday beverages",
+  "Adds a decorative and elegant touch to your table",
+  "Makes a thoughtful handmade gift",
+  "Perfect for coffee tables, bedside tables and workspaces",
+];
+
+const TEA_COASTER_STORY =
+  "Inspired by the look of a classic photo frame, this crochet coaster adds a decorative touch while keeping your surfaces protected from cups and mugs. Carefully handmade with quality cotton yarn, its textured crochet finish brings a cozy, artisanal feel to your home.\n\nWhether placed beside your morning chai, afternoon coffee, or styled as a little accent on your coffee table, it effortlessly blends functionality with beautiful handmade design.\n\nHandcrafted with love — a little care keeps it beautiful for longer.";
+
 export const extraProducts: SeedProduct[] = [
   {
-    slug: "crochet-tea-coaster",
-    name: "Crochet Tea Coaster",
-    tagline: "A Little Frame for Your Everyday Moments.",
-    description:
-      "Turn your everyday tea and coffee breaks into something a little more special with our Photo Frame Crochet Tea Coaster — a beautifully handcrafted piece designed to bring warmth, charm, and personality to your table.\n\nInspired by the look of a classic photo frame, this crochet coaster adds a decorative touch while keeping your surfaces protected from cups and mugs. Carefully handmade with quality cotton yarn, its textured crochet finish brings a cozy, artisanal feel to your home.\n\nWhether placed beside your morning chai, afternoon coffee, or styled as a little accent on your coffee table, it effortlessly blends functionality with beautiful handmade design.\n\nHandcrafted with love — a little care keeps it beautiful for longer.",
+    slug: "customized-crochet-tea-coaster",
+    name: "Customized Crochet Tea Coaster",
+    tagline: "Choose Your Signature Pattern in a Set of 4 or 6.",
+    description: `Turn your everyday tea and coffee breaks into something a little more special with a Customized Crochet Tea Coaster. Pick one of our signature patterns, then choose a set of 4 or a set of 6 — every coaster in the set is made in the design you select.\n\n${TEA_COASTER_STORY}`,
     material: "Premium Cotton Yarn",
-    size: "Coaster size",
+    size: "Set of 4 or Set of 6",
     ageRange: null,
-    features: [
-      "Unique photo-frame-inspired design",
-      "Beautifully handcrafted with cotton yarn",
-      "Perfect for tea, coffee and everyday beverages",
-      "Adds a decorative and elegant touch to your table",
-      "Makes a thoughtful handmade gift",
-      "Perfect for coffee tables, bedside tables and workspaces",
-    ],
+    features: [...TEA_COASTER_FEATURES],
     careInstructions: [...KEYCHAIN_CARE],
     images: [...CLOUDINARY.teaCoasterGallery],
-    imageAlt: "Photo frame inspired crochet tea coaster",
+    imageAlt: "Customized photo frame inspired crochet tea coaster",
     price: 1249,
-    isFeatured: true,
+    isFeatured: false,
     requiresPatternSelection: true,
     sortOrder: 1,
     variants: [
@@ -686,6 +690,40 @@ export const extraProducts: SeedProduct[] = [
         images: [...CLOUDINARY.teaCoasterSet6Gallery],
       },
     ],
+  },
+  {
+    slug: "crochet-tea-coasters-set-of-4",
+    name: "Crochet Tea Coasters — Set of 4",
+    tagline: "A Little Frame for Your Everyday Moments.",
+    description: `Turn your everyday tea and coffee breaks into something a little more special with our Photo Frame Crochet Tea Coasters, sold as a set of 4 in the signature pattern you choose.\n\n${TEA_COASTER_STORY}`,
+    material: "Premium Cotton Yarn",
+    size: "Set of 4",
+    ageRange: null,
+    features: [...TEA_COASTER_FEATURES],
+    careInstructions: [...KEYCHAIN_CARE],
+    images: [...CLOUDINARY.teaCoasterSet4Gallery],
+    imageAlt: "Set of 4 photo frame inspired crochet tea coasters",
+    price: 1249,
+    isFeatured: true,
+    requiresPatternSelection: true,
+    sortOrder: 2,
+  },
+  {
+    slug: "crochet-tea-coasters-set-of-6",
+    name: "Crochet Tea Coasters — Set of 6",
+    tagline: "Handcrafted Warmth for the Whole Table.",
+    description: `Turn your everyday tea and coffee breaks into something a little more special with our Photo Frame Crochet Tea Coasters, sold as a set of 6 in the signature pattern you choose.\n\n${TEA_COASTER_STORY}`,
+    material: "Premium Cotton Yarn",
+    size: "Set of 6",
+    ageRange: null,
+    features: [...TEA_COASTER_FEATURES],
+    careInstructions: [...KEYCHAIN_CARE],
+    images: [...CLOUDINARY.teaCoasterSet6Gallery],
+    imageAlt: "Set of 6 photo frame inspired crochet tea coasters",
+    price: 1749,
+    isFeatured: false,
+    requiresPatternSelection: true,
+    sortOrder: 3,
   },
   {
     slug: "giraffe-keychain",
@@ -709,7 +747,7 @@ export const extraProducts: SeedProduct[] = [
     imageAlt: "Ginger Giraff Keychain",
     price: 799,
     isFeatured: false,
-    sortOrder: 2,
+    sortOrder: 4,
   },
   {
     slug: "doll-keychain",
@@ -733,7 +771,7 @@ export const extraProducts: SeedProduct[] = [
     imageAlt: "Plum Doll Keychain",
     price: 699,
     isFeatured: false,
-    sortOrder: 3,
+    sortOrder: 5,
   },
   {
     slug: "lion-keychain",
@@ -757,7 +795,7 @@ export const extraProducts: SeedProduct[] = [
     imageAlt: "Caramel Lion Roar Keychain",
     price: 799,
     isFeatured: false,
-    sortOrder: 4,
+    sortOrder: 6,
   },
   {
     slug: "donkey-keychain",
@@ -781,7 +819,7 @@ export const extraProducts: SeedProduct[] = [
     imageAlt: "Dotty Donkey Keychain",
     price: 799,
     isFeatured: false,
-    sortOrder: 5,
+    sortOrder: 7,
   },
   {
     slug: "dog-keychain",
@@ -805,7 +843,7 @@ export const extraProducts: SeedProduct[] = [
     imageAlt: "Cocoa Cuddle Dog Keychain",
     price: 849,
     isFeatured: false,
-    sortOrder: 6,
+    sortOrder: 8,
   },
   {
     slug: "bunny-keychain",
@@ -829,7 +867,7 @@ export const extraProducts: SeedProduct[] = [
     imageAlt: "Cotton Candy Bunny Keychain",
     price: 849,
     isFeatured: false,
-    sortOrder: 7,
+    sortOrder: 9,
   },
   {
     slug: "stitch-keychain",
@@ -853,7 +891,7 @@ export const extraProducts: SeedProduct[] = [
     imageAlt: "Naughty Stitch Keychain",
     price: 849,
     isFeatured: false,
-    sortOrder: 8,
+    sortOrder: 10,
   },
 ];
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
 import { ProductDetailClient } from "@/components/catalog/ProductDetailClient";
 import { ProductGallery } from "@/components/catalog/ProductGallery";
@@ -10,6 +10,39 @@ import { ProductPurchaseSection } from "@/components/catalog/ProductPurchaseSect
 import { SiteShell } from "@/components/layout/SiteShell";
 import { getProductBySlug } from "@/lib/catalog";
 import { CLOUDINARY } from "@/lib/catalog-images";
+
+const LEGACY_TEA_COASTER_SLUG = "crochet-tea-coaster";
+const LEGACY_TEA_COASTER_TARGET = "/products/crochet-tea-coasters-set-of-4";
+
+type TeaPackView = "set4" | "set6";
+
+function teaCoasterPresentation(slug: string): {
+  singles: string[];
+  fixedPackView?: TeaPackView;
+  customizePacks: boolean;
+} | null {
+  if (slug === "customized-crochet-tea-coaster") {
+    return {
+      singles: [...CLOUDINARY.teaCoasterGallery],
+      customizePacks: true,
+    };
+  }
+  if (slug === "crochet-tea-coasters-set-of-4") {
+    return {
+      singles: [...CLOUDINARY.teaCoasterSet4Gallery],
+      fixedPackView: "set4",
+      customizePacks: false,
+    };
+  }
+  if (slug === "crochet-tea-coasters-set-of-6") {
+    return {
+      singles: [...CLOUDINARY.teaCoasterSet6Gallery],
+      fixedPackView: "set6",
+      customizePacks: false,
+    };
+  }
+  return null;
+}
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -21,6 +54,11 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
+  if (slug === LEGACY_TEA_COASTER_SLUG) {
+    return {
+      title: "Crochet Tea Coasters — Set of 4",
+    };
+  }
   const product = await getProductBySlug(slug);
   if (!product) return { title: "Product" };
   return {
@@ -31,19 +69,22 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
+  if (slug === LEGACY_TEA_COASTER_SLUG) {
+    redirect(LEGACY_TEA_COASTER_TARGET);
+  }
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
   const hasVariants = product.variants.length > 0;
-  const teaCoaster = product.slug === "crochet-tea-coaster";
-  const singles = teaCoaster ? [...CLOUDINARY.teaCoasterGallery] : product.images;
+  const teaCoaster = teaCoasterPresentation(product.slug);
+  const singles = teaCoaster?.singles ?? product.images;
   const packVariants = product.variants.map((variant) => ({
     id: variant.id,
     slug: variant.slug,
     name: variant.name,
     price: variant.price,
     badge: variant.badge,
-    images: teaCoaster
+    images: teaCoaster?.customizePacks
       ? variant.slug === "set-of-6"
         ? [...CLOUDINARY.teaCoasterSet6Gallery]
         : variant.slug === "set-of-4"
@@ -53,6 +94,7 @@ export default async function ProductPage({ params }: PageProps) {
     trackStock: variant.trackStock,
     stockQuantity: variant.stockQuantity,
   }));
+  const showPatternDetail = hasVariants || product.requiresPatternSelection;
 
   return (
     <SiteShell>
@@ -71,7 +113,7 @@ export default async function ProductPage({ params }: PageProps) {
           />
 
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-            {hasVariants ? (
+            {showPatternDetail ? (
               <ProductDetailClient
                 productId={product.id}
                 productName={product.name}
@@ -89,6 +131,7 @@ export default async function ProductPage({ params }: PageProps) {
                 singles={singles}
                 variants={packVariants}
                 requiresPatternSelection={product.requiresPatternSelection}
+                fixedPackView={teaCoaster?.fixedPackView}
                 trackStock={product.trackStock}
                 stockQuantity={product.stockQuantity}
               />

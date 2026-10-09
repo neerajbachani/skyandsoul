@@ -26,6 +26,11 @@ const BANNER_SLOTS: { key: BannerSlot; label: string }[] = [
   { key: "right", label: "Right banner" },
 ];
 
+const FEATURED_SLOTS: { key: keyof HomeContent["featuredBanners"]; label: string }[] = [
+  { key: "left", label: "Left banner" },
+  { key: "right", label: "Right banner" },
+];
+
 function moveItem<T>(items: readonly T[], index: number, direction: -1 | 1) {
   const nextIndex = index + direction;
   if (nextIndex < 0 || nextIndex >= items.length) return [...items];
@@ -463,9 +468,9 @@ export function HomepageAdmin() {
         </div>
       </Section>
 
-      <Section title="Featured banners" hint="The second image row under Shop by Collection.">
-        <div className="grid gap-4 lg:grid-cols-3">
-          {BANNER_SLOTS.map((slot) => (
+      <Section title="Featured banners" hint="Tea coaster and keychains, under Shop by Collection.">
+        <div className="grid gap-4 lg:grid-cols-2">
+          {FEATURED_SLOTS.map((slot) => (
             <div key={slot.key}>
               <p className="mb-2 font-sans text-xs uppercase tracking-[0.14em] text-chocolate/50">
                 {slot.label}

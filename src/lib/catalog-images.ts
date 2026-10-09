@@ -362,6 +362,12 @@ export const CLOUDINARY = {
   categoryFrameItYourWay,
   categoryLittleExtras: bunnyKeychainGallery[0],
   bedtimeBuddies: bedtimeBuddiesGallery[0],
+  blanketsShopBanner:
+    "https://res.cloudinary.com/dix9x012c/image/upload/v1791562941/Cozy_Mother_and_Baby_Portrait_bansfe.png",
+  toysShopBanner:
+    "https://res.cloudinary.com/dix9x012c/image/upload/v1791564904/IMG_20261009_222425_wcovfh.png",
+  keychainsShopBanner:
+    "https://res.cloudinary.com/dix9x012c/image/upload/v1791568150/Crochet_Bunny_Bag_Charm_Ad_gvwonf.png",
   bedtimeBuddiesGallery,
   cozyCub: cozyCubGallery[0],
   cozyCubGallery,

@@ -1,4 +1,4 @@
-import { PRIMARY_BANNERS, SECONDARY_BANNERS } from "@/components/home/BannerMosaic";
+import { FEATURED_BANNERS, PRIMARY_BANNERS } from "@/components/home/BannerMosaic";
 import { EDITORIAL_COPY, EDITORIAL_IMAGES } from "@/components/home/EditorialBanner";
 import { INSTAGRAM_HANDLE, INSTAGRAM_POSTS } from "@/components/home/InstagramFeed";
 import { HERO_SLIDES, SOCIAL_LINKS } from "@/lib/constants";
@@ -26,7 +26,7 @@ export const rawHomeDefaults = {
     title: "Shop by Collection",
     banners: PRIMARY_BANNERS,
   },
-  featuredBanners: SECONDARY_BANNERS,
+  featuredBanners: FEATURED_BANNERS,
   editorial: {
     ...EDITORIAL_COPY,
     images: EDITORIAL_IMAGES,

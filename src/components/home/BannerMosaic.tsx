@@ -13,25 +13,28 @@ export type BannerItem = {
   objectPosition?: string;
 };
 
-type BannerSet = {
-  wide: BannerItem;
+export type BannerPair = {
   left: BannerItem;
   right: BannerItem;
 };
 
+type BannerSet = BannerPair & {
+  wide: BannerItem;
+};
+
 export const PRIMARY_BANNERS: BannerSet = {
   wide: {
-    src: CLOUDINARY.bedtimeBuddies,
-    alt: "Bed Time Buddies granny-square crochet blanket with colorful animal faces",
-    href: collectionHref("blankets"),
-    label: "Blankets",
-  },
-  left: {
-    src: CLOUDINARY.crochetLionToyBanner,
-    alt: "Handmade crochet lion toy in a lime sweater, held up to show the full figure",
+    src: CLOUDINARY.toysShopBanner,
+    alt: "Baby sitting with handmade crochet toys, including a pilot dog, a boy doll, a yellow dog, and a girl doll in a pink dress",
     href: collectionHref("toys"),
     label: "Toys",
-    objectPosition: "object-[center_42%]",
+    objectPosition: "object-center",
+  },
+  left: {
+    src: CLOUDINARY.blanketsShopBanner,
+    alt: "Mother and baby sitting together on a colorful handmade crochet blanket with a crochet lion and dog",
+    href: collectionHref("blankets"),
+    label: "Blankets",
   },
   right: {
     src: CLOUDINARY.littleCurveThird,
@@ -42,27 +45,20 @@ export const PRIMARY_BANNERS: BannerSet = {
   },
 };
 
-export const SECONDARY_BANNERS: BannerSet = {
-  wide: {
-    src: CLOUDINARY.rainbowNest,
-    alt: "Rainbow Nest striped crochet baby blanket with cloud appliqués in a kraft gift box",
-    href: productHref("rainbow-nest"),
-    label: "Rainbow Nest",
-    objectPosition: "object-center",
-  },
+export const FEATURED_BANNERS: BannerPair = {
   left: {
     src: CLOUDINARY.teaCoaster,
     alt: "Photo frame inspired crochet tea coaster",
-    href: productHref("crochet-tea-coaster"),
+    href: productHref("crochet-tea-coasters-set-of-4"),
     label: "Tea Coaster",
     objectPosition: "object-[center_40%]",
   },
   right: {
-    src: CLOUDINARY.dollKeychain,
-    alt: "Plum Doll Keychain",
-    href: productHref("doll-keychain"),
-    label: "Plum Doll Keychain",
-    objectPosition: "object-[center_35%]",
+    src: CLOUDINARY.keychainsShopBanner,
+    alt: "Crochet bunny bag charm on a handbag with Bag's Best Friend promotional art",
+    href: collectionHref("little-extras"),
+    label: "Keychains",
+    objectPosition: "object-center",
   },
 };
 
@@ -71,6 +67,10 @@ type BannerPanelProps = {
   sizes: string;
   className?: string;
   wide?: boolean;
+  photoClassName?: string;
+  /** Tile height follows the image (contain) or a shared aspect box (cover fills the box). */
+  natural?: boolean;
+  naturalObjectFit?: "cover" | "contain";
 };
 
 function BannerPanel({
@@ -78,6 +78,9 @@ function BannerPanel({
   sizes,
   className = "",
   wide = false,
+  photoClassName = "absolute inset-x-0 -top-[8%] h-[116%]",
+  natural = false,
+  naturalObjectFit = "contain",
 }: BannerPanelProps) {
   return (
     <Link
@@ -85,13 +88,22 @@ function BannerPanel({
       data-mosaic-tile
       className={`group relative block min-h-0 min-w-0 overflow-hidden bg-sky/20 focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth ${className}`}
     >
-      <div data-mosaic-photo className="absolute inset-x-0 -top-[8%] h-[116%]">
+      <div
+        {...(natural ? {} : { "data-mosaic-photo": true })}
+        className={natural ? "absolute inset-0" : photoClassName}
+      >
         <Image
           src={banner.src}
           alt={banner.alt}
           fill
           sizes={sizes}
-          className={`object-cover transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100 ${banner.objectPosition ?? "object-center"}`}
+          className={
+            natural
+              ? naturalObjectFit === "cover"
+                ? `object-cover ${banner.objectPosition ?? "object-center"}`
+                : "object-contain object-center"
+              : `object-cover transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100 ${banner.objectPosition ?? "object-center"}`
+          }
         />
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-chocolate/35 via-transparent to-transparent" />
@@ -114,6 +126,13 @@ type BannerMosaicProps = {
   eyebrow?: string;
   title?: string;
 };
+
+/** Blankets image ratio — both bottom collection tiles use this so they align in a row. */
+const collectionPairAspectClass = "aspect-[1161/1355] w-full";
+
+/** Bottom pair keeps its previous share of the mosaic once the wide tile leaves that grid. */
+const sideRowClassName =
+  "grid h-[calc((min(100svh,48rem)-0.5rem)*10/17)] grid-cols-2 gap-2 sm:h-[calc((min(110svh,56rem)-0.75rem)*10/17)] sm:gap-3 md:h-[calc((min(120svh,68rem)-0.75rem)*10/17)] lg:h-[calc((min(132svh,80rem)-1rem)*10/17)] lg:gap-4";
 
 export function BannerMosaic({
   banners = PRIMARY_BANNERS,
@@ -141,21 +160,46 @@ export function BannerMosaic({
           </h2>
         </Reveal>
       ) : null}
-      <MosaicStage className="grid h-[min(100svh,48rem)] grid-cols-2 grid-rows-[minmax(0,1.4fr)_minmax(0,2fr)] gap-2 sm:h-[min(110svh,56rem)] sm:gap-3 md:h-[min(120svh,68rem)] lg:h-[min(132svh,80rem)] lg:gap-4">
+      <MosaicStage className="flex flex-col gap-2 sm:gap-3 lg:gap-4">
         <BannerPanel
           banner={banners.wide}
           sizes="100vw"
-          className="col-span-2"
+          className="aspect-[2/1] w-full shrink-0"
+          natural
           wide
         />
-        <BannerPanel
-          banner={banners.left}
-          sizes="50vw"
-        />
-        <BannerPanel
-          banner={banners.right}
-          sizes="50vw"
-        />
+        <div className="grid grid-cols-1 items-stretch gap-2 sm:grid-cols-2 sm:gap-3 lg:gap-4">
+          <BannerPanel
+            banner={banners.left}
+            sizes="(min-width: 640px) 50vw, 100vw"
+            className={collectionPairAspectClass}
+            natural
+          />
+          <BannerPanel
+            banner={banners.right}
+            sizes="(min-width: 640px) 50vw, 100vw"
+            className={collectionPairAspectClass}
+            natural
+            naturalObjectFit="cover"
+          />
+        </div>
+      </MosaicStage>
+    </section>
+  );
+}
+
+export function FeaturedBannerRow({
+  banners = FEATURED_BANNERS,
+  label = "Featured product banners",
+}: {
+  banners?: BannerPair;
+  label?: string;
+}) {
+  return (
+    <section aria-label={label}>
+      <MosaicStage className={sideRowClassName}>
+        <BannerPanel banner={banners.left} sizes="50vw" />
+        <BannerPanel banner={banners.right} sizes="50vw" />
       </MosaicStage>
     </section>
   );

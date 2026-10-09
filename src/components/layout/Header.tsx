@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { CartIcon } from "@/components/cart/CartIcon";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { useAuthStatus, useLogout } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 import { NAV_LINKS, SITE } from "@/lib/constants";
 
 export function Header() {
@@ -15,6 +16,7 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const { isAuthenticated, user, isLoading } = useAuthStatus();
+  const { totalItems } = useCart();
   const logout = useLogout();
 
   useEffect(() => {
@@ -45,8 +47,8 @@ export function Header() {
               alt={`${SITE.name} — ${SITE.tagline}`}
               width={450}
               height={106}
-              className="h-12 w-auto object-contain sm:h-14"
-              style={{ width: "auto", height: "auto", maxHeight: "3.5rem" }}
+              className="h-14 w-auto object-contain sm:h-16 lg:h-16"
+              style={{ width: "auto", height: "auto", maxHeight: "4.25rem" }}
               priority
             />
           </Link>
@@ -85,101 +87,118 @@ export function Header() {
             })}
           </nav>
 
-          <div className="relative flex items-center justify-self-end gap-1">
-            <Link
-              href="/search"
-              className="flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth"
-              aria-label="Search"
-            >
-              <SearchIcon />
-            </Link>
+          <div className="relative flex items-center justify-self-end">
+            {/* Desktop Actions */}
+            <div className="hidden lg:flex lg:items-center lg:gap-1">
+              <Link
+                href="/search"
+                className="flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth"
+                aria-label="Search"
+              >
+                <SearchIcon />
+              </Link>
 
-            {isLoading ? (
-              <span className="flex h-11 w-11 items-center justify-center text-chocolate/30">
-                <AccountIcon />
-              </span>
-            ) : isAuthenticated ? (
-              <div className="relative">
-                <button
-                  type="button"
-                  className="flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth"
-                  aria-label="Account menu"
-                  aria-expanded={accountOpen}
-                  onClick={() => setAccountOpen((open) => !open)}
-                >
+              {isLoading ? (
+                <span className="flex h-11 w-11 items-center justify-center text-chocolate/30">
                   <AccountIcon />
-                </button>
-                {accountOpen ? (
-                  <div className="absolute right-0 top-full z-40 mt-2 w-48 border border-chocolate/10 bg-white py-2 shadow-md">
-                    <p className="truncate px-4 py-2 font-sans text-xs text-chocolate/60">
-                      {user?.email}
-                    </p>
-                    <Link
-                      href="/account"
-                      className="block px-4 py-2 font-sans text-xs uppercase tracking-[0.12em] text-chocolate hover:bg-canvas"
-                      onClick={() => setAccountOpen(false)}
-                    >
-                      Account
-                    </Link>
-                    <Link
-                      href="/account/orders"
-                      className="block px-4 py-2 font-sans text-xs uppercase tracking-[0.12em] text-chocolate hover:bg-canvas"
-                      onClick={() => setAccountOpen(false)}
-                    >
-                      Orders
-                    </Link>
-                    {user?.role === "ADMIN" ? (
+                </span>
+              ) : isAuthenticated ? (
+                <div className="relative">
+                  <button
+                    type="button"
+                    className="flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth"
+                    aria-label="Account menu"
+                    aria-expanded={accountOpen}
+                    onClick={() => setAccountOpen((open) => !open)}
+                  >
+                    <AccountIcon />
+                  </button>
+                  {accountOpen ? (
+                    <div className="absolute right-0 top-full z-40 mt-2 w-48 border border-chocolate/10 bg-white py-2 shadow-md">
+                      <p className="truncate px-4 py-2 font-sans text-xs text-chocolate/60">
+                        {user?.email}
+                      </p>
                       <Link
-                        href="/admin"
+                        href="/account"
                         className="block px-4 py-2 font-sans text-xs uppercase tracking-[0.12em] text-chocolate hover:bg-canvas"
                         onClick={() => setAccountOpen(false)}
                       >
-                        Admin
+                        Account
                       </Link>
-                    ) : null}
-                    <button
-                      type="button"
-                      className="block w-full px-4 py-2 text-left font-sans text-xs uppercase tracking-[0.12em] text-chocolate hover:bg-canvas"
-                      onClick={async () => {
-                        await logout.mutateAsync();
-                        setAccountOpen(false);
-                      }}
-                    >
-                      Sign out
-                    </button>
-                  </div>
-                ) : null}
-              </div>
-            ) : (
-              <Link
-                href="/auth/login"
-                className="flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth"
-                aria-label="Sign in"
+                      <Link
+                        href="/account/orders"
+                        className="block px-4 py-2 font-sans text-xs uppercase tracking-[0.12em] text-chocolate hover:bg-canvas"
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        Orders
+                      </Link>
+                      {user?.role === "ADMIN" ? (
+                        <Link
+                          href="/admin"
+                          className="block px-4 py-2 font-sans text-xs uppercase tracking-[0.12em] text-chocolate hover:bg-canvas"
+                          onClick={() => setAccountOpen(false)}
+                        >
+                          Admin
+                        </Link>
+                      ) : null}
+                      <button
+                        type="button"
+                        className="block w-full px-4 py-2 text-left font-sans text-xs uppercase tracking-[0.12em] text-chocolate hover:bg-canvas"
+                        onClick={async () => {
+                          await logout.mutateAsync();
+                          setAccountOpen(false);
+                        }}
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              ) : (
+                <Link
+                  href="/auth/login"
+                  className="flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth"
+                  aria-label="Sign in"
+                >
+                  <AccountIcon />
+                </Link>
+              )}
+
+              <button
+                type="button"
+                className="flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-chocolate"
+                aria-label="Wishlist (coming soon)"
+                title="Wishlist coming soon"
+                disabled
               >
-                <AccountIcon />
-              </Link>
-            )}
+                <HeartIcon />
+              </button>
 
+              <CartIcon />
+            </div>
+
+            {/* Mobile Hamburger menu */}
             <button
               type="button"
-              className="flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-chocolate"
-              aria-label="Wishlist (coming soon)"
-              title="Wishlist coming soon"
-              disabled
-            >
-              <HeartIcon />
-            </button>
-
-            <CartIcon />
-
-            <button
-              type="button"
-              className="flex h-11 w-11 items-center justify-center text-chocolate lg:hidden"
-              aria-label="Open menu"
+              className="relative flex h-11 w-11 items-center justify-center text-chocolate transition-colors hover:text-earth lg:hidden"
+              aria-label={
+                totalItems > 0
+                  ? `Open menu, ${totalItems} item${totalItems === 1 ? "" : "s"} in cart`
+                  : "Open menu"
+              }
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen(true)}
             >
               <MenuIcon />
+              {totalItems > 0 ? (
+                <span
+                  className="absolute right-2 top-2 flex h-2.5 w-2.5"
+                  aria-hidden="true"
+                >
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-earth opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full border border-canvas bg-earth" />
+                </span>
+              ) : null}
             </button>
           </div>
         </div>

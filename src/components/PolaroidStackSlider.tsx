@@ -13,6 +13,7 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
+import { gsap, useGSAP, ScrollTrigger } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 
 const handwritten = Caveat({
@@ -36,6 +37,8 @@ export type PolaroidStackSliderProps = {
   mode?: "wheel" | "page-scroll";
   /** Replaces the default interaction hint under the controls. */
   clickHint?: string;
+  /** Parent section to pin on mobile with ScrollTrigger. */
+  pinSectionRef?: React.RefObject<HTMLElement | null>;
 };
 
 type Pose = {
@@ -236,7 +239,7 @@ function PolaroidCard({
   return (
     <motion.article
       aria-hidden={quiet}
-      className="pointer-events-none absolute top-1/2 left-1/2 w-[240px] select-none sm:w-[320px]"
+      className="pointer-events-none absolute top-1/2 left-1/2 w-[220px] select-none xs:w-[240px] sm:w-[320px]"
       style={{
         x,
         y,
@@ -275,7 +278,7 @@ function PolaroidCard({
           <p
             className={cn(
               handwritten.className,
-              "absolute inset-x-0 bottom-0 flex h-11 items-center justify-center px-3 text-[1.45rem] leading-none text-chocolate/85",
+              "absolute inset-x-0 bottom-0 flex h-11 items-center justify-center px-3 text-[1.3rem] leading-none text-chocolate/85 sm:text-[1.45rem]",
             )}
           >
             <span className="truncate">{image.caption}</span>
@@ -292,6 +295,7 @@ export function PolaroidStackSlider({
   className,
   mode = "wheel",
   clickHint,
+  pinSectionRef,
 }: PolaroidStackSliderProps) {
   const router = useRouter();
   const count = images.length;
@@ -304,11 +308,17 @@ export function PolaroidStackSlider({
   const dragRef = useRef<{
     pointerId: number;
     originX: number;
+    originY: number;
     lastX: number;
+    lastY: number;
     lastTime: number;
     velocity: number;
     moved: boolean;
   } | null>(null);
+
+  const [isMobile, setIsMobile] = useState(false);
+  const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
+  const mobileProgress = useMotionValue(0);
 
   const target = useMotionValue(0);
   const wheelProgress = useSpring(target, SPRING);
@@ -317,12 +327,14 @@ export function PolaroidStackSlider({
     offset: ["start start", "end end"],
   });
   const pageProgress = useTransform(scrollYProgress, [0, 1], [0, Math.max(count, 1)]);
-  const progress = mode === "page-scroll" ? pageProgress : wheelProgress;
+  const progress = isMobile
+    ? mobileProgress
+    : (mode === "page-scroll" ? pageProgress : wheelProgress);
   const reduced = useMotionValue(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
   useMotionValueEvent(progress, "change", (value) => {
-    const next = Math.floor(value);
+    const next = clamp(Math.round(value), 0, count - 1);
     setActiveIndex((current) => (current === next ? current : next));
   });
 
@@ -334,8 +346,62 @@ export function PolaroidStackSlider({
     return () => media.removeEventListener("change", sync);
   }, [reduced]);
 
+  useGSAP(
+    () => {
+      const pinTarget =
+        pinSectionRef?.current ||
+        stageRef.current?.closest("section") ||
+        scrollRootRef.current;
+      if (!pinTarget || count < 2) return;
+
+      const mm = gsap.matchMedia();
+
+      mm.add("(max-width: 767px)", () => {
+        setIsMobile(true);
+
+        const dwellStart = 0.04;
+        const dwellEnd = 0.10;
+        const activeRange = 1 - dwellStart - dwellEnd;
+        const scrollDistance = Math.round(Math.max((count - 1) * 360 + 300, 1600));
+
+        const st = ScrollTrigger.create({
+          trigger: pinTarget,
+          pin: true,
+          pinSpacing: true,
+          start: "top top",
+          end: () => `+=${scrollDistance}`,
+          scrub: 0.6,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            const t = self.progress;
+            let p: number;
+            if (t <= dwellStart) {
+              p = 0;
+            } else if (t >= 1 - dwellEnd) {
+              p = count - 1;
+            } else {
+              p = ((t - dwellStart) / activeRange) * (count - 1);
+            }
+            mobileProgress.set(clamp(p, 0, count - 1));
+          },
+        });
+
+        scrollTriggerRef.current = st;
+
+        return () => {
+          setIsMobile(false);
+          scrollTriggerRef.current = null;
+        };
+      });
+
+      return () => mm.revert();
+    },
+    { scope: scrollRootRef },
+  );
+
   useEffect(() => {
-    if (mode !== "wheel") return;
+    if (mode !== "wheel" || isMobile) return;
     const stage = stageRef.current;
     const sink = wheelSinkRef.current;
     if (!stage || !sink) return;
@@ -419,7 +485,7 @@ export function PolaroidStackSlider({
       sink.style.pointerEvents = "none";
       clearSnap();
     };
-  }, [count, mode, target, wheelProgress]);
+  }, [count, isMobile, mode, target, wheelProgress]);
 
   const indices = useMemo(
     () => visibleCardIndices(activeIndex, count, depth),
@@ -435,6 +501,20 @@ export function PolaroidStackSlider({
 
   function stepBy(direction: number) {
     if (count < 2) return;
+    if (isMobile && scrollTriggerRef.current) {
+      const st = scrollTriggerRef.current;
+      const nextIndex = clamp(activeIndex + direction, 0, count - 1);
+      const dwellStart = 0.04;
+      const dwellEnd = 0.10;
+      const activeRange = 1 - dwellStart - dwellEnd;
+      const targetP = count > 1 ? dwellStart + (nextIndex / (count - 1)) * activeRange : 0;
+      const targetScrollY = st.start + targetP * (st.end - st.start);
+      window.scrollTo({
+        top: targetScrollY,
+        behavior: "smooth",
+      });
+      return;
+    }
     if (mode === "page-scroll") {
       const root = scrollRootRef.current;
       if (!root) return;
@@ -454,13 +534,17 @@ export function PolaroidStackSlider({
 
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
     if (event.button !== 0 || count < 2) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
+    if (event.pointerType !== "touch") {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
     event.currentTarget.focus({ preventScroll: true });
     if (snapTimer.current !== null) window.clearTimeout(snapTimer.current);
     dragRef.current = {
       pointerId: event.pointerId,
       originX: event.clientX,
+      originY: event.clientY,
       lastX: event.clientX,
+      lastY: event.clientY,
       lastTime: performance.now(),
       velocity: 0,
       moved: false,
@@ -473,11 +557,23 @@ export function PolaroidStackSlider({
     const now = performance.now();
     const dt = Math.max(now - drag.lastTime, 1);
     const dx = event.clientX - drag.lastX;
+    const dy = event.clientY - drag.lastY;
+    if (Math.hypot(event.clientX - drag.originX, event.clientY - drag.originY) > 8) {
+      drag.moved = true;
+    }
+
+    if (event.pointerType === "touch") {
+      drag.lastX = event.clientX;
+      drag.lastY = event.clientY;
+      drag.lastTime = now;
+      return;
+    }
+
     const width = Math.max(cardWidth(), 1);
     const delta = -dx / width;
-    if (Math.abs(event.clientX - drag.originX) > 6) drag.moved = true;
     drag.velocity = delta / dt;
     drag.lastX = event.clientX;
+    drag.lastY = event.clientY;
     drag.lastTime = now;
     if (!drag.moved) return;
 
@@ -501,6 +597,16 @@ export function PolaroidStackSlider({
     if (!drag.moved) {
       const href = images[modulo(activeIndex, count)]?.href;
       if (href) router.push(href);
+      return;
+    }
+
+    if (event.pointerType === "touch") {
+      const totalDx = event.clientX - drag.originX;
+      const totalDy = event.clientY - drag.originY;
+      if (Math.abs(totalDx) > 50 && Math.abs(totalDy) < 40) {
+        if (totalDx < 0) stepBy(1);
+        else stepBy(-1);
+      }
       return;
     }
 
@@ -539,7 +645,7 @@ export function PolaroidStackSlider({
         aria-roledescription="carousel"
         aria-label={`${label}, photograph ${modulo(activeIndex, count) + 1} of ${count}`}
         tabIndex={0}
-        className="relative h-[28rem] w-full cursor-grab touch-pan-y outline-none select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-earth active:cursor-grabbing sm:h-[36rem]"
+        className="relative h-[22rem] w-full cursor-grab touch-pan-y outline-none select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-earth active:cursor-grabbing sm:h-[36rem]"
         style={{ perspective: "1200px" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -578,10 +684,10 @@ export function PolaroidStackSlider({
         })}
       </div>
 
-      <div className="mt-2 flex items-center justify-center gap-2 text-chocolate">
+      <div className="mt-1 flex items-center justify-center gap-2 text-chocolate sm:mt-2">
         <button
           type="button"
-          className="flex size-11 items-center justify-center transition-colors hover:text-earth focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth disabled:pointer-events-none disabled:opacity-30"
+          className="flex size-10 items-center justify-center transition-colors hover:text-earth focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth disabled:pointer-events-none disabled:opacity-30 sm:size-11"
           aria-label="Previous photograph"
           disabled={activeIndex <= 0}
           onClick={() => stepBy(-1)}
@@ -593,7 +699,7 @@ export function PolaroidStackSlider({
         </p>
         <button
           type="button"
-          className="flex size-11 items-center justify-center transition-colors hover:text-earth focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth disabled:pointer-events-none disabled:opacity-30"
+          className="flex size-10 items-center justify-center transition-colors hover:text-earth focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth disabled:pointer-events-none disabled:opacity-30 sm:size-11"
           aria-label="Next photograph"
           disabled={activeIndex >= count - 1}
           onClick={() => stepBy(1)}
@@ -606,9 +712,11 @@ export function PolaroidStackSlider({
       </p>
       <p className="mt-1 text-center font-sans text-[11px] tracking-wide text-chocolate/55">
         {clickHint ??
-          (mode === "page-scroll"
-            ? "Scroll the page to flip. Arrow keys work too."
-            : "Scroll, drag, or use the arrow keys.")}
+          (isMobile
+            ? "Scroll down to flip cards · Tap card to view"
+            : mode === "page-scroll"
+              ? "Scroll the page to flip. Arrow keys work too."
+              : "Scroll, drag, or use the arrow keys.")}
       </p>
     </div>
   );

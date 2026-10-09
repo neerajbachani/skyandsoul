@@ -1,9 +1,25 @@
 import Emitter from "./emitter";
 import Ticker from "./ticker";
 
+const CLICK_TRAVEL = 6;
+
+function eventClientPoint(event: MouseEvent | TouchEvent) {
+  if (event instanceof MouseEvent) {
+    return { x: event.clientX, y: event.clientY };
+  }
+
+  const touch = event.touches[0] ?? event.changedTouches[0];
+  if (!touch) return null;
+  return { x: touch.clientX, y: touch.clientY };
+}
+
 type SectionHost = HTMLElement & {
   __flyingSection?: Section;
 };
+
+const STAGGER_SPACING = 600; // ms between scheduled releases
+const STAGGER_JITTER = 400; // random jitter added to spacing
+const INTERSECT_BURST_MAX = 6; // max objects to schedule on intersect
 
 export class FlyingObject {
   parent: Section;
@@ -167,6 +183,16 @@ export class Section {
   lastTouch = 0;
   isPaused = true;
 
+  /** Pointer travel since gesture start. A short travel is a click, not a drag. */
+  private pointerTravel = 0;
+  private gestureOrigin: { x: number; y: number } | null = null;
+  private pendingObject: FlyingObject | null = null;
+  private tapOpened = false;
+  private destroyed = false;
+  /** Timeout IDs scheduled to stagger releases; cleared on destroy. */
+  private releaseTimeouts: number[] = [];
+  private loopInterval: number | null = null;
+
   private intersectObserver: IntersectionObserver | null = null;
 
   constructor(el: SectionHost) {
@@ -189,6 +215,7 @@ export class Section {
   }
 
   init = () => {
+    if (this.destroyed) return;
     this.setSize();
     this.setScroll();
     this.setLines();
@@ -197,11 +224,31 @@ export class Section {
   };
 
   destroy = () => {
+    this.destroyed = true;
     Emitter.off("mousemove", this.onMouseMove, this);
     Emitter.off("resize", this.onResize, this);
     Emitter.off("scroll", this.onScroll, this);
     Emitter.off("tick", this.tick, this);
     this.intersectObserver?.disconnect();
+
+    for (const object of [...this.objects, ...this.thrownObjects]) {
+      object.el.removeEventListener("mousedown", this.objectDragStart);
+      object.el.removeEventListener("touchstart", this.objectDragStart);
+      object.el.removeEventListener("click", this.objectClick);
+    }
+    window.removeEventListener("mouseup", this.objectDragEnd);
+    window.removeEventListener("touchend", this.objectDragEnd);
+    this.objectsWrapper.removeEventListener("touchmove", this.onTouchMove);
+    this.el.removeEventListener("intersect", this.onIntersect);
+    // clear any pending timeouts that were scheduled to stagger releases
+    this.releaseTimeouts.forEach((id) => clearTimeout(id));
+    this.releaseTimeouts.length = 0;
+    // stop any running looped throwing
+    if (this.loopInterval != null) {
+      clearInterval(this.loopInterval);
+      this.loopInterval = null;
+    }
+
     this.el.__flyingSection = undefined;
   };
 
@@ -214,10 +261,11 @@ export class Section {
     this.objects.forEach((object) => {
       object.el.addEventListener("mousedown", this.objectDragStart);
       object.el.addEventListener("touchstart", this.objectDragStart, { passive: false });
+      object.el.addEventListener("click", this.objectClick);
     });
 
-    this.el.addEventListener("mouseup", this.objectDragEnd);
-    this.el.addEventListener("touchend", this.objectDragEnd);
+    window.addEventListener("mouseup", this.objectDragEnd);
+    window.addEventListener("touchend", this.objectDragEnd, { passive: false });
     this.objectsWrapper.addEventListener("touchmove", this.onTouchMove, { passive: false });
     this.el.addEventListener("intersect", this.onIntersect, { passive: true });
 
@@ -259,15 +307,34 @@ export class Section {
     this.isPaused = !isIntersecting;
     this.canThrow = isIntersecting;
 
+    // When entering view, stagger a small burst of throws instead of releasing all waiting objects at once.
     if (!this.isPaused) {
-      this.thrownObjects.forEach((object) => {
-        object.isWaiting = false;
-      });
+      // clear any pending timeouts from previous intersections
+      this.releaseTimeouts.forEach((id) => clearTimeout(id));
+      this.releaseTimeouts.length = 0;
+
+      // Schedule a paced release of remaining objects so they don't all drop at once.
+      const available = this.objects.length;
+      const burstCount = Math.min(INTERSECT_BURST_MAX, Math.max(1, Math.round(available)));
+      for (let i = 0; i < burstCount; i++) {
+        const delay = i * STAGGER_SPACING + Math.random() * STAGGER_JITTER;
+        const id = window.setTimeout(() => {
+          if (this.destroyed) return;
+          this.throwObject();
+        }, delay);
+        this.releaseTimeouts.push(id);
+      }
+      // start continuous looped throwing while in view
+      this.startLoopedThrowing();
+    }
+    else {
+      this.stopLoopedThrowing();
     }
   };
 
   onMouseMove = (x: number, y: number) => {
     this.updateMousePosition(x, y);
+    this.trackPointerTravel(x, y);
   };
 
   onTouchMove = (e: TouchEvent) => {
@@ -279,6 +346,7 @@ export class Section {
     const touch = e.touches[0];
     if (!touch) return;
     this.updateMousePosition(touch.clientX, touch.clientY);
+    this.trackPointerTravel(touch.clientX, touch.clientY);
     this.lastTouch = performance.now();
   };
 
@@ -386,6 +454,31 @@ export class Section {
     this.drawLines();
   }
 
+  private startLoopedThrowing() {
+    if (this.loopInterval != null) return;
+    const tick = () => {
+      if (this.destroyed || !this.canThrow) {
+        this.stopLoopedThrowing();
+        return;
+      }
+      if (this.objects.length > 0) {
+        this.throwObject();
+      }
+    };
+    // immediate first tick then interval
+    tick();
+    this.loopInterval = window.setInterval(() => {
+      const delay = Math.random() * STAGGER_JITTER;
+      setTimeout(tick, delay);
+    }, STAGGER_SPACING);
+  }
+
+  private stopLoopedThrowing() {
+    if (this.loopInterval == null) return;
+    clearInterval(this.loopInterval);
+    this.loopInterval = null;
+  }
+
   drawLines() {
     const { height, width } = this.bounding;
     let d = `M 0 ${height} L ${width} ${height}`;
@@ -407,12 +500,15 @@ export class Section {
   }
 
   firstObjects() {
+    // Stagger initial release of objects instead of dropping all at once.
     const totalObjects = Math.max(Math.min(Math.round(window.safeWidth * 0.025), 5), 2);
     for (let i = 0; i < totalObjects; i++) {
-      if (this.objects.length === 0) break;
-      const object = this.objects.splice(Math.floor(Math.random() * this.objects.length), 1)[0];
-      object.set(false);
-      this.thrownObjects.push(object);
+      const delay = i * STAGGER_SPACING + Math.random() * STAGGER_JITTER;
+      const id = window.setTimeout(() => {
+        if (this.destroyed) return;
+        this.throwObject();
+      }, delay);
+      this.releaseTimeouts.push(id);
     }
   }
 
@@ -423,34 +519,90 @@ export class Section {
   }
 
   objectDragStart = (e: MouseEvent | TouchEvent) => {
+    const el = e.currentTarget as HTMLElement;
+    const object = this.thrownObjects.find((item) => item.el === el);
+    if (!object || object.isDragging || object.isVanishing || this.pendingObject) return;
+
     e.preventDefault();
     this.lastTouch = performance.now();
+    this.tapOpened = false;
+    this.pointerTravel = 0;
+    this.gestureOrigin = eventClientPoint(e);
+    this.pendingObject = object;
 
     if (e instanceof MouseEvent === false) {
       this.onTouchMove(e);
     }
-
-    const el = e.currentTarget as HTMLElement;
-    const object = this.thrownObjects.find((o) => o.el === el);
-    if (!object || object.isDragging || object.isVanishing) return;
-
-    this.draggedObject = object;
-    object.isDragging = true;
-    el.classList.add("is-dragging");
   };
 
   objectDragEnd = (e: MouseEvent | TouchEvent) => {
-    e.preventDefault();
-    const object = this.draggedObject;
+    const object = this.pendingObject;
     if (!object) return;
+    const point = eventClientPoint(e);
+    if (point) this.trackPointerTravel(point.x, point.y);
+    e.preventDefault();
 
+    const travel = this.pointerTravel;
+    const wasDrag = travel >= CLICK_TRAVEL;
     object.isDragging = false;
     object.el.classList.remove("is-dragging");
+    this.pendingObject = null;
+    this.draggedObject = null;
+    this.gestureOrigin = null;
+
+    if (!wasDrag) {
+      this.dispatchFrameClick(object);
+      this.tapOpened = true;
+      return;
+    }
+
     object.isVanishing = true;
     object.el.classList.add("is-vanishing");
     object.vanishStart = performance.now();
-    this.draggedObject = null;
   };
+
+  objectClick = (e: MouseEvent) => {
+    if (this.tapOpened) {
+      this.tapOpened = false;
+      return;
+    }
+
+    if (this.pointerTravel >= CLICK_TRAVEL) return;
+
+    const el = e.currentTarget as HTMLElement;
+    const object = this.thrownObjects.find((item) => item.el === el);
+    if (!object || object.isDragging || object.isVanishing) return;
+
+    this.dispatchFrameClick(object);
+  };
+
+  private trackPointerTravel(x: number, y: number) {
+    const object = this.pendingObject;
+    if (!this.gestureOrigin || !object) return;
+    const dx = x - this.gestureOrigin.x;
+    const dy = y - this.gestureOrigin.y;
+    this.pointerTravel = Math.max(this.pointerTravel, Math.hypot(dx, dy));
+
+    if (this.pointerTravel < CLICK_TRAVEL || object.isDragging || object.isVanishing) return;
+
+    this.draggedObject = object;
+    object.isDragging = true;
+    object.el.classList.add("is-dragging");
+  }
+
+  private dispatchFrameClick(object: FlyingObject) {
+    const raw = object.el.dataset.frameIndex;
+    if (raw == null) return;
+    const index = Number(raw);
+    if (!Number.isInteger(index)) return;
+
+    this.el.dispatchEvent(
+      new CustomEvent("frameclick", {
+        bubbles: true,
+        detail: { index },
+      }),
+    );
+  }
 
   tick = (time: number) => {
     const { scroll, mouse, el } = this;

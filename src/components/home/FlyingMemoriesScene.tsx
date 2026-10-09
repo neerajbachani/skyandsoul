@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   mountFlyingSection,
   unmountFlyingSection,
@@ -29,6 +30,11 @@ const BACK_PETAL_ANGLES = [30, 90, 150, 210, 270, 330] as const;
 
 export function FlyingMemoriesScene({ frames, ariaLabel }: FlyingMemoriesSceneProps) {
   const sectionRef = useRef<HTMLElement>(null);
+  const framesRef = useRef(frames);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const closeLightbox = useCallback(() => setOpenIndex(null), []);
+  const openFrame = openIndex == null ? null : frames[openIndex] ?? null;
+  framesRef.current = frames;
 
   useEffect(() => {
     ensureFlyingMemoriesRuntime();
@@ -42,13 +48,21 @@ export function FlyingMemoriesScene({ frames, ariaLabel }: FlyingMemoriesScenePr
 
     mountFlyingSection(section);
 
+    const onFrameClick = (event: Event) => {
+      const index = (event as CustomEvent<{ index: number }>).detail?.index;
+      if (typeof index !== "number" || !framesRef.current[index]) return;
+      setOpenIndex(index);
+    };
+
     const onMotionChange = () => {
       section.classList.toggle(styles.reducedMotion, media.matches);
     };
     media.addEventListener("change", onMotionChange);
+    section.addEventListener("frameclick", onFrameClick);
 
     return () => {
       media.removeEventListener("change", onMotionChange);
+      section.removeEventListener("frameclick", onFrameClick);
       unmountFlyingSection(section);
     };
   }, []);
@@ -115,10 +129,20 @@ export function FlyingMemoriesScene({ frames, ariaLabel }: FlyingMemoriesScenePr
 
       <div className={`${styles.objects} js-objects`}>
         {frames.map((frame, index) => (
-          <div key={`${frame.caption}-${index}`} className={`${styles.object} ${styles.objectFrame}`}>
+          <div
+            key={`${frame.caption}-${index}`}
+            className={`${styles.object} ${styles.objectFrame}`}
+            data-frame-index={index}
+          >
             <figure className={styles.frameInner}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={frame.src} alt={frame.alt} className={styles.frameImg} loading="lazy" />
+              <img
+                src={frame.src}
+                alt={frame.alt}
+                className={styles.frameImg}
+                loading="lazy"
+                draggable={false}
+              />
               <figcaption className={styles.frameCaption}>{frame.caption}</figcaption>
             </figure>
             <div className={`${styles.frameSide} ${styles.frameSideVertical}`} />
@@ -160,6 +184,101 @@ export function FlyingMemoriesScene({ frames, ariaLabel }: FlyingMemoriesScenePr
       <svg className={`${styles.linesSvg} js-svg`} aria-hidden>
         <path className={`${styles.linesPath} js-lines-circular-path`} d="" />
       </svg>
+
+      {openFrame ? <FlyingFrameLightbox frame={openFrame} onClose={closeLightbox} /> : null}
     </section>
   );
+}
+
+function FlyingFrameLightbox({
+  frame,
+  onClose,
+}: {
+  frame: FlyingFrame;
+  onClose: () => void;
+}) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setPortalTarget(document.body);
+  }, []);
+
+  useEffect(() => {
+    if (!portalTarget) return;
+    dialogRef.current?.focus();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      onClose();
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onClose, portalTarget]);
+
+  function handleBackdropClick(event: React.MouseEvent<HTMLDivElement>) {
+    if (event.target === event.currentTarget) onClose();
+  }
+
+  const content = (
+    <div
+      ref={dialogRef}
+      className="fixed inset-0 z-[60] flex flex-col bg-chocolate/92 backdrop-blur-[2px]"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="flying-memory-title"
+      tabIndex={-1}
+      onClick={handleBackdropClick}
+    >
+      <div className="flex shrink-0 items-center justify-end px-4 py-4 sm:px-6">
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          aria-label="Close image"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            aria-hidden="true"
+          >
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </div>
+
+      <div
+        className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-4 pb-8 sm:px-12"
+        onClick={handleBackdropClick}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={frame.src}
+          alt={frame.alt}
+          className="max-h-[min(72vh,900px)] w-auto max-w-5xl object-contain"
+          draggable={false}
+        />
+        <p
+          id="flying-memory-title"
+          className="font-sans text-xs font-medium uppercase tracking-[0.14em] text-white/80"
+        >
+          {frame.caption}
+        </p>
+      </div>
+    </div>
+  );
+
+  if (!portalTarget) return null;
+  return createPortal(content, portalTarget);
 }

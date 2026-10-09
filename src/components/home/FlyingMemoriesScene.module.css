@@ -142,7 +142,8 @@
   top: -100vh;
   bottom: -100vh;
   left: 0;
-  z-index: 5;
+  /* Ensure objects render above the catcher text */
+  z-index: 10;
   width: 100%;
   height: auto;
   overflow: hidden;
@@ -427,7 +428,7 @@
 }
 
 .object:global(.is-dragging) {
-  z-index: 2;
+  z-index: 20;
   transform-style: flat;
   cursor: grabbing;
 }
@@ -450,7 +451,7 @@
 .object:global(.is-vanishing) {
   --strip-width: 1px;
   --strip-gap: 25px;
-  z-index: 2;
+  z-index: 20;
   cursor: default;
   pointer-events: none;
   background:
@@ -495,7 +496,8 @@
   position: absolute;
   bottom: 0;
   left: 0;
-  z-index: 6;
+  /* Keep catcher below flying objects */
+  z-index: 2;
   width: 100%;
   height: calc(var(--padding) * 1.05 + var(--smiley-size) / 2);
   perspective: calc(var(--distortion) * 0.85em);

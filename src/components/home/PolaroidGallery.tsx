@@ -9,6 +9,7 @@ import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/Button";
 import { SITE } from "@/lib/constants";
 import { productHref } from "@/lib/money";
+import { getProductEditorial } from "@/lib/polaroid-editorial";
 import type { SpotlightProduct } from "@/lib/types";
 
 type PolaroidGalleryProps = {
@@ -18,11 +19,12 @@ type PolaroidGalleryProps = {
 function spotlightImages(products: SpotlightProduct[]): PolaroidImage[] {
   return products
     .filter((product) => product.images[0])
-    .map((product) => ({
+    .map((product, index) => ({
       src: product.images[0],
       alt: product.imageAlt || product.name,
       caption: product.name,
       href: productHref(product.slug),
+      meta: getProductEditorial(product, index),
     }));
 }
 
@@ -34,10 +36,10 @@ export function PolaroidGallery({ products }: PolaroidGalleryProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative z-10 overflow-hidden bg-canvas h-svh sm:h-auto pt-20 pb-6 sm:py-32 flex flex-col justify-between sm:block"
+      className="relative z-10 overflow-hidden bg-canvas h-svh flex flex-col justify-between pt-14 pb-4 sm:pt-16 sm:pb-6 lg:pt-20 lg:pb-6"
       aria-label={`${SITE.name} spotlight`}
     >
-      <Reveal className="mb-2 px-5 text-center sm:mb-14 sm:px-8">
+      <Reveal className="mb-2 px-5 text-center sm:mb-4 lg:mb-4 sm:px-8">
         <p
           data-reveal
           className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage"
@@ -54,11 +56,11 @@ export function PolaroidGallery({ products }: PolaroidGalleryProps) {
 
       <PolaroidStackSlider
         pinSectionRef={sectionRef}
-        className="my-auto sm:my-0 sm:mt-4"
+        className="my-auto"
         images={images}
       />
 
-      <div className="mt-2 flex justify-center px-5 sm:mt-12">
+      <div className="mt-2 flex justify-center px-5 sm:mt-4 lg:mt-4">
         <Button href="/collections" showArrow>
           View All
         </Button>

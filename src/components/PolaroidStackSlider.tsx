@@ -2,18 +2,18 @@
 
 import { Caveat } from "next/font/google";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  AnimatePresence,
   motion,
   useMotionValue,
   useMotionValueEvent,
-  useScroll,
-  useSpring,
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { gsap, useGSAP, ScrollTrigger } from "@/components/motion/reveal";
+import { useGSAP, ScrollTrigger } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 
 const handwritten = Caveat({
@@ -21,11 +21,21 @@ const handwritten = Caveat({
   weight: "500",
 });
 
+export type PolaroidEditorialMeta = {
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  detailTitle?: string;
+  detailDescription?: string;
+  tag?: string;
+};
+
 export type PolaroidImage = {
   src: string;
   alt: string;
   caption?: string;
   href?: string;
+  meta?: PolaroidEditorialMeta;
 };
 
 export type PolaroidStackSliderProps = {
@@ -33,11 +43,11 @@ export type PolaroidStackSliderProps = {
   /** How many cards to keep rendered ahead of the active one. */
   visibleCount?: number;
   className?: string;
-  /** "wheel" hijacks the wheel over the stage. "page-scroll" ties progress to a sticky section. */
+  /** Kept for backwards compatibility. */
   mode?: "wheel" | "page-scroll";
   /** Replaces the default interaction hint under the controls. */
   clickHint?: string;
-  /** Parent section to pin on mobile with ScrollTrigger. */
+  /** Parent section to pin with ScrollTrigger. */
   pinSectionRef?: React.RefObject<HTMLElement | null>;
 };
 
@@ -70,25 +80,6 @@ export const POSES: Record<number, Pose> = {
   5: { x: 92, y: 20, scale: 0.5, rotate: 26, blur: 6, opacity: 0, zIndex: 50 },
 };
 
-/** Inertia. Higher stiffness snaps faster; higher damping softens the settle; mass is the weight. */
-const SPRING = { stiffness: 120, damping: 22, mass: 0.8 };
-
-/** Progress added per pixel of wheel deltaY. */
-const WHEEL_GAIN = 0.0025;
-/** One wheel event cannot skip more than this many cards. */
-const MAX_WHEEL_STEP = 1.5;
-/** How far a drag flick can carry the stack, in cards. */
-const MAX_GESTURE_CARDS = 2;
-/** Idle time before the active card eases back to center. */
-const SNAP_DELAY_MS = 120;
-/**
- * Height of the hidden wheel sink. It stays parked at the midpoint so a
- * continuous gesture never hits an edge. Calling preventDefault on a box that
- * does not scroll makes the browser drop the rest of the gesture until the
- * pointer moves.
- */
-const WHEEL_SINK_SPAN = 200_000;
-const WHEEL_SINK_CENTER = WHEEL_SINK_SPAN / 2;
 /** Incoming card lifts by this many px at the midpoint of a flip. */
 const LIFT_PX = 28;
 const LIFT_SCALE = 0.03;
@@ -167,8 +158,7 @@ function resolvePose(
   let scale = lerp(from.scale, to.scale, eased);
   const x = lerp(from.x, to.x, eased);
   const rotate = lerp(from.rotate, to.rotate, eased);
-  // Reduced motion keeps the slide but drops the blur and the lift, so the
-  // leaving card simply fades out under the one coming forward.
+  // Reduced motion keeps the slide but drops the blur and the lift.
   const blur = reduced ? 0 : lerp(from.blur, to.blur, eased);
   let opacity = lerp(from.opacity, to.opacity, eased);
 
@@ -213,6 +203,8 @@ function PolaroidCard({
   progress,
   reduced,
   quiet,
+  slot,
+  onCardClick,
 }: {
   image: PolaroidImage;
   imageIndex: number;
@@ -221,6 +213,8 @@ function PolaroidCard({
   progress: MotionValue<number>;
   reduced: MotionValue<boolean>;
   quiet: boolean;
+  slot: number | null;
+  onCardClick?: (imageIndex: number, slot: number) => void;
 }) {
   const poseOf = () =>
     resolvePose(progress.get(), imageIndex, count, depth, reduced.get());
@@ -236,10 +230,19 @@ function PolaroidCard({
   });
   const zIndex = useTransform(() => poseOf().zIndex);
 
+  const isFront = slot === 0;
+  const isNext = slot === 1;
+  const isPrev = slot === -1;
+  const isInteractive = (isFront && Boolean(image.href)) || isNext || isPrev;
+
   return (
     <motion.article
       aria-hidden={quiet}
-      className="pointer-events-none absolute top-1/2 left-1/2 w-[220px] select-none xs:w-[240px] sm:w-[320px]"
+      onClick={isInteractive ? () => onCardClick?.(imageIndex, slot!) : undefined}
+      className={cn(
+        "absolute top-1/2 left-1/2 w-[210px] select-none xs:w-[230px] sm:w-[300px] lg:w-[320px]",
+        isInteractive ? "pointer-events-auto cursor-pointer" : "pointer-events-none",
+      )}
       style={{
         x,
         y,
@@ -254,7 +257,11 @@ function PolaroidCard({
       }}
     >
       <div
-        className="relative overflow-hidden bg-white"
+        className={cn(
+          "relative overflow-hidden bg-white transition-[box-shadow,transform] duration-200",
+          isFront && Boolean(image.href) && "hover:shadow-2xl hover:scale-[1.015]",
+          isNext && "hover:opacity-100",
+        )}
         style={{
           padding: "12px 12px 44px",
           borderRadius: 4,
@@ -266,7 +273,7 @@ function PolaroidCard({
             src={image.src}
             alt={quiet ? "" : image.alt}
             fill
-            sizes="(max-width: 639px) 240px, 320px"
+            sizes="(max-width: 639px) 230px, (max-width: 1023px) 300px, 320px"
             className="object-cover"
             draggable={false}
             {...(imageIndex < 3
@@ -293,7 +300,6 @@ export function PolaroidStackSlider({
   images,
   visibleCount = 6,
   className,
-  mode = "wheel",
   clickHint,
   pinSectionRef,
 }: PolaroidStackSliderProps) {
@@ -302,34 +308,9 @@ export function PolaroidStackSlider({
   const depth = Math.min(visibleCount, Math.max(1, count - 2));
   const scrollRootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const wheelSinkRef = useRef<HTMLDivElement>(null);
-  const inViewRef = useRef(false);
-  const snapTimer = useRef<number | null>(null);
-  const dragRef = useRef<{
-    pointerId: number;
-    originX: number;
-    originY: number;
-    lastX: number;
-    lastY: number;
-    lastTime: number;
-    velocity: number;
-    moved: boolean;
-  } | null>(null);
-
-  const [isMobile, setIsMobile] = useState(false);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
-  const mobileProgress = useMotionValue(0);
 
-  const target = useMotionValue(0);
-  const wheelProgress = useSpring(target, SPRING);
-  const { scrollYProgress } = useScroll({
-    target: scrollRootRef,
-    offset: ["start start", "end end"],
-  });
-  const pageProgress = useTransform(scrollYProgress, [0, 1], [0, Math.max(count, 1)]);
-  const progress = isMobile
-    ? mobileProgress
-    : (mode === "page-scroll" ? pageProgress : wheelProgress);
+  const progress = useMotionValue(0);
   const reduced = useMotionValue(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -354,138 +335,49 @@ export function PolaroidStackSlider({
         scrollRootRef.current;
       if (!pinTarget || count < 2) return;
 
-      const mm = gsap.matchMedia();
+      const dwellStart = 0.04;
+      const dwellEnd = 0.10;
+      const activeRange = 1 - dwellStart - dwellEnd;
 
-      mm.add("(max-width: 767px)", () => {
-        setIsMobile(true);
+      const getScrollDistance = () => {
+        const isDesktop = window.innerWidth >= 768;
+        const cardStepPx = isDesktop ? 400 : 360;
+        const dwellPx = isDesktop ? 350 : 300;
+        return Math.round(Math.max((count - 1) * cardStepPx + dwellPx, 1600));
+      };
 
-        const dwellStart = 0.04;
-        const dwellEnd = 0.10;
-        const activeRange = 1 - dwellStart - dwellEnd;
-        const scrollDistance = Math.round(Math.max((count - 1) * 360 + 300, 1600));
-
-        const st = ScrollTrigger.create({
-          trigger: pinTarget,
-          pin: true,
-          pinSpacing: true,
-          start: "top top",
-          end: () => `+=${scrollDistance}`,
-          scrub: 0.6,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            const t = self.progress;
-            let p: number;
-            if (t <= dwellStart) {
-              p = 0;
-            } else if (t >= 1 - dwellEnd) {
-              p = count - 1;
-            } else {
-              p = ((t - dwellStart) / activeRange) * (count - 1);
-            }
-            mobileProgress.set(clamp(p, 0, count - 1));
-          },
-        });
-
-        scrollTriggerRef.current = st;
-
-        return () => {
-          setIsMobile(false);
-          scrollTriggerRef.current = null;
-        };
+      const st = ScrollTrigger.create({
+        trigger: pinTarget,
+        pin: true,
+        pinSpacing: true,
+        start: "top top",
+        end: () => `+=${getScrollDistance()}`,
+        scrub: 0.6,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const t = self.progress;
+          let p: number;
+          if (t <= dwellStart) {
+            p = 0;
+          } else if (t >= 1 - dwellEnd) {
+            p = count - 1;
+          } else {
+            p = ((t - dwellStart) / activeRange) * (count - 1);
+          }
+          progress.set(clamp(p, 0, count - 1));
+        },
       });
 
-      return () => mm.revert();
+      scrollTriggerRef.current = st;
+
+      return () => {
+        st.kill();
+        scrollTriggerRef.current = null;
+      };
     },
-    { scope: scrollRootRef },
+    { scope: scrollRootRef, dependencies: [count] },
   );
-
-  useEffect(() => {
-    if (mode !== "wheel" || isMobile) return;
-    const stage = stageRef.current;
-    const sink = wheelSinkRef.current;
-    if (!stage || !sink) return;
-
-    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-    let locking = false;
-
-    const armSink = () => {
-      const armed = inViewRef.current && finePointer.matches;
-      sink.style.pointerEvents = armed ? "auto" : "none";
-    };
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        inViewRef.current = Boolean(entry?.isIntersecting && entry.intersectionRatio >= 0.35);
-        armSink();
-      },
-      { threshold: [0, 0.35, 0.6, 1] },
-    );
-    observer.observe(stage);
-    finePointer.addEventListener("change", armSink);
-    sink.scrollTop = WHEEL_SINK_CENTER;
-    armSink();
-
-    const clearSnap = () => {
-      if (snapTimer.current !== null) window.clearTimeout(snapTimer.current);
-      snapTimer.current = null;
-    };
-
-    const maxIndex = Math.max(count - 1, 0);
-
-    const scheduleSnap = () => {
-      clearSnap();
-      snapTimer.current = window.setTimeout(() => {
-        target.set(clamp(Math.round(target.get()), 0, maxIndex));
-      }, SNAP_DELAY_MS);
-    };
-
-    const releasePageScroll = (delta: number) => {
-      const root = document.documentElement;
-      const previous = root.style.scrollBehavior;
-      root.style.scrollBehavior = "auto";
-      window.scrollBy(0, delta);
-      root.style.scrollBehavior = previous;
-    };
-
-    const onScroll = () => {
-      if (locking) return;
-      const delta = sink.scrollTop - WHEEL_SINK_CENTER;
-      locking = true;
-      sink.scrollTop = WHEEL_SINK_CENTER;
-      locking = false;
-      if (!inViewRef.current || Math.abs(delta) < 0.5) return;
-
-      const step = clamp(delta * WHEEL_GAIN, -MAX_WHEEL_STEP, MAX_WHEEL_STEP);
-      if (step === 0) return;
-
-      const current = target.get();
-      const shown = wheelProgress.get();
-      const parkedAtStart = current <= 0.001;
-      const parkedAtEnd = current >= maxIndex - 0.001;
-      // Keep the page still until the 8th card has actually settled, then let
-      // further scrolling move the page instead of looping the deck.
-      const arrivedStart = parkedAtStart && shown <= 0.04;
-      const arrivedEnd = parkedAtEnd && shown >= maxIndex - 0.04;
-      if ((step < 0 && arrivedStart) || (step > 0 && arrivedEnd)) {
-        releasePageScroll(delta);
-        return;
-      }
-      if ((step < 0 && parkedAtStart) || (step > 0 && parkedAtEnd)) return;
-
-      target.set(clamp(current + step, 0, maxIndex));
-      scheduleSnap();
-    };
-
-    sink.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      observer.disconnect();
-      finePointer.removeEventListener("change", armSink);
-      sink.removeEventListener("scroll", onScroll);
-      sink.style.pointerEvents = "none";
-      clearSnap();
-    };
-  }, [count, isMobile, mode, target, wheelProgress]);
 
   const indices = useMemo(
     () => visibleCardIndices(activeIndex, count, depth),
@@ -493,16 +385,12 @@ export function PolaroidStackSlider({
   );
 
   const current = images[modulo(activeIndex, count)];
-
-  function cardWidth() {
-    const card = stageRef.current?.querySelector("article");
-    return card instanceof HTMLElement ? card.offsetWidth || 320 : 320;
-  }
+  const meta = current?.meta;
 
   function stepBy(direction: number) {
     if (count < 2) return;
-    if (isMobile && scrollTriggerRef.current) {
-      const st = scrollTriggerRef.current;
+    const st = scrollTriggerRef.current;
+    if (st) {
       const nextIndex = clamp(activeIndex + direction, 0, count - 1);
       const dwellStart = 0.04;
       const dwellEnd = 0.10;
@@ -513,115 +401,20 @@ export function PolaroidStackSlider({
         top: targetScrollY,
         behavior: "smooth",
       });
-      return;
+    } else {
+      progress.set(clamp(activeIndex + direction, 0, count - 1));
     }
-    if (mode === "page-scroll") {
-      const root = scrollRootRef.current;
-      if (!root) return;
-      const top = root.getBoundingClientRect().top + window.scrollY;
-      const stepPx = root.offsetHeight / (count + 1);
-      const traveled = window.scrollY - top;
-      const index = Math.round(traveled / stepPx);
-      window.scrollTo({
-        top: top + (index + direction) * stepPx,
-        behavior: "smooth",
-      });
-      return;
-    }
-    if (snapTimer.current !== null) window.clearTimeout(snapTimer.current);
-    target.set(clamp(Math.round(target.get()) + direction, 0, count - 1));
   }
 
-  function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
-    if (event.button !== 0 || count < 2) return;
-    if (event.pointerType !== "touch") {
-      event.currentTarget.setPointerCapture(event.pointerId);
-    }
-    event.currentTarget.focus({ preventScroll: true });
-    if (snapTimer.current !== null) window.clearTimeout(snapTimer.current);
-    dragRef.current = {
-      pointerId: event.pointerId,
-      originX: event.clientX,
-      originY: event.clientY,
-      lastX: event.clientX,
-      lastY: event.clientY,
-      lastTime: performance.now(),
-      velocity: 0,
-      moved: false,
-    };
-  }
-
-  function onPointerMove(event: React.PointerEvent<HTMLDivElement>) {
-    const drag = dragRef.current;
-    if (!drag || drag.pointerId !== event.pointerId) return;
-    const now = performance.now();
-    const dt = Math.max(now - drag.lastTime, 1);
-    const dx = event.clientX - drag.lastX;
-    const dy = event.clientY - drag.lastY;
-    if (Math.hypot(event.clientX - drag.originX, event.clientY - drag.originY) > 8) {
-      drag.moved = true;
-    }
-
-    if (event.pointerType === "touch") {
-      drag.lastX = event.clientX;
-      drag.lastY = event.clientY;
-      drag.lastTime = now;
-      return;
-    }
-
-    const width = Math.max(cardWidth(), 1);
-    const delta = -dx / width;
-    drag.velocity = delta / dt;
-    drag.lastX = event.clientX;
-    drag.lastY = event.clientY;
-    drag.lastTime = now;
-    if (!drag.moved) return;
-
-    if (mode === "page-scroll") {
-      const root = scrollRootRef.current;
-      if (!root) return;
-      const stepPx = root.offsetHeight / (count + 1);
-      window.scrollBy({ top: delta * stepPx });
-      return;
-    }
-    target.set(clamp(target.get() + delta, 0, count - 1));
-  }
-
-  function onPointerUp(event: React.PointerEvent<HTMLDivElement>) {
-    const drag = dragRef.current;
-    if (!drag || drag.pointerId !== event.pointerId) return;
-    dragRef.current = null;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-    if (!drag.moved) {
-      const href = images[modulo(activeIndex, count)]?.href;
+  function handleCardClick(imageIndex: number, slot: number) {
+    if (slot === 0) {
+      const href = images[imageIndex]?.href;
       if (href) router.push(href);
-      return;
+    } else if (slot === 1) {
+      stepBy(1);
+    } else if (slot === -1) {
+      stepBy(-1);
     }
-
-    if (event.pointerType === "touch") {
-      const totalDx = event.clientX - drag.originX;
-      const totalDy = event.clientY - drag.originY;
-      if (Math.abs(totalDx) > 50 && Math.abs(totalDy) < 40) {
-        if (totalDx < 0) stepBy(1);
-        else stepBy(-1);
-      }
-      return;
-    }
-
-    if (mode === "page-scroll") {
-      const root = scrollRootRef.current;
-      if (!root) return;
-      const top = root.getBoundingClientRect().top + window.scrollY;
-      const stepPx = root.offsetHeight / (count + 1);
-      const projected = window.scrollY - top + clamp(drag.velocity * 220, -2, 2) * stepPx;
-      window.scrollTo({ top: top + Math.round(projected / stepPx) * stepPx, behavior: "smooth" });
-      return;
-    }
-
-    const projected = target.get() + clamp(drag.velocity * 220, -MAX_GESTURE_CARDS, MAX_GESTURE_CARDS);
-    target.set(clamp(Math.round(projected), 0, count - 1));
   }
 
   function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
@@ -638,52 +431,147 @@ export function PolaroidStackSlider({
 
   const label = current?.caption || current?.alt || "Photograph";
   const stage = (
-    <div onKeyDown={onKeyDown}>
-      <div
-        ref={stageRef}
-        role="region"
-        aria-roledescription="carousel"
-        aria-label={`${label}, photograph ${modulo(activeIndex, count) + 1} of ${count}`}
-        tabIndex={0}
-        className="relative h-[22rem] w-full cursor-grab touch-pan-y outline-none select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-earth active:cursor-grabbing sm:h-[36rem]"
-        style={{ perspective: "1200px" }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-      >
-        {mode === "wheel" ? (
-          <div
-            ref={wheelSinkRef}
-            aria-hidden
-            className="absolute inset-0 z-[200] cursor-inherit overflow-y-scroll overscroll-y-contain select-none pointer-events-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            style={{ scrollBehavior: "auto" }}
+    <div onKeyDown={onKeyDown} className="relative w-full">
+      {/* Mobile Top Text: Animates with active card */}
+      <div className="w-full px-4 text-center min-h-[54px] flex flex-col justify-center mb-1 md:hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeIndex}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.25, ease: [0.2, 0, 0, 1] }}
           >
-            <div style={{ height: WHEEL_SINK_SPAN }} />
-          </div>
-        ) : null}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-[62%] left-1/2 h-8 w-56 -translate-x-1/2 rounded-full bg-chocolate/15 blur-xl sm:w-80"
-        />
-        {indices.map((imageIndex) => {
-          const image = images[imageIndex];
-          if (!image) return null;
-          return (
-            <PolaroidCard
-              key={imageIndex}
-              image={image}
-              imageIndex={imageIndex}
-              count={count}
-              depth={depth}
-              progress={progress}
-              reduced={reduced}
-              quiet={slotOffset(imageIndex, activeIndex, count, depth) !== 0}
-            />
-          );
-        })}
+            {meta?.eyebrow && (
+              <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-sage">
+                {meta.eyebrow}
+              </p>
+            )}
+            <h3 className="font-serif text-lg xs:text-xl font-medium text-chocolate truncate px-2">
+              {meta?.title ?? current?.caption ?? "Artisanal Piece"}
+            </h3>
+            {meta?.description && (
+              <p className="font-serif text-[11px] leading-tight text-chocolate/75 line-clamp-1 max-w-xs mx-auto">
+                {meta.description}
+              </p>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
+      {/* Main Center Area: Desktop Left Text + Center Stage */}
+      <div className="relative mx-auto flex w-full max-w-5xl items-center justify-center md:gap-6 lg:gap-12">
+        {/* Desktop Left Text: Animates with active card */}
+        <div className="hidden md:flex flex-1 justify-end pr-4 lg:pr-8 text-right">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeIndex}
+              initial={{ opacity: 0, x: -18 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -18 }}
+              transition={{ duration: 0.3, ease: [0.2, 0, 0, 1] }}
+              className="max-w-[280px] lg:max-w-[320px] flex flex-col items-end"
+            >
+              {meta?.tag && (
+                <span className="mb-1.5 inline-flex items-center rounded-full bg-earth/10 px-2.5 py-0.5 font-sans text-[10px] font-semibold tracking-wider text-earth uppercase">
+                  {meta.tag}
+                </span>
+              )}
+              {meta?.eyebrow && (
+                <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.22em] text-sage">
+                  {meta.eyebrow}
+                </span>
+              )}
+              <h3 className="mt-1.5 font-serif text-2xl lg:text-3xl font-medium text-chocolate leading-tight">
+                {meta?.title ?? current?.caption ?? "Artisanal Piece"}
+              </h3>
+              {meta?.description && (
+                <p className="mt-2.5 font-serif text-xs lg:text-sm leading-relaxed text-chocolate/75">
+                  {meta.description}
+                </p>
+              )}
+              {current?.href && (
+                <Link
+                  href={current.href}
+                  className="mt-4 inline-flex items-center gap-1.5 font-sans text-xs font-semibold tracking-wider text-earth transition-colors hover:text-chocolate uppercase group"
+                >
+                  <span>Explore Piece</span>
+                  <span className="transition-transform group-hover:translate-x-1">→</span>
+                </Link>
+              )}
+              <div className="mt-4 h-[2px] w-10 rounded-full bg-sage/40" />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Center Stage with Polaroid Cards */}
+        <div
+          ref={stageRef}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label={`${label}, photograph ${modulo(activeIndex, count) + 1} of ${count}`}
+          tabIndex={0}
+          className="relative h-[21rem] xs:h-[23rem] sm:h-[30rem] lg:h-[32rem] w-full max-w-[340px] xs:max-w-[360px] sm:max-w-[440px] lg:max-w-[500px] shrink-0 outline-none select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-earth"
+          style={{ perspective: "1200px" }}
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute top-[62%] left-1/2 h-8 w-56 -translate-x-1/2 rounded-full bg-chocolate/15 blur-xl sm:w-80"
+          />
+          {indices.map((imageIndex) => {
+            const image = images[imageIndex];
+            if (!image) return null;
+            const slot = slotOffset(imageIndex, activeIndex, count, depth);
+            return (
+              <PolaroidCard
+                key={imageIndex}
+                image={image}
+                imageIndex={imageIndex}
+                count={count}
+                depth={depth}
+                progress={progress}
+                reduced={reduced}
+                quiet={slot !== 0}
+                slot={slot}
+                onCardClick={handleCardClick}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Mobile Bottom Text: Animates with active card */}
+      <div className="w-full px-4 text-center min-h-[44px] flex flex-col justify-center mt-1 md:hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeIndex}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: [0.2, 0, 0, 1] }}
+          >
+            <div className="flex items-center justify-center gap-2">
+              {meta?.tag && (
+                <span className="rounded-full bg-earth/10 px-2 py-0.5 font-sans text-[10px] font-semibold tracking-wider text-earth uppercase">
+                  {meta.tag}
+                </span>
+              )}
+              {meta?.detailTitle && (
+                <span className="font-sans text-[11px] font-medium text-chocolate/85">
+                  {meta.detailTitle}
+                </span>
+              )}
+            </div>
+            {meta?.detailDescription && (
+              <p className="mt-0.5 font-sans text-[11px] leading-tight text-chocolate/65 line-clamp-1 max-w-xs mx-auto">
+                {meta.detailDescription}
+              </p>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Controls & Arrows */}
       <div className="mt-1 flex items-center justify-center gap-2 text-chocolate sm:mt-2">
         <button
           type="button"
@@ -711,27 +599,10 @@ export function PolaroidStackSlider({
         {label}
       </p>
       <p className="mt-1 text-center font-sans text-[11px] tracking-wide text-chocolate/55">
-        {clickHint ??
-          (isMobile
-            ? "Scroll down to flip cards · Tap card to view"
-            : mode === "page-scroll"
-              ? "Scroll the page to flip. Arrow keys work too."
-              : "Scroll, drag, or use the arrow keys.")}
+        {clickHint ?? "Scroll down to flip cards · Click card to view"}
       </p>
     </div>
   );
-
-  if (mode === "page-scroll") {
-    return (
-      <div
-        ref={scrollRootRef}
-        className={cn("relative", className)}
-        style={{ height: `${(count + 1) * 85}vh` }}
-      >
-        <div className="sticky top-0 flex h-dvh flex-col justify-center">{stage}</div>
-      </div>
-    );
-  }
 
   return (
     <div ref={scrollRootRef} className={className}>

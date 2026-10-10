@@ -1,5 +1,5 @@
 import { FEATURED_BANNERS, PRIMARY_BANNERS } from "@/components/home/BannerMosaic";
-import { EDITORIAL_COPY, EDITORIAL_IMAGES } from "@/components/home/EditorialBanner";
+import { EDITORIAL_COPY, EDITORIAL_IMAGES } from "@/lib/editorial-constants";
 import { INSTAGRAM_HANDLE, INSTAGRAM_POSTS } from "@/components/home/InstagramFeed";
 import { HERO_SLIDES, SOCIAL_LINKS } from "@/lib/constants";
 

@@ -36,8 +36,8 @@ export function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 z-30 bg-canvas/95 backdrop-blur-sm transition-shadow duration-300 ${
-          scrolled ? "shadow-[0_1px_0_rgba(75,50,34,0.08)]" : ""
+        className={`z-30 bg-canvas/95 backdrop-blur-sm transition-shadow duration-300 lg:sticky lg:top-0 ${
+          scrolled ? "lg:shadow-[0_1px_0_rgba(75,50,34,0.08)]" : ""
         }`}
       >
         <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-4 px-5 py-4 lg:grid-cols-[auto_1fr_auto] lg:px-8">
@@ -47,8 +47,8 @@ export function Header() {
               alt={`${SITE.name} — ${SITE.tagline}`}
               width={450}
               height={106}
-              className="h-14 w-auto object-contain sm:h-16 lg:h-16"
-              style={{ width: "auto", height: "auto", maxHeight: "4.25rem" }}
+              className="h-auto w-auto max-h-12 object-contain sm:max-h-14 lg:max-h-[4.25rem]"
+              style={{ width: "auto", height: "auto" }}
               priority
             />
           </Link>

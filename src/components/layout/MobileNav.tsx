@@ -4,8 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { SearchSuggestionsDropdown } from "@/components/catalog/SearchSuggestionsDropdown";
 import { useAuthStatus, useLogout } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
+import { useCategories } from "@/hooks/useCategories";
 import { NAV_LINKS, SITE } from "@/lib/constants";
 
 type MobileNavProps = {
@@ -21,6 +23,8 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
   const previouslyFocused = useRef<HTMLElement | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { data: categories = [] } = useCategories();
   const { totalItems } = useCart();
   const { isAuthenticated, user, isLoading } = useAuthStatus();
   const logout = useLogout();
@@ -110,7 +114,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         aria-modal={open}
       >
         {/* Drawer Header */}
-        <div className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-chocolate/10 bg-canvas/95 px-5 py-3.5 backdrop-blur-sm">
+        <div className="z-10 flex shrink-0 items-center justify-between border-b border-chocolate/10 bg-canvas/95 px-5 py-3.5 backdrop-blur-sm">
           <Link
             href="/"
             onClick={onClose}
@@ -121,8 +125,8 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               alt={`${SITE.name} — ${SITE.tagline}`}
               width={220}
               height={66}
-              className="h-11 w-auto object-contain sm:h-12"
-              style={{ width: "auto", height: "auto", maxHeight: "3rem" }}
+              className="h-auto w-auto max-h-10 object-contain"
+              style={{ width: "auto", height: "auto" }}
             />
           </Link>
           <button
@@ -138,9 +142,12 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         {/* Drawer Scrollable Body */}
         <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-5 space-y-6">
           {/* Search Form */}
-          <div>
+          <div className="relative">
             <form
-              onSubmit={handleSearchSubmit}
+              onSubmit={(e) => {
+                setIsDropdownOpen(false);
+                handleSearchSubmit(e);
+              }}
               role="search"
               className="relative flex items-center"
             >
@@ -158,14 +165,22 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                 id="mobile-nav-search"
                 type="search"
                 value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
+                onFocus={() => setIsDropdownOpen(true)}
+                onChange={(event) => {
+                  setSearchQuery(event.target.value);
+                  setIsDropdownOpen(true);
+                }}
                 placeholder="Search blankets, toys, frames…"
-                className="w-full rounded-xl border border-chocolate/15 bg-white py-2.5 pl-10 pr-9 font-sans text-xs text-chocolate placeholder:text-chocolate/40 transition-colors focus:border-earth focus:outline-none focus:ring-1 focus:ring-earth"
+                autoComplete="off"
+                className="w-full rounded-xl border border-chocolate/15 bg-white py-2.5 pl-10 pr-9 font-sans text-xs text-chocolate placeholder:text-chocolate/40 transition-colors focus:border-earth focus:outline-none focus:ring-1 focus:ring-earth [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
               />
               {searchQuery ? (
                 <button
                   type="button"
-                  onClick={handleClearSearch}
+                  onClick={() => {
+                    handleClearSearch();
+                    setIsDropdownOpen(false);
+                  }}
                   className="absolute right-2.5 flex h-6 w-6 items-center justify-center rounded-full text-chocolate/40 transition-colors hover:bg-chocolate/5 hover:text-chocolate"
                   aria-label="Clear search"
                 >
@@ -173,6 +188,22 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                 </button>
               ) : null}
             </form>
+
+            <SearchSuggestionsDropdown
+              isOpen={isDropdownOpen && Boolean(searchQuery.trim())}
+              query={searchQuery}
+              categories={categories}
+              onSelectSuggestion={(term) => {
+                setSearchQuery(term);
+                setIsDropdownOpen(false);
+                onClose();
+                router.push(`/search?q=${encodeURIComponent(term)}`);
+              }}
+              onClose={() => {
+                setIsDropdownOpen(false);
+                onClose();
+              }}
+            />
           </div>
 
           {/* Quick Actions: Cart & Wishlist */}

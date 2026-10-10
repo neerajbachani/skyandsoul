@@ -36,7 +36,7 @@ export function Header() {
   return (
     <>
       <header
-        className={`z-30 bg-canvas/95 backdrop-blur-sm transition-shadow duration-300 lg:sticky lg:top-0 ${
+        className={`z-30 bg-canvas/95 backdrop-blur-sm transition-shadow duration-300 lg:top-0 ${
           scrolled ? "lg:shadow-[0_1px_0_rgba(75,50,34,0.08)]" : ""
         }`}
       >

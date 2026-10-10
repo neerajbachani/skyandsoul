@@ -187,9 +187,11 @@ export function EditorialBanner({ content }: { content: EditorialBannerContent }
 
                 const productName = dynamicImage?.name || fallbackProduct.name;
                 const productCategory = dynamicImage?.category || fallbackProduct.category;
-                const productPrice = dynamicImage?.price ?? fallbackProduct.price;
-                const originalPrice = dynamicImage?.originalPrice ?? fallbackProduct.originalPrice;
-                const badge = dynamicImage?.badge || fallbackProduct.badge;
+                const productPrice = typeof dynamicImage?.price === "number" ? dynamicImage.price : fallbackProduct.price;
+                const rawOriginal = dynamicImage?.originalPrice ?? ("originalPrice" in fallbackProduct ? (fallbackProduct as { originalPrice?: number }).originalPrice : undefined);
+                const originalPrice = typeof rawOriginal === "number" ? rawOriginal : undefined;
+                const rawBadge = dynamicImage?.badge || ("badge" in fallbackProduct ? (fallbackProduct as { badge?: string }).badge : undefined);
+                const badge = typeof rawBadge === "string" ? rawBadge : undefined;
                 const targetHref = dynamicImage?.href || fallbackProduct.href;
 
                 const isMobileSwapped = activeViewOverrides[fallbackProduct.id] === 1;

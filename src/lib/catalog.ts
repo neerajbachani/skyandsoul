@@ -43,6 +43,37 @@ export async function listCategories() {
   }));
 }
 
+export async function listCategoriesWithProducts(limitPerCategory = 4) {
+  const categories = await prisma.category.findMany({
+    orderBy: { sortOrder: "asc" },
+    include: {
+      products: {
+        where: { isPublished: true },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+        take: limitPerCategory,
+      },
+      _count: {
+        select: {
+          products: { where: { isPublished: true } },
+        },
+      },
+    },
+  });
+
+  return categories.map((category) => ({
+    ...category,
+    productCount: category._count.products,
+    products: category.products.map((product) => ({
+      ...product,
+      category: {
+        id: category.id,
+        slug: category.slug,
+        name: category.name,
+      },
+    })),
+  }));
+}
+
 export async function getCategoryBySlug(
   slug: string,
   page = 1,

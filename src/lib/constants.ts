@@ -141,18 +141,18 @@ export const HERO_SLIDES = [
     objectPosition: "object-center",
   },
   {
-    eyebrow: "Frames",
-    headline: "A name, a nest, a beginning.",
+    eyebrow: "Little Extras",
+    headline: "Little extras, big charm.",
     subheadline:
-      "Personalized nursery frames, handmade to hold the first details of a life.",
-    cta: "Shop Frames",
-    ctaHref: "/collections/frames",
+      "Tea-time coasters and keychain charms — handmade details for everyday moments.",
+    cta: "Shop Little Extras",
+    ctaHref: "/collections/little-extras",
     image:
-      "https://res.cloudinary.com/dix9x012c/image/upload/v1791178703/Mint_Nursery_Lion_Birth_Announcement_daixnp.png",
+      "https://res.cloudinary.com/dix9x012c/image/upload/v1791615216/Handmade_Tea_Time_Treasures_frcdxd.png",
     imageMobile:
-      "https://res.cloudinary.com/dix9x012c/image/upload/v1788507353/skyandsoul/doc2/frame-welcome-to-the-world.jpg",
+      "https://res.cloudinary.com/dix9x012c/image/upload/v1791615525/Gemini_Generated_Image_hzb7lahzb7lahzb7_wad1ul.png",
     imageAlt:
-      "Mint nursery frame with a crochet lion, balloons, and a birth announcement",
+      "Little Extras hero with crochet keychains, tea coasters, and Little Extras, Shop Now",
     objectPosition: "object-center",
   },
 ] as const;

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MosaicStage } from "@/components/home/MosaicStage";
 import { Reveal } from "@/components/motion/reveal";
+import { RetroCta, RetroThemeKey } from "@/components/ui/retro-cta";
 import { CLOUDINARY } from "@/lib/catalog-images";
 import { collectionHref, productHref } from "@/lib/money";
 
@@ -10,6 +11,8 @@ export type BannerItem = {
   alt: string;
   href: string;
   label: string;
+  eyebrow?: string;
+  theme?: RetroThemeKey;
   objectPosition?: string;
 };
 
@@ -28,6 +31,8 @@ export const PRIMARY_BANNERS: BannerSet = {
     alt: "Baby sitting with handmade crochet toys, including a pilot dog, a boy doll, a yellow dog, and a girl doll in a pink dress",
     href: collectionHref("toys"),
     label: "Toys",
+    eyebrow: "Shop",
+    theme: "white-rust",
     objectPosition: "object-center",
   },
   left: {
@@ -35,12 +40,16 @@ export const PRIMARY_BANNERS: BannerSet = {
     alt: "Mother and baby sitting together on a colorful handmade crochet blanket with a crochet lion and dog",
     href: collectionHref("blankets"),
     label: "Blankets",
+    eyebrow: "Heirloom",
+    theme: "white-rust",
   },
   right: {
     src: CLOUDINARY.littleCurveThird,
     alt: "Little Curve cloud nursery frame with a crochet girl, puppy, flowers, and a name plaque",
     href: collectionHref("frames"),
     label: "Frames",
+    eyebrow: "Memory",
+    theme: "white-rust",
     objectPosition: "object-center",
   },
 };
@@ -50,14 +59,18 @@ export const FEATURED_BANNERS: BannerPair = {
     src: CLOUDINARY.teaCoaster,
     alt: "Photo frame inspired crochet tea coaster",
     href: productHref("crochet-tea-coasters-set-of-4"),
-    label: "Tea Coaster",
+    label: "Coasters",
+    eyebrow: "Artisanal",
+    theme: "white-rust",
     objectPosition: "object-[center_40%]",
   },
   right: {
     src: CLOUDINARY.keychainsShopBanner,
     alt: "Crochet bunny bag charm on a handbag with Bag's Best Friend promotional art",
     href: collectionHref("little-extras"),
-    label: "Keychains",
+    label: "Key Chains",
+    eyebrow: "Shop",
+    theme: "white-rust",
     objectPosition: "object-center",
   },
 };
@@ -119,16 +132,16 @@ function BannerPanel({
           }
         />
       </div>
-      <div className="absolute inset-0 bg-gradient-to-t from-chocolate/35 via-transparent to-transparent" />
-      <span
-        className={`absolute bottom-3 left-1/2 z-10 -translate-x-1/2 truncate bg-white text-center font-sans font-medium uppercase text-chocolate shadow-sm transition-[translate,scale,box-shadow] duration-150 ease-out group-hover:-translate-y-0.5 group-hover:shadow-md group-active:scale-[0.96] motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 motion-reduce:group-active:scale-100 sm:bottom-4 lg:bottom-6 ${
-          wide
-            ? "w-auto min-w-[10rem] px-4 py-2.5 text-[10px] tracking-[0.14em] sm:px-5 sm:py-3 sm:text-[11px] sm:tracking-[0.16em]"
-            : "w-[calc(100%-1.25rem)] px-2.5 py-2 text-[9px] tracking-[0.12em] sm:w-[calc(100%-1.75rem)] sm:px-4 sm:py-2.5 sm:text-[10px] sm:tracking-[0.14em] md:w-auto md:min-w-[10.5rem] lg:min-w-[12rem] lg:px-5 lg:py-3 lg:text-[11px] lg:tracking-[0.16em]"
-        }`}
-      >
-        {banner.label} →
-      </span>
+      <div className="absolute inset-0 bg-gradient-to-t from-chocolate/70 via-chocolate/15 to-transparent pointer-events-none" />
+      <div className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center justify-center text-center pointer-events-none w-full px-2 sm:bottom-4 lg:bottom-6">
+        <RetroCta
+          label={banner.label}
+          eyebrow={banner.eyebrow}
+          size={wide ? "lg" : "md"}
+          theme={banner.theme ?? "white-rust"}
+          underline
+        />
+      </div>
     </Link>
   );
 }

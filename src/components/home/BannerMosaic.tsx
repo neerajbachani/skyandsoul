@@ -71,6 +71,8 @@ type BannerPanelProps = {
   /** Tile height follows the image (contain) or a shared aspect box (cover fills the box). */
   natural?: boolean;
   naturalObjectFit?: "cover" | "contain";
+  /** md+: same portrait tile ratio as collection pair banners, with inset cover (mobile unchanged). */
+  desktopPairTile?: boolean;
 };
 
 function BannerPanel({
@@ -81,16 +83,25 @@ function BannerPanel({
   photoClassName = "absolute inset-x-0 -top-[8%] h-[116%]",
   natural = false,
   naturalObjectFit = "contain",
+  desktopPairTile = false,
 }: BannerPanelProps) {
+  const resolvedPhotoClassName = desktopPairTile
+    ? "absolute inset-x-0 -top-[8%] h-[116%] md:inset-0 md:top-0 md:h-full"
+    : photoClassName;
+
+  const resolvedTileClassName = desktopPairTile
+    ? `md:aspect-[1161/1355] md:w-full ${className}`
+    : className;
+
   return (
     <Link
       href={banner.href}
       data-mosaic-tile
-      className={`group relative block min-h-0 min-w-0 overflow-hidden bg-sky/20 focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth ${className}`}
+      className={`group relative block min-h-0 min-w-0 overflow-hidden bg-sky/20 focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth ${resolvedTileClassName}`}
     >
       <div
         {...(natural ? {} : { "data-mosaic-photo": true })}
-        className={natural ? "absolute inset-0" : photoClassName}
+        className={natural ? "absolute inset-0" : resolvedPhotoClassName}
       >
         <Image
           src={banner.src}
@@ -102,7 +113,9 @@ function BannerPanel({
               ? naturalObjectFit === "cover"
                 ? `object-cover ${banner.objectPosition ?? "object-center"}`
                 : "object-contain object-center"
-              : `object-cover transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100 ${banner.objectPosition ?? "object-center"}`
+              : desktopPairTile
+                ? `object-cover ${banner.objectPosition ?? "object-center"} transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100 md:transition-none md:group-hover:scale-100`
+                : `object-cover transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100 ${banner.objectPosition ?? "object-center"}`
           }
         />
       </div>
@@ -130,9 +143,9 @@ type BannerMosaicProps = {
 /** Blankets image ratio — both bottom collection tiles use this so they align in a row. */
 const collectionPairAspectClass = "aspect-[1161/1355] w-full";
 
-/** Bottom pair keeps its previous share of the mosaic once the wide tile leaves that grid. */
-const sideRowClassName =
-  "grid h-[calc((min(100svh,48rem)-0.5rem)*10/17)] grid-cols-2 gap-2 sm:h-[calc((min(110svh,56rem)-0.75rem)*10/17)] sm:gap-3 md:h-[calc((min(120svh,68rem)-0.75rem)*10/17)] lg:h-[calc((min(132svh,80rem)-1rem)*10/17)] lg:gap-4";
+/** Tea coaster / keychains: viewport-height row on small screens; md+ matches collection pair tile height. */
+const featuredRowStageClassName =
+  "grid h-[calc((min(100svh,48rem)-0.5rem)*10/17)] grid-cols-2 gap-2 sm:h-[calc((min(110svh,56rem)-0.75rem)*10/17)] sm:gap-3 md:h-auto md:items-stretch md:gap-3 lg:gap-4";
 
 export function BannerMosaic({
   banners = PRIMARY_BANNERS,
@@ -197,9 +210,17 @@ export function FeaturedBannerRow({
 }) {
   return (
     <section aria-label={label}>
-      <MosaicStage className={sideRowClassName}>
-        <BannerPanel banner={banners.left} sizes="50vw" />
-        <BannerPanel banner={banners.right} sizes="50vw" />
+      <MosaicStage className={featuredRowStageClassName}>
+        <BannerPanel
+          banner={banners.left}
+          sizes="(min-width: 768px) 50vw, 50vw"
+          desktopPairTile
+        />
+        <BannerPanel
+          banner={banners.right}
+          sizes="(min-width: 768px) 50vw, 50vw"
+          desktopPairTile
+        />
       </MosaicStage>
     </section>
   );

@@ -76,10 +76,11 @@ export function ProductGallery({
   const currentSrc = gallery[displayIndex] ?? gallery[0];
 
   return (
-    <div>
+    <div className="rounded-3xl bg-white p-2.5 sm:p-3.5 ring-1 ring-chocolate/10 shadow-[0_4px_24px_-4px_rgba(75,50,34,0.06)]">
+      {/* Main Image Stage */}
       <div
         ref={mainFrameRef}
-        className="product-gallery-main group/main relative aspect-[4/5] overflow-hidden bg-sky/20"
+        className="product-gallery-main group/main relative aspect-[4/5] overflow-hidden rounded-2xl bg-canvas ring-1 ring-chocolate/5"
         onMouseMove={handleMainMouseMove}
         onMouseLeave={handleMainMouseLeave}
       >
@@ -93,13 +94,22 @@ export function ProductGallery({
             src={currentSrc}
             alt={alt}
             fill
-            sizes="100vw"
+            sizes="(max-width: 1024px) 100vw, 50vw"
             quality={85}
             className="product-gallery-zoom-image pointer-events-none object-cover"
             priority
           />
         </button>
 
+        {/* Floating Provenance Tag */}
+        <div className="absolute left-3 top-3 z-10">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1 font-sans text-[10px] font-medium uppercase tracking-[0.12em] text-chocolate shadow-xs backdrop-blur-md ring-1 ring-chocolate/10">
+            <span className="h-1.5 w-1.5 rounded-full bg-sage" />
+            Jaipur Atelier
+          </span>
+        </div>
+
+        {/* Floating Zoom Action Pill */}
         <button
           ref={zoomButtonRef}
           type="button"
@@ -107,36 +117,41 @@ export function ProductGallery({
             event.stopPropagation();
             openLightbox();
           }}
-          className="absolute bottom-3 left-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-chocolate shadow-md transition-[box-shadow,scale] hover:shadow-lg active:scale-95 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth"
+          className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 font-sans text-xs font-medium text-chocolate shadow-md backdrop-blur-sm transition-all duration-200 hover:bg-white hover:shadow-lg active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-earth"
           aria-label="View larger image"
         >
           <ZoomInIcon />
+          <span>Zoom</span>
         </button>
       </div>
 
+      {/* Thumbnails strip */}
       {gallery.length > 1 ? (
-        <div className="mt-3 grid grid-cols-4 gap-3">
-          {gallery.map((image, index) => (
-            <button
-              key={image + index}
-              type="button"
-              onClick={() => handleThumbClick(index)}
-              className={`relative aspect-square overflow-hidden border transition-colors ${
-                displayIndex === index
-                  ? "border-earth"
-                  : "border-transparent hover:border-chocolate/20"
-              }`}
-              aria-label={`View image ${index + 1}`}
-            >
-              <Image
-                src={image}
-                alt=""
-                fill
-                sizes="120px"
-                className="object-cover"
-              />
-            </button>
-          ))}
+        <div className="mt-3 flex items-center gap-2.5 overflow-x-auto pb-1 pt-0.5">
+          {gallery.map((image, index) => {
+            const isSelected = displayIndex === index;
+            return (
+              <button
+                key={image + index}
+                type="button"
+                onClick={() => handleThumbClick(index)}
+                className={`relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 overflow-hidden rounded-xl transition-all duration-200 ${
+                  isSelected
+                    ? "ring-2 ring-earth ring-offset-2 scale-[1.02] shadow-xs"
+                    : "ring-1 ring-chocolate/15 opacity-70 hover:opacity-100 hover:ring-chocolate/30"
+                }`}
+                aria-label={`View photo ${index + 1}`}
+              >
+                <Image
+                  src={image}
+                  alt=""
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                />
+              </button>
+            );
+          })}
         </div>
       ) : null}
 
@@ -156,12 +171,12 @@ export function ProductGallery({
 function ZoomInIcon() {
   return (
     <svg
-      width="18"
-      height="18"
+      width="15"
+      height="15"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.75"
+      strokeWidth="2"
       aria-hidden="true"
     >
       <circle cx="11" cy="11" r="7" />

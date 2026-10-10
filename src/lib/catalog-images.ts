@@ -28,8 +28,8 @@ const butterCupBlissGallery = [
 ] as const;
 
 const cozyCubGallery = [
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927662/skyandsoul/client-drive/blankets/cozy-cub/dsc00824.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927660/skyandsoul/client-drive/blankets/cozy-cub/dsc00815.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927662/skyandsoul/client-drive/blankets/cozy-cub/dsc00824.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927664/skyandsoul/client-drive/blankets/cozy-cub/dsc00914.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927665/skyandsoul/client-drive/blankets/cozy-cub/dsc00922.jpg",
 ] as const;
@@ -53,24 +53,21 @@ const lavenderBlissGallery = [
 ] as const;
 
 const rainbowNestGallery = [
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927694/skyandsoul/client-drive/blankets/rainbow-nest/dsc00828.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927700/skyandsoul/client-drive/blankets/rainbow-nest/dsc00926-copy.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927696/skyandsoul/client-drive/blankets/rainbow-nest/dsc00830.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927698/skyandsoul/client-drive/blankets/rainbow-nest/dsc00862-copy.jpg",
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927700/skyandsoul/client-drive/blankets/rainbow-nest/dsc00926-copy.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927694/skyandsoul/client-drive/blankets/rainbow-nest/dsc00828.jpg",
 ] as const;
 
 const tinyPawsGallery = [
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927702/skyandsoul/client-drive/blankets/tiny-paws/dsc00781.jpg",
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927704/skyandsoul/client-drive/blankets/tiny-paws/dsc00788.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927707/skyandsoul/client-drive/blankets/tiny-paws/dsc00927.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1791609237/skyandsoul/client-drive/blankets/tiny-paws/dsc00788.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927702/skyandsoul/client-drive/blankets/tiny-paws/dsc00781.jpg",
 ] as const;
 
 const lionKeychainGallery = [
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927709/skyandsoul/client-drive/key-chains/caramel-lion-roar-keychain/dsc00719.jpg",
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927711/skyandsoul/client-drive/key-chains/caramel-lion-roar-keychain/dsc00720.jpg",
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927713/skyandsoul/client-drive/key-chains/caramel-lion-roar-keychain/dsc00721.jpg",
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927721/skyandsoul/client-drive/key-chains/caramel-lion-roar-keychain/dsc00722.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927723/skyandsoul/client-drive/key-chains/caramel-lion-roar-keychain/dsc00723.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927709/skyandsoul/client-drive/key-chains/caramel-lion-roar-keychain/dsc00719.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927725/skyandsoul/client-drive/key-chains/caramel-lion-roar-keychain/dsc00766.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927726/skyandsoul/client-drive/key-chains/caramel-lion-roar-keychain/dsc00902.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927728/skyandsoul/client-drive/key-chains/caramel-lion-roar-keychain/dsc00903.jpg",
@@ -78,9 +75,9 @@ const lionKeychainGallery = [
 ] as const;
 
 const dogKeychainGallery = [
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927733/skyandsoul/client-drive/key-chains/cocoa-cuddle-dog-keychain/dsc00707.jpg",
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927735/skyandsoul/client-drive/key-chains/cocoa-cuddle-dog-keychain/dsc00713.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927737/skyandsoul/client-drive/key-chains/cocoa-cuddle-dog-keychain/dsc00718.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927735/skyandsoul/client-drive/key-chains/cocoa-cuddle-dog-keychain/dsc00713.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927733/skyandsoul/client-drive/key-chains/cocoa-cuddle-dog-keychain/dsc00707.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927740/skyandsoul/client-drive/key-chains/cocoa-cuddle-dog-keychain/dsc00764.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927741/skyandsoul/client-drive/key-chains/cocoa-cuddle-dog-keychain/dsc00767.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927743/skyandsoul/client-drive/key-chains/cocoa-cuddle-dog-keychain/dsc00901.jpg",
@@ -89,9 +86,8 @@ const dogKeychainGallery = [
 ] as const;
 
 const bunnyKeychainGallery = [
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927748/skyandsoul/client-drive/key-chains/cotton-candy-bunny-keychain/dsc00728.jpg",
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927750/skyandsoul/client-drive/key-chains/cotton-candy-bunny-keychain/dsc00729.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927752/skyandsoul/client-drive/key-chains/cotton-candy-bunny-keychain/dsc00765.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927748/skyandsoul/client-drive/key-chains/cotton-candy-bunny-keychain/dsc00728.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927754/skyandsoul/client-drive/key-chains/cotton-candy-bunny-keychain/dsc00769.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927757/skyandsoul/client-drive/key-chains/cotton-candy-bunny-keychain/dsc00904.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927758/skyandsoul/client-drive/key-chains/cotton-candy-bunny-keychain/img-0774.jpg",
@@ -99,16 +95,16 @@ const bunnyKeychainGallery = [
 ] as const;
 
 const donkeyKeychainGallery = [
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927761/skyandsoul/client-drive/key-chains/dotty-donkey-keychain/dsc00734.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927768/skyandsoul/client-drive/key-chains/dotty-donkey-keychain/dsc00907.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927764/skyandsoul/client-drive/key-chains/dotty-donkey-keychain/dsc00763.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927766/skyandsoul/client-drive/key-chains/dotty-donkey-keychain/dsc00773.jpg",
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927768/skyandsoul/client-drive/key-chains/dotty-donkey-keychain/dsc00907.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927761/skyandsoul/client-drive/key-chains/dotty-donkey-keychain/dsc00734.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927771/skyandsoul/client-drive/key-chains/dotty-donkey-keychain/whatsapp-image-2026-09-02-at-7-41-49-am-1.jpg",
 ] as const;
 
 const giraffeKeychainGallery = [
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927775/skyandsoul/client-drive/key-chains/ginger-giraff-keychain/dsc00714.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927777/skyandsoul/client-drive/key-chains/ginger-giraff-keychain/dsc00716.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927775/skyandsoul/client-drive/key-chains/ginger-giraff-keychain/dsc00714.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927781/skyandsoul/client-drive/key-chains/ginger-giraff-keychain/dsc00724.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927783/skyandsoul/client-drive/key-chains/ginger-giraff-keychain/dsc00725.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927785/skyandsoul/client-drive/key-chains/ginger-giraff-keychain/dsc00736.jpg",
@@ -118,18 +114,18 @@ const giraffeKeychainGallery = [
 ] as const;
 
 const stitchKeychainGallery = [
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927795/skyandsoul/client-drive/key-chains/naughty-stitch-keychain/dsc00733.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927801/skyandsoul/client-drive/key-chains/naughty-stitch-keychain/dsc00906.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927796/skyandsoul/client-drive/key-chains/naughty-stitch-keychain/dsc00756.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927799/skyandsoul/client-drive/key-chains/naughty-stitch-keychain/dsc00771.jpg",
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927801/skyandsoul/client-drive/key-chains/naughty-stitch-keychain/dsc00906.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927795/skyandsoul/client-drive/key-chains/naughty-stitch-keychain/dsc00733.jpg",
 ] as const;
 
 const dollKeychainGallery = [
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927804/skyandsoul/client-drive/key-chains/plum-doll-keychain/dsc00731.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927811/skyandsoul/client-drive/key-chains/plum-doll-keychain/dsc00908.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927806/skyandsoul/client-drive/key-chains/plum-doll-keychain/dsc00732.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927808/skyandsoul/client-drive/key-chains/plum-doll-keychain/dsc00761.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927810/skyandsoul/client-drive/key-chains/plum-doll-keychain/dsc00770.jpg",
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927811/skyandsoul/client-drive/key-chains/plum-doll-keychain/dsc00908.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927804/skyandsoul/client-drive/key-chains/plum-doll-keychain/dsc00731.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790927813/skyandsoul/client-drive/key-chains/plum-doll-keychain/img-0771.jpg",
 ] as const;
 
@@ -142,11 +138,11 @@ const crochetBoyToyGallery = [
 ] as const;
 
 const crochetBearToyGallery = [
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790928011/skyandsoul/client-drive/toys/marshmallow-bear-toy/dsc00786.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790928010/skyandsoul/client-drive/toys/marshmallow-bear-toy/dsc00777.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790928005/skyandsoul/client-drive/toys/marshmallow-bear-toy/dsc00741.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790928006/skyandsoul/client-drive/toys/marshmallow-bear-toy/dsc00748.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790928007/skyandsoul/client-drive/toys/marshmallow-bear-toy/dsc00750.jpg",
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790928010/skyandsoul/client-drive/toys/marshmallow-bear-toy/dsc00777.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790928011/skyandsoul/client-drive/toys/marshmallow-bear-toy/dsc00786.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790928013/skyandsoul/client-drive/toys/marshmallow-bear-toy/dsc00952.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790928014/skyandsoul/client-drive/toys/marshmallow-bear-toy/dsc00972.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790928016/skyandsoul/client-drive/toys/marshmallow-bear-toy/whatsapp-image-2026-08-14-at-4-28-47-pm.jpg",
@@ -161,9 +157,9 @@ const crochetPilotBearToyGallery = [
 ] as const;
 
 const crochetLionToyGallery = [
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790928030/skyandsoul/client-drive/toys/simba-lion-toy/dsc00950.jpg",
-  "https://res.cloudinary.com/dix9x012c/image/upload/v1790928026/skyandsoul/client-drive/toys/simba-lion-toy/dsc00752.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790928027/skyandsoul/client-drive/toys/simba-lion-toy/dsc00774.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790928026/skyandsoul/client-drive/toys/simba-lion-toy/dsc00752.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790928030/skyandsoul/client-drive/toys/simba-lion-toy/dsc00950.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790928029/skyandsoul/client-drive/toys/simba-lion-toy/dsc00890.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790928032/skyandsoul/client-drive/toys/simba-lion-toy/dsc00951.jpg",
   "https://res.cloudinary.com/dix9x012c/image/upload/v1790928033/skyandsoul/client-drive/toys/simba-lion-toy/dsc00973.jpg",
@@ -188,6 +184,13 @@ const crochetGirlToyGallery = [
 
 const TEA_CDN = "https://res.cloudinary.com/dix9x012c/image/upload";
 
+const TEA_COASTER_CUSTOM_COVER =
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927828/skyandsoul/client-drive/set-of-4-tea-coaster/bloom-square-set-of-4-white/dsc01022.jpg";
+const TEA_COASTER_SET4_COVER =
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927817/skyandsoul/client-drive/set-of-4-tea-coaster/bloom-square-set-of-4-black/dsc01013.jpg";
+const TEA_COASTER_SET6_COVER =
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927954/skyandsoul/client-drive/set-of-6-tea-coaster/petal-hush-set-of-6-black/dsc01053.jpg";
+
 /**
  * Each design is mapped by what the photo shows. File numbers are not aligned,
  * and several client-drive "set" photos mix two designs, so those are left out.
@@ -197,8 +200,8 @@ const TEA_COASTER_PATTERNS = [
   {
     name: "Blue granny square, light frame",
     individual: [
+      TEA_COASTER_CUSTOM_COVER,
       `${TEA_CDN}/v1789287357/skyandsoul/docs3/tea-coaster-1.png`,
-      "https://res.cloudinary.com/dix9x012c/image/upload/v1790927828/skyandsoul/client-drive/set-of-4-tea-coaster/bloom-square-set-of-4-white/dsc01022.jpg",
     ],
     set4: [`${TEA_CDN}/v1789287393/skyandsoul/docs3/tea-coaster-set4-9.jpg`],
     set6: [`${TEA_CDN}/v1789287413/skyandsoul/docs3/tea-coaster-set6-6.png`],
@@ -210,8 +213,8 @@ const TEA_COASTER_PATTERNS = [
       "https://res.cloudinary.com/dix9x012c/image/upload/v1790927820/skyandsoul/client-drive/set-of-4-tea-coaster/bloom-square-set-of-4-black/dsc01018.jpg",
     ],
     set4: [
+      TEA_COASTER_SET4_COVER,
       `${TEA_CDN}/v1789287392/skyandsoul/docs3/tea-coaster-set4-8.jpg`,
-      "https://res.cloudinary.com/dix9x012c/image/upload/v1790927817/skyandsoul/client-drive/set-of-4-tea-coaster/bloom-square-set-of-4-black/dsc01013.jpg",
     ],
     set6: [
       `${TEA_CDN}/v1789287415/skyandsoul/docs3/tea-coaster-set6-7.png`,
@@ -260,8 +263,8 @@ const TEA_COASTER_PATTERNS = [
     individual: [`${TEA_CDN}/v1789287376/skyandsoul/docs3/tea-coaster-7.png`],
     set4: [`${TEA_CDN}/v1789287382/skyandsoul/docs3/tea-coaster-set4-1.jpg`],
     set6: [
+      TEA_COASTER_SET6_COVER,
       "https://res.cloudinary.com/dix9x012c/image/upload/v1790927948/skyandsoul/client-drive/set-of-6-tea-coaster/petal-hush-set-of-6-black/dsc01051.jpg",
-      "https://res.cloudinary.com/dix9x012c/image/upload/v1790927954/skyandsoul/client-drive/set-of-6-tea-coaster/petal-hush-set-of-6-black/dsc01053.jpg",
     ],
   },
   {
@@ -301,6 +304,16 @@ const TEA_COASTER_PATTERNS = [
     set6: [] as string[],
   },
 ] as const;
+
+function galleryWithCover(images: string[], cover: string): string[] {
+  const index = images.indexOf(cover);
+  if (index <= 0) return images;
+  const next = [...images];
+  const currentFirst = next[0];
+  next[0] = cover;
+  next[index] = currentFirst;
+  return next;
+}
 
 function teaCoasterPhotos(
   pattern: (typeof TEA_COASTER_PATTERNS)[number],
@@ -355,12 +368,14 @@ export const CUSTOMIZE_FRAME_IMAGES = [
 ] as const;
 
 export const CLOUDINARY = {
-  categoryBlankets: rainbowNestGallery[0],
+  categoryBlankets:
+    "https://res.cloudinary.com/dix9x012c/image/upload/v1790927694/skyandsoul/client-drive/blankets/rainbow-nest/dsc00828.jpg",
   categoryToys: crochetLionToyGallery[0],
   categoryFrames:
     "https://res.cloudinary.com/dix9x012c/image/upload/v1788507352/skyandsoul/doc2/frame-memory-nest.jpg",
   categoryFrameItYourWay,
-  categoryLittleExtras: bunnyKeychainGallery[0],
+  categoryLittleExtras:
+    "https://res.cloudinary.com/dix9x012c/image/upload/v1790927748/skyandsoul/client-drive/key-chains/cotton-candy-bunny-keychain/dsc00728.jpg",
   bedtimeBuddies: bedtimeBuddiesGallery[0],
   blanketsShopBanner:
     "https://res.cloudinary.com/dix9x012c/image/upload/v1791562941/Cozy_Mother_and_Baby_Portrait_bansfe.png",
@@ -418,14 +433,19 @@ export const CLOUDINARY = {
   littleWorld:
     "https://res.cloudinary.com/dix9x012c/image/upload/v1788507348/skyandsoul/doc2/frame-little-curve-3.png",
   rattanHeart: framePlaceholder,
-  teaCoasterGallery: TEA_COASTER_PATTERNS.map((pattern) => pattern.individual[0]),
-  teaCoasterSet4Gallery: TEA_COASTER_PATTERNS.map((pattern) =>
-    teaCoasterPhotos(pattern, "set4")[0],
+  teaCoasterGallery: galleryWithCover(
+    TEA_COASTER_PATTERNS.map((pattern) => pattern.individual[0]),
+    TEA_COASTER_CUSTOM_COVER,
   ),
-  teaCoasterSet6Gallery: TEA_COASTER_PATTERNS.map((pattern) =>
-    teaCoasterPhotos(pattern, "set6")[0],
+  teaCoasterSet4Gallery: galleryWithCover(
+    TEA_COASTER_PATTERNS.map((pattern) => teaCoasterPhotos(pattern, "set4")[0]),
+    TEA_COASTER_SET4_COVER,
   ),
-  teaCoaster: TEA_COASTER_PATTERNS[0].individual[1],
+  teaCoasterSet6Gallery: galleryWithCover(
+    TEA_COASTER_PATTERNS.map((pattern) => teaCoasterPhotos(pattern, "set6")[0]),
+    TEA_COASTER_SET6_COVER,
+  ),
+  teaCoaster: TEA_COASTER_PATTERNS[0].individual[0],
   bunnyKeychain: bunnyKeychainGallery[0],
   bunnyKeychainGallery,
   donkeyKeychain: donkeyKeychainGallery[0],
@@ -448,7 +468,7 @@ export const LITTLE_EXTRAS_HERO_SLIDES = [
     alt: "Cotton Candy Bunny Keychain",
   },
   {
-    src: TEA_COASTER_PATTERNS[0].individual[1],
+    src: TEA_COASTER_PATTERNS[0].individual[0],
     alt: "Blue granny square tea coaster with a light frame",
   },
 ] as const;

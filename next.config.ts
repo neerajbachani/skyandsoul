@@ -18,6 +18,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      { source: "/blankets", destination: "/collections/blankets" },
+      { source: "/toys", destination: "/collections/toys" },
+      { source: "/frames", destination: "/collections/frames" },
+      { source: "/little-extras", destination: "/collections/little-extras" },
+    ];
+  },
 };
 
 export default nextConfig;

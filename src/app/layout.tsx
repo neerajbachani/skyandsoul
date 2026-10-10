@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import { SkipToContent } from "@/components/layout/SkipToContent";
+import { retroFont } from "@/app/fonts";
 import { SITE } from "@/lib/constants";
 import { QueryProvider } from "@/providers/QueryProvider";
 import "./globals.css";
@@ -62,7 +63,7 @@ export default function RootLayout({
       lang="en"
       className={`${cormorant.variable} ${sans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-canvas text-chocolate">
+      <body className={`${retroFont.variable} min-h-full flex flex-col bg-canvas text-chocolate`}>
         <QueryProvider>
           <SkipToContent />
           {children}

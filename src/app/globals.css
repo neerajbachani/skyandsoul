@@ -21,6 +21,7 @@
   --color-canvas: #fafaf8;
   --font-sans: var(--font-sans-ui);
   --font-serif: var(--font-cormorant);
+  --font-retro: var(--font-retro), "Lilita One", Impact, "Arial Black", sans-serif;
   --animate-marquee: marquee 45s linear infinite;
   --animate-sky-drift: sky-drift 18s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite
     alternate;
@@ -41,6 +42,15 @@
   }
   to {
     transform: translate3d(8%, -3%, 0);
+  }
+}
+
+@keyframes hero-progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
   }
 }
 

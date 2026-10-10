@@ -124,6 +124,13 @@ const editorialImageSchema = z.object({
   src: imageUrl,
   alt: imageAlt,
   objectPosition: z.string().trim().max(80).optional(),
+  secondarySrc: imageUrl.optional(),
+  name: z.string().trim().max(120).optional(),
+  price: z.number().int().min(0).optional(),
+  originalPrice: z.number().int().min(0).optional(),
+  badge: z.string().trim().max(40).optional(),
+  category: z.string().trim().max(60).optional(),
+  href: siteLink.optional(),
 });
 
 const instagramPostSchema = z.object({
@@ -149,10 +156,10 @@ export const homeContentSchema = z.object({
   }),
   featuredBanners: bannerPairSchema,
   editorial: z.object({
-    eyebrow: z.string().trim().min(1, "Add a gift collage eyebrow").max(80),
-    heading: z.string().trim().min(1, "Add a gift collage heading").max(160),
-    body: z.string().trim().min(1, "Add a gift collage description").max(500),
-    cta: z.string().trim().min(1, "Add a gift collage button label").max(80),
+    eyebrow: z.string().trim().min(1, "Add an editorial eyebrow").max(80),
+    heading: z.string().trim().min(1, "Add an editorial heading").max(160),
+    body: z.string().trim().min(1, "Add an editorial description").max(500),
+    cta: z.string().trim().min(1, "Add an editorial button label").max(80),
     ctaHref: siteLink,
     images: z.tuple([
       editorialImageSchema,

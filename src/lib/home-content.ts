@@ -60,12 +60,32 @@ export function mergeHeroSlidesFromDefaults(content: HomeContent): HomeContent {
   };
 }
 
+/** If DB has legacy gifting copy, migrate to new curated e-commerce copy */
+export function mergeEditorialFromDefaults(content: HomeContent): HomeContent {
+  if (
+    content.editorial.eyebrow === "Gifting" ||
+    content.editorial.heading === "The Perfect Gift for New Beginnings"
+  ) {
+    return {
+      ...content,
+      editorial: {
+        ...DEFAULT_HOME_CONTENT.editorial,
+        images: content.editorial.images,
+      },
+    };
+  }
+  return content;
+}
+
 export async function readHomeContent(): Promise<{ content: HomeContent; saved: boolean }> {
   const row = await prisma.homePage.findUnique({ where: { id: HOME_PAGE_ID } });
   if (!row) return { content: DEFAULT_HOME_CONTENT, saved: false };
   const parsed = homeContentSchema.safeParse(row.content);
   if (!parsed.success) return { content: DEFAULT_HOME_CONTENT, saved: false };
-  return { content: mergeHeroSlidesFromDefaults(parsed.data), saved: true };
+  return {
+    content: mergeEditorialFromDefaults(mergeHeroSlidesFromDefaults(parsed.data)),
+    saved: true,
+  };
 }
 
 async function resolveSpotlight(ids: string[]): Promise<SpotlightProduct[]> {

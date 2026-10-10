@@ -490,7 +490,7 @@ export function HomepageAdmin() {
         </div>
       </Section>
 
-      <Section title="Gift collage" hint="Four images sit beside the gift message.">
+      <Section title="The Curated Edit" hint="Four featured products sit beside the editorial message.">
         <div className="grid gap-3 sm:grid-cols-2">
           <Field
             label="Eyebrow"

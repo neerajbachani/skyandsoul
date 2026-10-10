@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 
 export type HeroSlideContent = {
   id: string;
@@ -16,24 +17,17 @@ export type HeroSlideContent = {
   imageAlt: string;
 };
 
-const AUTOPLAY_MS = 3000;
-const SWIPE_THRESHOLD = 48;
-
-const photoFade =
-  "transition-opacity duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none";
+const AUTOPLAY_MS = 4500;
+const RESUME_DELAY_MS = 4500;
 
 function HeroSlidePicture({
   slide,
-  slideIndex,
-  active,
+  priority = false,
 }: {
   slide: HeroSlideContent;
-  slideIndex: number;
-  active: boolean;
+  priority?: boolean;
 }) {
-  const fade = `${photoFade} ${active ? "opacity-100" : "opacity-0"}`;
-  const alt = active ? slide.imageAlt : "";
-  const priority = slideIndex === 0;
+  const alt = slide.imageAlt;
 
   if (slide.imageMobile) {
     return (
@@ -43,16 +37,18 @@ function HeroSlidePicture({
           alt={alt}
           fill
           priority={priority}
-          sizes="100vw"
-          className={`object-cover object-center md:hidden ${fade}`}
+          sizes="(max-width: 768px) 100vw, 1px"
+          className="object-cover object-center md:hidden"
+          draggable={false}
         />
         <Image
           src={slide.image}
           alt={alt}
           fill
           priority={priority}
-          sizes="100vw"
-          className={`hidden object-cover object-center md:block ${fade}`}
+          sizes="(min-width: 768px) 100vw, 1px"
+          className="hidden object-cover object-center md:block"
+          draggable={false}
         />
       </>
     );
@@ -65,17 +61,20 @@ function HeroSlidePicture({
       fill
       priority={priority}
       sizes="100vw"
-      className={`object-cover object-center ${fade}`}
+      className="object-cover object-center"
+      draggable={false}
     />
   );
 }
 
 function Chevron({
   direction,
-  size = 22,
+  size = 20,
+  className = "",
 }: {
   direction: "prev" | "next";
   size?: number;
+  className?: string;
 }) {
   return (
     <svg
@@ -84,13 +83,14 @@ function Chevron({
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.4"
+      strokeWidth="1.75"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
+      className={className}
     >
       {direction === "prev" ? (
-        <path d="M15 5l-7 7 7 7" />
+        <path d="M15 19l-7-7 7-7" />
       ) : (
         <path d="M9 5l7 7-7 7" />
       )}
@@ -98,38 +98,116 @@ function Chevron({
   );
 }
 
+function PauseIcon({ size = 12 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <rect x="6" y="4" width="4" height="16" rx="1.5" />
+      <rect x="14" y="4" width="4" height="16" rx="1.5" />
+    </svg>
+  );
+}
+
+function PlayIcon({ size = 12 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      className="translate-x-[1px]"
+    >
+      <path d="M6 4.75A1.75 1.75 0 0 1 8.7 3.25l11.25 7.25a1.75 1.75 0 0 1 0 3l-11.25 7.25A1.75 1.75 0 0 1 6 19.25V4.75z" />
+    </svg>
+  );
+}
+
+const slideVariants: Variants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? "100%" : "-100%",
+    opacity: 0.85,
+    scale: 1.02,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    scale: 1,
+    transition: {
+      x: { type: "spring" as const, stiffness: 220, damping: 28, mass: 0.8 },
+      opacity: { duration: 0.4 },
+      scale: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+    },
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? "-100%" : "100%",
+    opacity: 0.85,
+    scale: 0.98,
+    transition: {
+      x: { type: "spring" as const, stiffness: 220, damping: 28, mass: 0.8 },
+      opacity: { duration: 0.4 },
+      scale: { duration: 0.4 },
+    },
+  }),
+};
+
+const reducedVariants: Variants = {
+  enter: { opacity: 0 },
+  center: { opacity: 1, transition: { duration: 0.3 } },
+  exit: { opacity: 0, transition: { duration: 0.3 } },
+};
+
 export function Hero({ slides }: { slides: readonly HeroSlideContent[] }) {
   const count = slides.length;
-  const pointerIdRef = useRef<number | null>(null);
-  const startXRef = useRef(0);
-  const startYRef = useRef(0);
-  const deltaXRef = useRef(0);
-  const draggingRef = useRef(false);
-  const suppressClickRef = useRef(false);
-  const indexRef = useRef(0);
 
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [[page, direction], setPage] = useState<[number, number]>([0, 0]);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isInteracting, setIsInteracting] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [hidden, setHidden] = useState(false);
 
-  const goTo = useCallback(
-    (target: number) => {
-      const next = ((target % count) + count) % count;
-      if (next === indexRef.current) return;
-      indexRef.current = next;
-      setIndex(next);
+  const dragDistanceRef = useRef(0);
+  const resumeTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const activeIndex = count > 0 ? ((page % count) + count) % count : 0;
+  const currentSlide = slides[activeIndex];
+
+  const paginate = useCallback(
+    (newDirection: number) => {
+      setPage(([prevPage]) => [prevPage + newDirection, newDirection]);
     },
-    [count],
+    [],
   );
 
-  const go = useCallback(
-    (delta: number) => {
-      goTo(indexRef.current + delta);
+  const jumpTo = useCallback(
+    (targetIndex: number) => {
+      if (targetIndex === activeIndex) return;
+      let diff = targetIndex - activeIndex;
+      // Choose the shortest visual distance
+      if (diff > count / 2) diff -= count;
+      else if (diff < -count / 2) diff += count;
+      const dir = diff >= 0 ? 1 : -1;
+      setPage(([prevPage]) => [prevPage + diff, dir]);
     },
-    [goTo],
+    [activeIndex, count],
   );
 
+  // Resume autoplay automatically after user stops manually interacting
+  const registerUserInteraction = useCallback(() => {
+    setIsInteracting(true);
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => {
+      setIsInteracting(false);
+    }, RESUME_DELAY_MS);
+  }, []);
+
+  // Motion reduction check
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const sync = () => setReduceMotion(media.matches);
@@ -138,150 +216,200 @@ export function Hero({ slides }: { slides: readonly HeroSlideContent[] }) {
     return () => media.removeEventListener("change", sync);
   }, []);
 
+  // Tab visibility check
   useEffect(() => {
     const sync = () => setHidden(document.hidden);
     document.addEventListener("visibilitychange", sync);
     return () => document.removeEventListener("visibilitychange", sync);
   }, []);
 
+  // Cleanup resume timer
   useEffect(() => {
-    if (paused || reduceMotion || hidden || count < 2) return;
-    const timer = window.setInterval(() => {
-      go(1);
+    return () => {
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    };
+  }, []);
+
+  // Autoplay active state
+  const isAutoplayActive =
+    !isPaused &&
+    !isHovered &&
+    !isInteracting &&
+    !reduceMotion &&
+    !hidden &&
+    count > 1;
+
+  useEffect(() => {
+    if (!isAutoplayActive) return;
+
+    const timer = setInterval(() => {
+      paginate(1);
     }, AUTOPLAY_MS);
-    return () => window.clearInterval(timer);
-  }, [count, go, hidden, index, paused, reduceMotion]);
 
-  function onPointerDown(event: React.PointerEvent<HTMLElement>) {
-    if (event.button !== 0 || count < 2) return;
-    pointerIdRef.current = event.pointerId;
-    startXRef.current = event.clientX;
-    startYRef.current = event.clientY;
-    deltaXRef.current = 0;
-    draggingRef.current = false;
-    suppressClickRef.current = false;
-  }
+    return () => clearInterval(timer);
+  }, [isAutoplayActive, paginate, page]);
 
-  function onPointerMove(event: React.PointerEvent<HTMLElement>) {
-    if (pointerIdRef.current !== event.pointerId) return;
-    const deltaX = event.clientX - startXRef.current;
-    const deltaY = event.clientY - startYRef.current;
-    if (!draggingRef.current) {
-      if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 8) {
-        pointerIdRef.current = null;
-        return;
-      }
-      if (Math.abs(deltaX) < 8) return;
-      draggingRef.current = true;
-      suppressClickRef.current = true;
+  // Only pause on hover if device has genuine pointer hover (no sticky touch hovers)
+  const handleMouseEnter = useCallback(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches
+    ) {
+      setIsHovered(true);
     }
-    deltaXRef.current = deltaX;
-  }
+  }, []);
 
-  function endDrag(event: React.PointerEvent<HTMLElement>) {
-    if (pointerIdRef.current !== event.pointerId) return;
-    const delta = deltaXRef.current;
-    const wasDragging = draggingRef.current;
-    pointerIdRef.current = null;
-    deltaXRef.current = 0;
-    draggingRef.current = false;
-    if (!wasDragging) return;
-    if (delta <= -SWIPE_THRESHOLD) go(1);
-    else if (delta >= SWIPE_THRESHOLD) go(-1);
-  }
-
-  function onClickCapture(event: React.MouseEvent<HTMLElement>) {
-    if (!suppressClickRef.current) return;
-    event.preventDefault();
-    event.stopPropagation();
-    suppressClickRef.current = false;
-  }
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false);
+  }, []);
 
   function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      go(1);
+      paginate(1);
+      registerUserInteraction();
     } else if (event.key === "ArrowLeft") {
       event.preventDefault();
-      go(-1);
+      paginate(-1);
+      registerUserInteraction();
     }
   }
 
-  const navButtonClass =
-    "flex size-11 items-center justify-center text-chocolate transition-colors duration-300 hover:text-earth focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth";
-  const slide = slides[index];
-  if (!slide) return null;
+  if (!count || !currentSlide) return null;
 
   return (
     <section
-      tabIndex={0}
-      className="relative w-full aspect-[4/5] md:aspect-[2/1] touch-pan-y overflow-hidden bg-sky/40 select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-earth"
+      className="relative w-full aspect-[4/5] sm:aspect-[16/10] md:aspect-[2.1/1] overflow-hidden bg-[#f4efe8] select-none touch-pan-y"
       aria-roledescription="carousel"
       aria-label="Featured collections"
-      onFocus={() => setPaused(true)}
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false);
-      }}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={endDrag}
-      onPointerCancel={endDrag}
-      onClickCapture={onClickCapture}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       onKeyDown={onKeyDown}
     >
+      {/* Slide Viewport */}
       <div
-        className="absolute inset-0"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
+        className="relative h-full w-full overflow-hidden"
+        onClickCapture={(e) => {
+          if (dragDistanceRef.current > 12) {
+            e.preventDefault();
+            e.stopPropagation();
+            dragDistanceRef.current = 0;
+          }
+        }}
       >
-        {slides.map((item, slideIndex) => {
-          const active = slideIndex === index;
-          return (
-            <div
-              key={item.id}
-              className={`absolute inset-0 ${active ? "z-[1]" : "pointer-events-none z-0"}`}
-              aria-hidden={!active}
-            >
-              {active && item.ctaHref ? (
-                <Link
-                  href={item.ctaHref}
-                  className="absolute inset-0 block cursor-pointer"
-                  aria-label={`${item.cta} — ${item.eyebrow}`}
-                >
-                  <HeroSlidePicture
-                    slide={item}
-                    slideIndex={slideIndex}
-                    active={active}
-                  />
-                </Link>
-              ) : (
+        <AnimatePresence initial={false} custom={direction}>
+          <motion.div
+            key={page}
+            custom={direction}
+            variants={reduceMotion ? reducedVariants : slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.18}
+            onDragStart={() => {
+              dragDistanceRef.current = 0;
+            }}
+            onDrag={(_, info) => {
+              dragDistanceRef.current = Math.abs(info.offset.x);
+            }}
+            onDragEnd={(_, { offset, velocity }) => {
+              const swipe = Math.abs(offset.x) * velocity.x;
+              if (offset.x < -45 || swipe < -200) {
+                paginate(1);
+                registerUserInteraction();
+              } else if (offset.x > 45 || swipe > 200) {
+                paginate(-1);
+                registerUserInteraction();
+              }
+            }}
+            className="absolute inset-0 h-full w-full"
+          >
+            {currentSlide.ctaHref ? (
+              <Link
+                href={currentSlide.ctaHref}
+                className="relative block h-full w-full cursor-pointer focus-visible:outline-none"
+                tabIndex={0}
+                aria-label={`${currentSlide.cta || "Shop"} — ${currentSlide.headline || currentSlide.eyebrow}`}
+                draggable={false}
+              >
                 <HeroSlidePicture
-                  slide={item}
-                  slideIndex={slideIndex}
-                  active={active}
+                  slide={currentSlide}
+                  priority={page === 0}
                 />
-              )}
-            </div>
-          );
-        })}
+              </Link>
+            ) : (
+              <HeroSlidePicture
+                slide={currentSlide}
+                priority={page === 0}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
-        <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-20 flex items-center justify-center gap-2 bg-gradient-to-t from-chocolate/35 via-chocolate/10 to-transparent pb-2 pt-10 md:bottom-6 md:from-transparent md:via-transparent md:pb-0 md:pt-0">
+      {/* Subtle bottom vignette to ensure pill contrast on all slides */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-chocolate/20 via-chocolate/5 to-transparent z-10"
+        aria-hidden="true"
+      />
+
+      {/* Side Navigation Chevrons */}
+      {count > 1 && (
+        <>
           <button
             type="button"
-            className={`${navButtonClass} max-md:text-white max-md:hover:text-white/85`}
+            onClick={() => {
+              paginate(-1);
+              registerUserInteraction();
+            }}
             aria-label="Previous slide"
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={() => go(-1)}
+            className="absolute left-3 sm:left-6 md:left-8 top-1/2 -translate-y-1/2 z-20 flex size-10 sm:size-12 items-center justify-center rounded-full backdrop-blur-md bg-white/75 hover:bg-white text-chocolate/80 hover:text-chocolate shadow-[0_4px_24px_rgba(75,50,34,0.12)] border border-white/80 transition-all duration-300 hover:scale-105 active:scale-95 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-earth"
           >
-            <Chevron direction="prev" />
+            <Chevron
+              direction="prev"
+              size={20}
+              className="transition-transform duration-200 group-hover:-translate-x-0.5"
+            />
           </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              paginate(1);
+              registerUserInteraction();
+            }}
+            aria-label="Next slide"
+            className="absolute right-3 sm:right-6 md:right-8 top-1/2 -translate-y-1/2 z-20 flex size-10 sm:size-12 items-center justify-center rounded-full backdrop-blur-md bg-white/75 hover:bg-white text-chocolate/80 hover:text-chocolate shadow-[0_4px_24px_rgba(75,50,34,0.12)] border border-white/80 transition-all duration-300 hover:scale-105 active:scale-95 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-earth"
+          >
+            <Chevron
+              direction="next"
+              size={20}
+              className="transition-transform duration-200 group-hover:translate-x-0.5"
+            />
+          </button>
+        </>
+      )}
+
+      {/* Bottom Floating Control Island */}
+      {count > 1 && (
+        <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 sm:gap-3.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full backdrop-blur-xl bg-white/85 hover:bg-white/95 border border-white/80 shadow-[0_8px_32px_rgba(75,50,34,0.14)] transition-all duration-300">
+          {/* Active slide index */}
+          <span className="text-[11px] sm:text-xs font-sans font-semibold tracking-wider text-chocolate/80 tabular-nums select-none">
+            0{activeIndex + 1}
+          </span>
+
+          <span className="h-3 w-px bg-chocolate/15" aria-hidden="true" />
+
+          {/* Slide Indicators with Progress Bar */}
           <div
-            className="flex items-center justify-center gap-1"
+            className="flex items-center gap-1.5"
             role="tablist"
             aria-label="Hero slides"
           >
             {slides.map((item, slideIndex) => {
-              const active = slideIndex === index;
+              const active = slideIndex === activeIndex;
               return (
                 <button
                   key={item.id}
@@ -289,33 +417,59 @@ export function Hero({ slides }: { slides: readonly HeroSlideContent[] }) {
                   role="tab"
                   aria-label={`Go to slide ${slideIndex + 1}`}
                   aria-selected={active}
-                  className="flex size-11 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-earth max-md:focus-visible:outline-white"
-                  onPointerDown={(event) => event.stopPropagation()}
-                  onClick={() => goTo(slideIndex)}
+                  onClick={() => {
+                    jumpTo(slideIndex);
+                    registerUserInteraction();
+                  }}
+                  className="relative flex items-center justify-center py-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-earth"
                 >
-                  <span
-                    className={`block size-2 rounded-full transition-opacity duration-300 max-md:bg-white md:bg-chocolate ${
-                      active ? "opacity-100" : "opacity-30 hover:opacity-55"
-                    }`}
-                  />
+                  {active ? (
+                    <span className="relative block h-1.5 sm:h-2 w-7 sm:w-9 overflow-hidden rounded-full bg-chocolate/20">
+                      <span
+                        key={page}
+                        className="absolute inset-y-0 left-0 bg-chocolate rounded-full"
+                        style={{
+                          animation: isAutoplayActive
+                            ? `hero-progress ${AUTOPLAY_MS}ms linear forwards`
+                            : "none",
+                          width: isAutoplayActive ? undefined : "100%",
+                        }}
+                      />
+                    </span>
+                  ) : (
+                    <span className="block size-1.5 sm:size-2 rounded-full bg-chocolate/30 hover:bg-chocolate/65 transition-all duration-300 hover:scale-125" />
+                  )}
                 </button>
               );
             })}
           </div>
+
+          <span className="h-3 w-px bg-chocolate/15" aria-hidden="true" />
+
+          {/* Total slide count */}
+          <span className="text-[11px] sm:text-xs font-sans text-chocolate/45 tracking-wider tabular-nums select-none">
+            0{count}
+          </span>
+
+          {/* Autoplay Play/Pause Toggle */}
           <button
             type="button"
-            className={`${navButtonClass} max-md:text-white max-md:hover:text-white/85`}
-            aria-label="Next slide"
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={() => go(1)}
+            onClick={() => {
+              setIsPaused((p) => !p);
+              registerUserInteraction();
+            }}
+            aria-label={isPaused ? "Resume slideshow" : "Pause slideshow"}
+            title={isPaused ? "Resume slideshow" : "Pause slideshow"}
+            className="ml-0.5 flex size-5 sm:size-6 items-center justify-center rounded-full text-chocolate/60 hover:text-chocolate transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-earth"
           >
-            <Chevron direction="next" />
+            {isPaused ? <PlayIcon size={10} /> : <PauseIcon size={10} />}
           </button>
         </div>
-      </div>
+      )}
 
+      {/* Screen Reader Announcement */}
       <p className="sr-only" aria-live="polite">
-        {slide.imageAlt}
+        Slide {activeIndex + 1} of {count}: {currentSlide.imageAlt}
       </p>
     </section>
   );

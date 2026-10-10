@@ -27,8 +27,8 @@ export default async function HomePage() {
       <Header />
       <Hero slides={content.hero.slides} />
       <main id="main-content" className="flex-1 overflow-clip">
-      <ValueProps />
-        
+        <ValueProps />
+
         <div className="flex flex-col gap-4 bg-white sm:gap-8 lg:gap-12">
           <BannerMosaic
             banners={content.shopByCollection.banners}
@@ -38,7 +38,7 @@ export default async function HomePage() {
           <FeaturedBannerRow banners={content.featuredBanners} />
         </div>
         <PolaroidGallery products={spotlightProducts} />
-        <BrandStory />
+        {/* <BrandStory /> */}
         <EditorialBanner content={content.editorial} />
         <Testimonials />
         <div className={stageStyles.stage} data-flying-stage>

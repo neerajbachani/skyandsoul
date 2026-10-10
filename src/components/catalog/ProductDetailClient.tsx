@@ -4,8 +4,9 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { PatternPicker } from "@/components/catalog/PatternPicker";
 import { ProductGallery } from "@/components/catalog/ProductGallery";
-import { ProductInfo } from "@/components/catalog/ProductInfo";
+import { ProductEditorialAccordion } from "@/components/catalog/ProductEditorialAccordion";
 import { ProductPurchaseSection } from "@/components/catalog/ProductPurchaseSection";
+import { ProductStickyMobileBar } from "@/components/catalog/ProductStickyMobileBar";
 import type { PackVariant } from "@/components/catalog/PackSizePicker";
 import { patternLabelForIndex } from "@/lib/patterns";
 import {
@@ -34,7 +35,6 @@ type ProductDetailClientProps = {
   singles: string[];
   variants: PackVariant[];
   requiresPatternSelection?: boolean;
-  /** Locks gallery photos to one pack, for products sold as a single set size. */
   fixedPackView?: PackView;
   trackStock?: boolean;
   stockQuantity?: number;
@@ -130,122 +130,167 @@ export function ProductDetailClient({
     );
   }
 
+  const selectedVariant = variants.find((v) => v.id === selectedVariantId);
+  const currentPrice = selectedVariant?.price ?? basePrice;
+  const mainImage = galleryImages[0] ?? singles[0] ?? "/logo.png";
+
   return (
     <>
-      <div>
-        {variants.length > 0 ? (
-          <div className="mb-4 flex flex-wrap gap-2">
-            {requiresPatternSelection ? (
-              <GalleryTab
-                label="Individual designs"
-                active={galleryView === "singles"}
-                onClick={() => handleGalleryTab("singles")}
-              />
+      <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+        {/* Left Column: Sticky Gallery */}
+        <div className="lg:col-span-7">
+          <div className="lg:sticky lg:top-28">
+            {variants.length > 0 ? (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {requiresPatternSelection ? (
+                  <GalleryTab
+                    label="Individual designs"
+                    active={galleryView === "singles"}
+                    onClick={() => handleGalleryTab("singles")}
+                  />
+                ) : null}
+                {variants.map((variant) => (
+                  <GalleryTab
+                    key={variant.id}
+                    label={variant.name}
+                    active={galleryView === variant.id}
+                    onClick={() => handleGalleryTab(variant.id)}
+                  />
+                ))}
+              </div>
             ) : null}
-            {variants.map((variant) => (
-              <GalleryTab
-                key={variant.id}
-                label={variant.name}
-                active={galleryView === variant.id}
-                onClick={() => handleGalleryTab(variant.id)}
-              />
-            ))}
-          </div>
-        ) : null}
-        <ProductGallery
-          key={`${galleryView}-${selectedPatternImage ?? "all"}`}
-          images={galleryImages}
-          alt={imageAlt}
-          onImageSelect={handleGalleryImageSelect}
-        />
-      </div>
 
-      <div>
-        <p className="font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-sage">
-          {categoryName}
-        </p>
-        <h1 className="mt-3 font-serif text-4xl font-medium text-chocolate sm:text-5xl">
-          {productName}
-        </h1>
-        {tagline ? (
-          <p className="mt-4 font-serif text-xl italic text-earth">{tagline}</p>
-        ) : null}
-
-        <dl className="mt-8 grid gap-4 border-y border-chocolate/10 py-6 sm:grid-cols-3">
-          {material ? (
-            <div>
-              <dt className="font-sans text-[10px] uppercase tracking-[0.14em] text-chocolate/50">
-                Material
-              </dt>
-              <dd className="mt-1 font-serif text-base text-chocolate">{material}</dd>
-            </div>
-          ) : null}
-          {size ? (
-            <div>
-              <dt className="font-sans text-[10px] uppercase tracking-[0.14em] text-chocolate/50">
-                Size
-              </dt>
-              <dd className="mt-1 font-serif text-base text-chocolate">{size}</dd>
-            </div>
-          ) : null}
-          {ageRange ? (
-            <div>
-              <dt className="font-sans text-[10px] uppercase tracking-[0.14em] text-chocolate/50">
-                Age
-              </dt>
-              <dd className="mt-1 font-serif text-base text-chocolate">{ageRange}</dd>
-            </div>
-          ) : null}
-        </dl>
-
-        {requiresPatternSelection ? (
-          <div className="mt-8">
-            <PatternPicker
-              patterns={singles}
-              labels={patternLabels}
-              selectedImage={selectedPatternImage}
-              onSelect={handlePatternSelect}
+            <ProductGallery
+              key={`${galleryView}-${selectedPatternImage ?? "all"}`}
+              images={galleryImages}
+              alt={imageAlt}
+              onImageSelect={handleGalleryImageSelect}
             />
           </div>
-        ) : null}
-
-        <div className="mt-8">
-          <ProductPurchaseSection
-            productId={productId}
-            productName={productName}
-            basePrice={basePrice}
-            trackStock={trackStock}
-            stockQuantity={stockQuantity}
-            variants={variants}
-            selectedVariantId={selectedVariantId}
-            onVariantChange={handleVariantSelect}
-            requirePattern={requiresPatternSelection}
-            selectedPatternImage={selectedPatternImage}
-            selectedPatternLabel={selectedPatternLabel}
-            pickerLabel={
-              requiresPatternSelection ? "Choose pack size" : "Choose style"
-            }
-          />
         </div>
 
-        <p className="mt-3">
-          <Link
-            href={`/collections/${categorySlug}`}
-            className="font-sans text-xs font-medium uppercase tracking-[0.14em] text-earth underline underline-offset-[6px]"
-          >
-            More in {categoryName}
-          </Link>
-        </p>
-        <p className="mt-4 font-sans text-xs text-chocolate/55">
-          Secure checkout with Razorpay. Sign in to complete your order.
-        </p>
+        {/* Right Column: Sticky Purchase Details */}
+        <div className="lg:col-span-5 flex flex-col justify-between">
+          <div>
+            {/* Provenance & Category */}
+            <div className="flex items-center gap-2.5">
+              <Link
+                href={`/collections/${categorySlug}`}
+                className="font-sans text-[11px] font-semibold uppercase tracking-[0.18em] text-sage hover:underline"
+              >
+                {categoryName}
+              </Link>
+              <span className="h-1 w-1 rounded-full bg-chocolate/30" />
+              <span className="font-sans text-[10px] uppercase tracking-wider text-chocolate/50">
+                Artisanal Heirloom
+              </span>
+            </div>
 
-        <ProductInfo
-          description={description}
-          features={features}
-          careInstructions={careInstructions}
-        />
+            {/* Product Title */}
+            <h1 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-chocolate leading-[1.08] text-balance">
+              {productName}
+            </h1>
+
+            {/* Poetic Tagline */}
+            {tagline ? (
+              <p className="mt-3 font-serif text-xl italic text-earth leading-snug">
+                {tagline}
+              </p>
+            ) : null}
+
+            {/* Free Shipping & Reassurance Pill */}
+            <div className="mt-5 flex items-center gap-3 rounded-xl border border-sage/20 bg-sage/5 p-3 text-xs text-chocolate/80">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sage/20 text-sage font-bold">
+                ✓
+              </span>
+              <span>
+                Free shipping Pan-India on orders above ₹999 · Includes complimentary gift box
+              </span>
+            </div>
+
+            {/* Pattern Picker if applicable */}
+            {requiresPatternSelection ? (
+              <div className="mt-7">
+                <PatternPicker
+                  patterns={singles}
+                  labels={patternLabels}
+                  selectedImage={selectedPatternImage}
+                  onSelect={handlePatternSelect}
+                />
+              </div>
+            ) : null}
+
+            {/* Purchase CTA, Quantity, & Variant selector */}
+            <div className="mt-7">
+              <ProductPurchaseSection
+                productId={productId}
+                productName={productName}
+                basePrice={basePrice}
+                trackStock={trackStock}
+                stockQuantity={stockQuantity}
+                variants={variants}
+                selectedVariantId={selectedVariantId}
+                onVariantChange={handleVariantSelect}
+                requirePattern={requiresPatternSelection}
+                selectedPatternImage={selectedPatternImage}
+                selectedPatternLabel={selectedPatternLabel}
+                pickerLabel={
+                  requiresPatternSelection ? "Choose pack size" : "Choose option"
+                }
+              />
+            </div>
+
+            {/* Trust and Help link */}
+            <div className="mt-4 flex items-center justify-between border-t border-chocolate/10 pt-3 font-sans text-xs text-chocolate/60">
+              <span>Secure Razorpay Checkout</span>
+              <Link
+                href="/contact"
+                className="font-medium text-earth underline underline-offset-4 hover:text-chocolate"
+              >
+                Need custom sizing?
+              </Link>
+            </div>
+
+            {/* Structured Heirloom Accordion */}
+            <ProductEditorialAccordion
+              description={description}
+              features={features}
+              careInstructions={careInstructions}
+              material={material}
+              size={size}
+              ageRange={ageRange}
+            />
+
+            {/* Jaipur Studio Guarantee Seal */}
+            <div className="mt-8 rounded-2xl border border-chocolate/10 bg-[#f9f7f4] p-5">
+              <div className="flex items-start gap-3.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-earth text-white font-serif text-xs font-semibold">
+                  SN
+                </div>
+                <div>
+                  <h4 className="font-serif text-base font-medium text-chocolate">
+                    The Sky n Soul Atelier Promise
+                  </h4>
+                  <p className="mt-1 font-serif text-xs leading-relaxed text-chocolate/75">
+                    Every piece is crafted in small batches by our women artisans in Jaipur, Rajasthan. No shortcuts, no machine compromises — just genuine heirloom craftsmanship.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Mobile Sticky Purchase Bar */}
+      <ProductStickyMobileBar
+        productName={productName}
+        price={currentPrice}
+        image={mainImage}
+        onAddToCart={() => {
+          // Smooth scroll to buy section on mobile
+          window.scrollTo({ top: 380, behavior: "smooth" });
+        }}
+      />
     </>
   );
 }
@@ -263,10 +308,10 @@ function GalleryTab({
     <button
       type="button"
       onClick={onClick}
-      className={`border px-3 py-2 font-sans text-[11px] font-medium uppercase tracking-[0.12em] transition-colors ${
+      className={`rounded-full px-4 py-1.5 font-sans text-xs font-medium uppercase tracking-[0.12em] transition-all duration-200 ${
         active
-          ? "border-earth bg-earth/5 text-chocolate"
-          : "border-chocolate/15 bg-white text-chocolate/60 hover:border-earth/40 hover:text-chocolate"
+          ? "bg-earth text-white shadow-xs"
+          : "border border-chocolate/15 bg-white text-chocolate/70 hover:border-chocolate/30 hover:text-chocolate"
       }`}
     >
       {label}

@@ -16,14 +16,21 @@ export function useDebouncedValue<T>(value: T, delay = 300) {
   return debounced;
 }
 
-export function useSearch(query: string) {
+export function useSearch(
+  queryOrParams: string | { query: string; category?: string },
+) {
+  const query =
+    typeof queryOrParams === "string" ? queryOrParams : queryOrParams.query;
+  const category =
+    typeof queryOrParams === "string" ? undefined : queryOrParams.category;
   const debounced = useDebouncedValue(query.trim(), 300);
 
   return useQuery({
-    queryKey: queryKeys.search(debounced),
+    queryKey: ["search", debounced, category ?? "all"] as const,
     queryFn: () =>
       fetchProducts({
         search: debounced,
+        category: category || undefined,
         limit: 24,
       }),
     enabled: debounced.length >= 2,

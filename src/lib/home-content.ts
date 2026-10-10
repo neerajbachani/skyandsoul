@@ -60,21 +60,35 @@ export function mergeHeroSlidesFromDefaults(content: HomeContent): HomeContent {
   };
 }
 
-/** If DB has legacy gifting copy, migrate to new curated e-commerce copy */
+const PREVIOUS_EDITORIAL_IMAGE_SRCS = new Set([
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927694/skyandsoul/client-drive/blankets/rainbow-nest/dsc00828.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790928032/skyandsoul/client-drive/toys/simba-lion-toy/dsc00951.jpg",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1788507348/skyandsoul/doc2/frame-little-curve-3.png",
+  "https://res.cloudinary.com/dix9x012c/image/upload/v1790927752/skyandsoul/client-drive/key-chains/cotton-candy-bunny-keychain/dsc00765.jpg",
+]);
+
+function usesPreviousEditorialImages(content: HomeContent) {
+  return content.editorial.images.every((image) => PREVIOUS_EDITORIAL_IMAGE_SRCS.has(image.src));
+}
+
+/** If DB has legacy gifting copy or the previous editorial product photos, use the current edit. */
 export function mergeEditorialFromDefaults(content: HomeContent): HomeContent {
-  if (
+  const legacyCopy =
     content.editorial.eyebrow === "Gifting" ||
-    content.editorial.heading === "The Perfect Gift for New Beginnings"
-  ) {
-    return {
-      ...content,
-      editorial: {
-        ...DEFAULT_HOME_CONTENT.editorial,
-        images: content.editorial.images,
-      },
-    };
-  }
-  return content;
+    content.editorial.heading === "The Perfect Gift for New Beginnings";
+  const legacyImages = usesPreviousEditorialImages(content);
+
+  if (!legacyCopy && !legacyImages) return content;
+
+  return {
+    ...content,
+    editorial: legacyCopy
+      ? DEFAULT_HOME_CONTENT.editorial
+      : {
+          ...content.editorial,
+          images: DEFAULT_HOME_CONTENT.editorial.images,
+        },
+  };
 }
 
 export async function readHomeContent(): Promise<{ content: HomeContent; saved: boolean }> {
